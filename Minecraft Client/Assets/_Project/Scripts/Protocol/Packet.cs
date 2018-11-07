@@ -30,6 +30,6 @@ public class Packet
 
 	public override string ToString()
 	{
-		return $"Lenngth: {Length} ID: {PacketID} Data (raw): {BitConverter.ToString(Payload)}";
+		return $"Length: {Length} ID: {PacketID} Data (raw): {BitConverter.ToString(Payload)}";
 	}
 }

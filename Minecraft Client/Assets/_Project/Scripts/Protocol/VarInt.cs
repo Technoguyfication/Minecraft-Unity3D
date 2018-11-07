@@ -14,8 +14,8 @@ public class VarInt
 	public static int Read(List<byte> bytes)
 	{
 		int value = 0, numRead = 0, result = 0;
-		byte read = bytes.Read(1)[0];
-		while ((read & 0x80) != 0)
+		byte read;
+		while (true)
 		{
 			read = bytes.Read(1)[0];
 			value = (read & 0x7F);
@@ -24,6 +24,7 @@ public class VarInt
 			numRead++;
 			if (numRead > 5)
 				throw new UnityException("VarInt too big!");
+			if ((read & 0x80) != 0) break;
 		}
 		return result;
 	}

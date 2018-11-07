@@ -102,10 +102,10 @@ public class NetworkClient
 	private int ReadNextVarInt()
 	{
 		int value = 0, numRead = 0, result = 0;
-		byte read = ReadBytes(1)[0];
+		byte read;
 		lock (StreamReadLock)
 		{
-			while ((read & 0x80) != 0)
+			while (true)
 			{
 				read = ReadBytes(1)[0];
 				value = (read & 0x7F);
@@ -114,6 +114,8 @@ public class NetworkClient
 				numRead++;
 				if (numRead > 5)
 					throw new UnityException("VarInt too big!");
+
+				if ((read & 0x80) != 128) break;
 			}
 		}
 		return result;

@@ -21,8 +21,8 @@ public class VarLong : MonoBehaviour {
 	{
 		int numRead = 0;
 		long value = 0, result = 0;
-		byte read = bytes[0];
-		while ((read & 0x80) != 0)
+		byte read;
+		while (true)
 		{
 			read = bytes[numRead];
 			value = (read & 0x7F);
@@ -31,6 +31,7 @@ public class VarLong : MonoBehaviour {
 			numRead++;
 			if (numRead > 10)
 				throw new UnityException("VarLong too big!");
+			if ((read & 0x80) != 128) break;
 		}
 		return result;
 	}

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -17,5 +18,21 @@ public static class Utility {
 		data.RemoveRange(index, amount);
 
 		return subset;
+	}
+
+	public static T[] ReverseIfLittleEndian<T>(this T[] array)
+	{
+		if (BitConverter.IsLittleEndian)
+			Array.Reverse(array);
+
+		return array;
+	}
+
+	public static List<T> ReverseIfLittleEndian<T>(this List<T> list)
+	{
+		if (BitConverter.IsLittleEndian)
+			list.Reverse();
+
+		return list;
 	}
 }
