@@ -1,17 +1,18 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
 // https://wiki.vg/Protocol#Definitions
-public class VarInt
+public static class VarInt
 {
 	/// <summary>
-	/// Reads the next VarInt from a list/>
+	/// Reads the next VarInt from a list
 	/// </summary>
 	/// <param name="bytes"></param>
 	/// <returns></returns>
-	public static int Read(List<byte> bytes)
+	public static int ReadNext(List<byte> bytes)
 	{
 		int value = 0, numRead = 0, result = 0;
 		byte read;
@@ -30,7 +31,30 @@ public class VarInt
 	}
 
 	/// <summary>
-	/// 
+	/// Reads the next VarInt from a stream
+	/// </summary>
+	/// <returns></returns>
+	public static int ReadNext(Utility.ReadBytes readFunction)
+	{
+		int value = 0, numRead = 0, result = 0;
+		byte read;
+		while (true)
+		{
+			read = readFunction(1)[0];
+			value = (read & 0x7F);
+			result |= (value << (7 * numRead));
+
+			numRead++;
+			if (numRead > 5)
+				throw new UnityException("VarInt too big!");
+
+			if ((read & 0x80) != 128) break;
+		}
+		return result;
+	}
+
+	/// <summary>
+	/// Turns an int into varint bytes
 	/// </summary>
 	/// <param name="value"></param>
 	/// <returns></returns>

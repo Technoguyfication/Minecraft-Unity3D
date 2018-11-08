@@ -4,25 +4,24 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
-public class test : MonoBehaviour {
+public class Test : MonoBehaviour
+{
+
+	public string address = "localhost";
+	public int port = 25565;
 
 	// Use this for initialization
-	void Start () {
+	void Start()
+	{
 		NetworkClient client = new NetworkClient();
-		client.Client.Connect("localhost", 25565);
+		client.Client.Connect(address, port);
 
-		List<byte> payload = new List<byte>();
-		payload.AddRange(VarInt.GetBytes(404));
-		byte[] stringRaw = Encoding.Unicode.GetBytes("127.0.0.1");
-		payload.AddRange(VarInt.GetBytes(stringRaw.Length));
-		payload.AddRange(stringRaw);
-		payload.AddRange(BitConverter.GetBytes((short)25565).ReverseIfLittleEndian());
-		payload.AddRange(VarInt.GetBytes(1));
-
-		Packet p = new Packet()
+		var p = new HandshakePacket()
 		{
-			PacketID = 1,
-			Payload = payload.ToArray()
+			Address = address,
+			Port = (ushort)port,
+			ProtocolVersion = 404,
+			NextState = HandshakePacket.NextStateEnum.STATUS
 		};
 
 		Debug.Log(p);
@@ -32,9 +31,10 @@ public class test : MonoBehaviour {
 
 		Debug.Log(_p);
 	}
-	
+
 	// Update is called once per frame
-	void Update () {
-		
+	void Update()
+	{
+
 	}
 }

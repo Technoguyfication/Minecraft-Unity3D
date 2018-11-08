@@ -50,7 +50,7 @@ public class NetworkClient
 	{
 		lock (StreamWriteLock)
 		{
-			byte[] buffer = p.Raw;
+			byte[] buffer = Packet.GetRaw(p);
 			Write(buffer, 0, buffer.Length);
 		}
 	}
@@ -81,43 +81,19 @@ public class NetworkClient
 
 		lock (StreamReadLock)
 		{
-			length = ReadNextVarInt();
+			length = VarInt.ReadNext(ReadBytes);
 			List<byte> buffer = new List<byte>(ReadBytes(length));
-			packetId = VarInt.Read(buffer);
+			packetId = VarInt.ReadNext(buffer);
 			data = buffer.ToArray();
 		}
 
-		return new Packet()
+		//todo: cast these based on packet id
+
+		return new GenericPacket()
 		{
 			PacketID = packetId,
 			Payload = data
 		};
 
-	}
-
-	/// <summary>
-	/// Reads the next VarInt from the server
-	/// </summary>
-	/// <returns></returns>
-	private int ReadNextVarInt()
-	{
-		int value = 0, numRead = 0, result = 0;
-		byte read;
-		lock (StreamReadLock)
-		{
-			while (true)
-			{
-				read = ReadBytes(1)[0];
-				value = (read & 0x7F);
-				result |= (value << (7 * numRead));
-
-				numRead++;
-				if (numRead > 5)
-					throw new UnityException("VarInt too big!");
-
-				if ((read & 0x80) != 128) break;
-			}
-		}
-		return result;
 	}
 }
