@@ -16,17 +16,21 @@ public class Test : MonoBehaviour
 		NetworkClient client = new NetworkClient();
 		client.Client.Connect(address, port);
 
-		var p = new HandshakePacket()
+		Packet[] packets = new Packet[] {
+		new HandshakePacket()
 		{
 			Address = address,
 			Port = (ushort)port,
 			ProtocolVersion = 404,
-			NextState = HandshakePacket.NextStateEnum.STATUS
+			NextState = NetworkClient.ProtocolState.STATUS
+		},
+		new RequestPacket()
 		};
 
-		Debug.Log(p);
+		client.WritePackets(packets);
+		// state has been set to status
+		client.State = NetworkClient.ProtocolState.STATUS;
 
-		client.WritePacket(p);
 		var _p = client.ReadNextPacket();
 
 		Debug.Log(_p);

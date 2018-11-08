@@ -25,7 +25,7 @@ public static class VarInt
 			numRead++;
 			if (numRead > 5)
 				throw new UnityException("VarInt too big!");
-			if ((read & 0x80) != 0) break;
+			if ((read & 0x80) != 128) break;
 		}
 		return result;
 	}

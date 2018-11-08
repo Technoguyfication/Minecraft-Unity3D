@@ -30,12 +30,5 @@ public class HandshakePacket : Packet
 	public int ProtocolVersion { get; set; }
 	public string Address { get; set; }
 	public ushort Port { get; set; }
-	public NextStateEnum NextState { get; set; }
-
-	public enum NextStateEnum
-	{
-		STATUS = 1,
-		LOGIN = 2
-	}
-
+	public NetworkClient.ProtocolState NextState { get; set; }
 }

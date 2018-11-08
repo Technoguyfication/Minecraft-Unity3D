@@ -6,12 +6,14 @@ using UnityEngine;
 public class NetworkClient
 {
 	public TcpClient Client = new TcpClient();
+	public ProtocolState State;
+
 	private readonly object StreamReadLock = new object();
 	private readonly object StreamWriteLock = new object();
 
 	public NetworkClient()
 	{
-
+		State = ProtocolState.HANDSHAKING;
 	}
 
 	/// <summary>
@@ -56,6 +58,18 @@ public class NetworkClient
 	}
 
 	/// <summary>
+	/// Writes multiple packets
+	/// </summary>
+	/// <param name="packets"></param>
+	public void WritePackets(ICollection<Packet> packets)
+	{
+		foreach (var packet in packets)
+		{
+			WritePacket(packet);
+		}
+	}
+
+	/// <summary>
 	/// Sends bytes to the server
 	/// </summary>
 	/// <param name="buffer"></param>
@@ -77,23 +91,42 @@ public class NetworkClient
 	{
 		int length;
 		int packetId;
-		byte[] data;
+		byte[] payload;
 
 		lock (StreamReadLock)
 		{
 			length = VarInt.ReadNext(ReadBytes);
 			List<byte> buffer = new List<byte>(ReadBytes(length));
 			packetId = VarInt.ReadNext(buffer);
-			data = buffer.ToArray();
+			payload = buffer.ToArray();
 		}
 
-		//todo: cast these based on packet id
-
-		return new GenericPacket()
+		switch (State)
 		{
-			PacketID = packetId,
-			Payload = data
-		};
+			case ProtocolState.STATUS:
+				switch (packetId)
+				{
+					case 0x00: return new ResponsePacket() { Payload = payload };
+					case 0x01: return new PingPongPacket() { Payload = payload };
+				}
+				break;
+			case ProtocolState.LOGIN:
+				switch (packetId)
+				{
 
+				}
+				break;
+		}
+
+		// no clue what the packet is.. return it anyways
+		return new GenericPacket { PacketID = packetId, Payload = payload };
+	}
+
+	public enum ProtocolState
+	{
+		HANDSHAKING,
+		STATUS = 1,
+		LOGIN = 2,
+		PLAY
 	}
 }
