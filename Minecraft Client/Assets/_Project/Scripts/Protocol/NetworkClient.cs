@@ -1,19 +1,86 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Net.Sockets;
+using System.Threading.Tasks;
+using System.Threading;
 using UnityEngine;
 
-public class NetworkClient
+public class NetworkClient : IDisposable
 {
-	public TcpClient Client = new TcpClient();
+	/// <summary>
+	/// See: https://wiki.vg/Protocol_version_numbers
+	/// </summary>
+	public const int PROTOCOL_VERSION = 404;
+
 	public ProtocolState State;
 
+	/// <summary>
+	/// Gets whether the client is connected to a server or not
+	/// </summary>
+	public bool Connected { get { return Client?.Connected ?? false; } }
+
+	private TcpClient Client;
 	private readonly object StreamReadLock = new object();
 	private readonly object StreamWriteLock = new object();
 
 	public NetworkClient()
 	{
 		State = ProtocolState.HANDSHAKING;
+	}
+
+	~NetworkClient()
+	{
+		Dispose();
+	}
+
+	public void Dispose()
+	{
+		if (Client?.Connected ?? false)
+			Disconnect();
+
+		Client?.Dispose();
+	}
+
+	/// <summary>
+	/// Connect to a Minecraft server, will throw a <see cref="UnityException"/> if it is already connected to a server.
+	/// </summary>
+	/// <param name="hostname"></param>
+	/// <param name="port"></param>
+	public void Connect(string hostname, int port)
+	{
+		if (Client?.Connected ?? false)
+			throw new UnityException("Need to disconnect first!");
+
+		Client = new TcpClient();
+		Client.Connect(hostname, port);
+	}
+
+	/// <summary>
+	/// Starts connecting to a server
+	/// </summary>
+	/// <param name="hostname"></param>
+	/// <param name="port"></param>
+	public void StartConnect(string hostname, int port)
+	{
+		if (Client?.Connected ?? false)
+			throw new UnityException("Need to disconnect first!");
+
+		Client = new TcpClient();
+		Client.ConnectAsync(hostname, port);
+	}
+
+	/// <summary>
+	/// Disconnect from a server, sending the correct packets if needed
+	/// </summary>
+	public void Disconnect()
+	{
+		// TODO: use the correct protocol for disconnecting
+
+		if (!Client.Connected)
+			return;
+
+		Client.Dispose();
 	}
 
 	/// <summary>
@@ -87,7 +154,7 @@ public class NetworkClient
 	/// Gets the next packet from the server
 	/// </summary>
 	/// <returns></returns>
-	public Packet ReadNextPacket()
+	public PacketData ReadNextPacket()
 	{
 		int length;
 		int packetId;
@@ -101,25 +168,11 @@ public class NetworkClient
 			payload = buffer.ToArray();
 		}
 
-		switch (State)
+		return new PacketData
 		{
-			case ProtocolState.STATUS:
-				switch (packetId)
-				{
-					case 0x00: return new ResponsePacket() { Payload = payload };
-					case 0x01: return new PingPongPacket() { Payload = payload };
-				}
-				break;
-			case ProtocolState.LOGIN:
-				switch (packetId)
-				{
-
-				}
-				break;
-		}
-
-		// no clue what the packet is.. return it anyways
-		return new GenericPacket { PacketID = packetId, Payload = payload };
+			ID = packetId,
+			Payload = payload
+		};
 	}
 
 	public enum ProtocolState

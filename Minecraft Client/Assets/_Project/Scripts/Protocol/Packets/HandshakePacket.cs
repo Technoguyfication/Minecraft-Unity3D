@@ -27,7 +27,7 @@ public class HandshakePacket : Packet
 		}
 	}
 
-	public int ProtocolVersion { get; set; }
+	public int ProtocolVersion { get; set; } = NetworkClient.PROTOCOL_VERSION;
 	public string Address { get; set; }
 	public ushort Port { get; set; }
 	public NetworkClient.ProtocolState NextState { get; set; }

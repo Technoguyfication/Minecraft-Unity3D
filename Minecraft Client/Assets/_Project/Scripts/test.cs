@@ -13,27 +13,28 @@ public class Test : MonoBehaviour
 	// Use this for initialization
 	void Start()
 	{
-		NetworkClient client = new NetworkClient();
-		client.Client.Connect(address, port);
-
-		Packet[] packets = new Packet[] {
-		new HandshakePacket()
+		using (NetworkClient client = new NetworkClient())
 		{
-			Address = address,
-			Port = (ushort)port,
-			ProtocolVersion = 404,
-			NextState = NetworkClient.ProtocolState.STATUS
-		},
-		new RequestPacket()
-		};
+			client.Connect(address, port);
 
-		client.WritePackets(packets);
-		// state has been set to status
-		client.State = NetworkClient.ProtocolState.STATUS;
+			Packet[] packets = new Packet[] {
+				new HandshakePacket()
+				{
+					Address = address,
+					Port = (ushort)port,
+					NextState = NetworkClient.ProtocolState.STATUS
+				},
+				new RequestPacket()
+			};
 
-		var _p = client.ReadNextPacket();
+			client.WritePackets(packets);
+			// state has been set to status
+			client.State = NetworkClient.ProtocolState.STATUS;
 
-		Debug.Log(_p);
+			var _p = client.ReadNextPacket();
+
+			Debug.Log(_p);
+		}
 	}
 
 	// Update is called once per frame
