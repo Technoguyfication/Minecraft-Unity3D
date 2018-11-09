@@ -31,9 +31,10 @@ public class Test : MonoBehaviour
 			// state has been set to status
 			client.State = NetworkClient.ProtocolState.STATUS;
 
-			var _p = client.ReadNextPacket();
+			var packetData = client.ReadNextPacket();
+			var response = new ResponsePacket(packetData);
 
-			Debug.Log(_p);
+			Debug.Log(response);
 		}
 	}
 

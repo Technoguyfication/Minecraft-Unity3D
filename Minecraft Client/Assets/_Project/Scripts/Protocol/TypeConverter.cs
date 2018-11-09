@@ -17,7 +17,7 @@ public static class TypeConverter
 	{
 		int strLen = VarInt.ReadNext(bytes);
 		var strRaw = bytes.Read(strLen);
-		return Encoding.Unicode.GetString(strRaw.ToArray());
+		return Encoding.UTF8.GetString(strRaw.ToArray());
 	}
 
 	public static byte[] GetBytes(string data)

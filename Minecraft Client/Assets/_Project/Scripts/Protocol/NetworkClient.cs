@@ -57,20 +57,6 @@ public class NetworkClient : IDisposable
 	}
 
 	/// <summary>
-	/// Starts connecting to a server
-	/// </summary>
-	/// <param name="hostname"></param>
-	/// <param name="port"></param>
-	public void StartConnect(string hostname, int port)
-	{
-		if (Client?.Connected ?? false)
-			throw new UnityException("Need to disconnect first!");
-
-		Client = new TcpClient();
-		Client.ConnectAsync(hostname, port);
-	}
-
-	/// <summary>
 	/// Disconnect from a server, sending the correct packets if needed
 	/// </summary>
 	public void Disconnect()

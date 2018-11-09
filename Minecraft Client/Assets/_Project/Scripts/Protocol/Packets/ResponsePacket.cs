@@ -9,6 +9,13 @@ using System.Threading.Tasks;
 /// </summary>
 public class ResponsePacket : Packet
 {
+	public ResponsePacket()
+	{
+
+	}
+
+	public ResponsePacket(PacketData data) : base(data) { }
+
 	public override byte[] Payload
 	{
 		get

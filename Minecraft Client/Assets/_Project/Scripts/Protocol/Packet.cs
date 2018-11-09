@@ -15,6 +15,21 @@ public abstract class Packet
 	public int PacketID { get; set; }
 	public abstract byte[] Payload { get; set; }
 
+	public Packet()
+	{
+
+	}
+
+	/// <summary>
+	/// Create a packet using a <see cref="PacketData"/> object
+	/// </summary>
+	/// <param name="data"></param>
+	protected Packet(PacketData data)
+	{
+		PacketID = data.ID;
+		Payload = data.Payload;
+	}
+
 	public override string ToString()
 	{
 		return $"Length: {Length} ID: {PacketID} Data (raw): {BitConverter.ToString(Payload)}";

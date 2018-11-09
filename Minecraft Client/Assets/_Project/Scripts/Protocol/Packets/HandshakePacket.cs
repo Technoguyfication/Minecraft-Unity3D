@@ -10,6 +10,8 @@ public class HandshakePacket : Packet
 		PacketID = 0x00;
 	}
 
+	public HandshakePacket(PacketData data) : base(data) { }
+
 	public override byte[] Payload
 	{
 		get
