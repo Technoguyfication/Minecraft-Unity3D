@@ -32,7 +32,7 @@ public struct BlockPos
 		return new BlockPos()
 		{
 			X = X % 16,
-			Y = Y % 16,
+			Y = Y,
 			Z = Z % 16
 		};
 	}

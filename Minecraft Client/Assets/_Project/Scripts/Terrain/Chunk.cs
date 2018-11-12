@@ -25,9 +25,9 @@ public class Chunk
 	/// <summary>
 	/// Blocks stored in chunks as WXYZ where W = chunk index in column and XYZ are block coords relative to chunk
 	/// </summary>
-	private readonly Block[,,,] _blocks = new Block[16, 16, 16, 16];
-	private readonly int[,,,] _blockLights = new int[16, 16, 16, 16];
-	private readonly int[,,,] _skylights = new int[16, 16, 16, 16];
+	private readonly Block[,,] _blocks = new Block[16, 256, 16];
+	private readonly int[,,] _blockLights = new int[16, 256, 16];
+	private readonly int[,,] _skylights = new int[16, 256, 16];
 
 	/// <summary>
 	/// Biome map for chunk
@@ -64,21 +64,22 @@ public class Chunk
 	public Block GetBlockAt(BlockPos pos)
 	{
 		var chunkPos = pos.GetPosWithinChunk();
-		int w = pos.Y / 16; // chunk index in column
-		int y = pos.Y % 16;
-
-		return _blocks[w, chunkPos.X, y, chunkPos.Z];
+		return _blocks[chunkPos.X, chunkPos.Y, chunkPos.Z];
 	}
 
 	public int GetBlockLightLevel(BlockPos pos)
 	{
-		int[] index = new int[] { 5, 5, 5, 5 };
-		return _blockLights[index];
+		var chunkPos = pos.GetPosWithinChunk();
+		return _blockLights[pos.X, pos.Y, pos.Z];
 	}
 
 	public int GetSkyLightLevel(BlockPos pos)
 	{
+		if (World.Dimension != World.DimensionType.OVERWORLD)
+			throw new Exception("Sky lights do not exist in this dimension!");
 
+		var chunkPos = pos.GetPosWithinChunk();
+		return _skylights[pos.X, pos.Y, pos.Z];
 	}
 
 	public void AddChunkData(ChunkDataPacket packet)
@@ -151,7 +152,7 @@ public class Chunk
 							uint blockState = palette.GetBlockState(blockData);
 							Block blk = new Block((Block.BlockType)(blockState));
 
-							_blocks[w, x, y, z] = blk;
+							_blocks[x, y + (16 * w), z] = blk;
 						}
 					}
 				}
@@ -166,8 +167,8 @@ public class Chunk
 							// light data takes 4 bits. because of this, we read two light values per byte
 							byte value = data.Read(1)[0];
 
-							_blockLights[w, x, y, z] = value & 0xf;
-							_blockLights[w, x + 1, y, z] = (value >> 4) & 0xf;
+							_blockLights[x, y + (16 * w), z] = value & 0xf;
+							_blockLights[x + 1, y + (16 * w), z] = (value >> 4) & 0xf;
 						}
 					}
 				}
@@ -185,8 +186,8 @@ public class Chunk
 								// light data takes 4 bits. because of this, we read two light values per byte
 								byte value = data.Read(1)[0];
 
-								_skylights[w, x, y, z] = value & 0xf;
-								_skylights[w, x + 1, y, z] = (value >> 4) & 0xf;
+								_skylights[x, y + (16 * w), z] = value & 0xf;
+								_skylights[x + 1, y + (16 * w), z] = (value >> 4) & 0xf;
 							}
 						}
 					}
@@ -200,7 +201,7 @@ public class Chunk
 					for (int x = 0; x < 16; x++)
 						for (int y = 0; y < 16; y++)
 							for (int z = 0; z < 16; z++)
-								_blocks[w, x, y, z] = new Block(Block.BlockType.AIR);
+								_blocks[x, y + (16 * w), z] = new Block(Block.BlockType.AIR);
 				}
 			}
 		}
