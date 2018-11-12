@@ -7,4 +7,12 @@ using System.Threading.Tasks;
 public class GenericPacket : Packet
 {
 	public override byte[] Payload { get; set; }
+
+	public GenericPacket()
+	{
+		PacketID = default(int);
+	}
+
+	public GenericPacket(PacketData data) : base(data) { } // packet id should be set correctly if this ctor is used
+
 }

@@ -18,7 +18,7 @@ public class HandshakePacket : Packet
 		{
 			List<byte> builder = new List<byte>();
 			builder.AddRange(VarInt.GetBytes(ProtocolVersion));
-			builder.AddRange(TypeConverter.GetBytes(Address));
+			builder.AddRange(PacketStructureUtility.GetBytes(Address));
 			builder.AddRange(BitConverter.GetBytes(Port).ReverseIfLittleEndian());
 			builder.AddRange(VarInt.GetBytes((int)NextState));
 			return builder.ToArray();

@@ -1,12 +1,13 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
 /// <summary>
-/// Used for reading and writing data in packet payload format
+/// Used for reading and writing data in packet format. DOES perform endianness fixing
 /// </summary>
-public static class TypeConverter
+public static class PacketStructureUtility
 {
 	/// <summary>
 	/// Reads the next string
@@ -18,6 +19,24 @@ public static class TypeConverter
 		int strLen = VarInt.ReadNext(bytes);
 		var strRaw = bytes.Read(strLen);
 		return Encoding.UTF8.GetString(strRaw.ToArray());
+	}
+
+	public static int GetInt32(List<byte> bytes)
+	{
+		byte[] intRaw = bytes.Read(4).ToArray();
+		return BitConverter.ToInt32(intRaw.ReverseIfLittleEndian(), 0);
+	}
+
+	public static long GetInt64(List<byte> bytes)
+	{
+		byte[] longRaw = bytes.Read(8, 0).ToArray();
+		return BitConverter.ToInt64(longRaw.ReverseIfLittleEndian(), 0);
+	}
+
+	public static bool GetBoolean(List<byte> bytes)
+	{
+		byte[] boolRaw = bytes.Read(1, 0).ToArray();
+		return BitConverter.ToBoolean(boolRaw, 0);
 	}
 
 	public static byte[] GetBytes(string data)

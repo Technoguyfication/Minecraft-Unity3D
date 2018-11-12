@@ -20,6 +20,9 @@ public static class Utility {
 	/// <returns></returns>
 	public static List<T> Read<T>(this List<T> data, int amount, int index)
 	{
+		if (data.Count < amount + index)
+			throw new IndexOutOfRangeException("Requested data out of range of List");
+
 		List<T> subset = new List<T>();
 		subset.AddRange(data.GetRange(index, amount));
 		data.RemoveRange(index, amount);
