@@ -16,13 +16,21 @@ public class Block {
 
 	public BlockType Type { get; set; }
 
+	public override string ToString()
+	{
+		return Type.ToString();
+	}
+
 	public enum BlockType
 	{
 		// todo: add all block types here.
 		AIR = 0,
+		CAVE_AIR = 8592,
+		DIORITE = 4,
+		GRANITE = 2,
 		STONE = 1,
-		GRASS = 2,
-		DIRT = 3,
-		COBBLESTONE = 4
+		GRASS = 9,
+		DIRT = 10,
+		COBBLESTONE = 14
 	}
 }

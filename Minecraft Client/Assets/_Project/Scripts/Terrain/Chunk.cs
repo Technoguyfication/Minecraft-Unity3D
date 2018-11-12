@@ -26,9 +26,7 @@ public class Chunk
 	/// Blocks stored in chunks as WXYZ where W = chunk index in column and XYZ are block coords relative to chunk
 	/// </summary>
 	private readonly Block[,,,] _blocks = new Block[16, 16, 16, 16];
-
 	private readonly int[,,,] _blockLights = new int[16, 16, 16, 16];
-
 	private readonly int[,,,] _skylights = new int[16, 16, 16, 16];
 
 	/// <summary>
@@ -72,6 +70,17 @@ public class Chunk
 		return _blocks[w, chunkPos.X, y, chunkPos.Z];
 	}
 
+	public int GetBlockLightLevel(BlockPos pos)
+	{
+		int[] index = new int[] { 5, 5, 5, 5 };
+		return _blockLights[index];
+	}
+
+	public int GetSkyLightLevel(BlockPos pos)
+	{
+
+	}
+
 	public void AddChunkData(ChunkDataPacket packet)
 	{
 		//check if data applies to this chunk
@@ -108,21 +117,20 @@ public class Chunk
 
 				// read data into array of longs
 				int dataArrayLength = VarInt.ReadNext(data);
-
-				long[] dataArray = new long[dataArrayLength];
+				ulong[] dataArray = new ulong[dataArrayLength];
 				for (int i = 0; i < dataArrayLength; i++)
 				{
-					dataArray[i] = PacketStructureUtility.GetInt64(data);
+					dataArray[i] = PacketStructureUtility.GetUInt64(data);
 				}
 
 				// parse block data
-				for (int y = 0; y < 16; y++)	// for section height
+				for (int y = 0; y < 16; y++)    // for section height
 				{
 					for (int z = 0; z < 16; z++)    // section width
 					{
-						for (int x = 0; x < 16; x++)	// section width
+						for (int x = 0; x < 16; x++)    // section width
 						{
-							int blockNumber = ((y * 16) + z * 16) + x;
+							int blockNumber = (((y * 16) + z) * 16) + x;
 							int startLong = (blockNumber * bitsPerBlock) / 64;
 							int startOffset = (blockNumber * bitsPerBlock) % 64;
 							int endLong = ((blockNumber + 1) * bitsPerBlock - 1) / 64;
@@ -138,13 +146,11 @@ public class Chunk
 								blockData = (uint)(dataArray[startLong] >> startOffset | dataArray[endLong] << endOffset);
 							}
 
-							Block blk;
-							try
-							{
-								blk = new Block((Block.BlockType)palette.GetBlockState(blockData & individualValueMask));
-							}
-							catch (Exception)
-							{ throw; }
+							blockData &= individualValueMask;
+
+							uint blockState = palette.GetBlockState(blockData);
+							Block blk = new Block((Block.BlockType)(blockState));
+
 							_blocks[w, x, y, z] = blk;
 						}
 					}
@@ -158,7 +164,7 @@ public class Chunk
 						for (int x = 0; x < 16; x += 2)
 						{
 							// light data takes 4 bits. because of this, we read two light values per byte
-							byte value = data.Read(1, 0)[0];
+							byte value = data.Read(1)[0];
 
 							_blockLights[w, x, y, z] = value & 0xf;
 							_blockLights[w, x + 1, y, z] = (value >> 4) & 0xf;
@@ -177,7 +183,7 @@ public class Chunk
 							for (int x = 0; x < 16; x += 2)
 							{
 								// light data takes 4 bits. because of this, we read two light values per byte
-								byte value = data.Read(1, 0)[0];
+								byte value = data.Read(1)[0];
 
 								_skylights[w, x, y, z] = value & 0xf;
 								_skylights[w, x + 1, y, z] = (value >> 4) & 0xf;

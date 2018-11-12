@@ -33,6 +33,12 @@ public static class PacketStructureUtility
 		return BitConverter.ToInt64(longRaw.ReverseIfLittleEndian(), 0);
 	}
 
+	public static ulong GetUInt64(List<byte> bytes)
+	{
+		byte[] ulongRaw = bytes.Read(8, 0).ToArray();
+		return BitConverter.ToUInt64(ulongRaw.ReverseIfLittleEndian(), 0);
+	}
+
 	public static bool GetBoolean(List<byte> bytes)
 	{
 		byte[] boolRaw = bytes.Read(1, 0).ToArray();

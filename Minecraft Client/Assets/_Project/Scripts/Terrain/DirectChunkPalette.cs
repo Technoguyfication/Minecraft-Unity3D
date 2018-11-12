@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 public class DirectChunkPalette : IChunkPalette
 {
+	public int Length { get; } = 0;
+
 	public uint GetBlockState(uint id)
 	{
 		return id;
@@ -13,7 +15,6 @@ public class DirectChunkPalette : IChunkPalette
 
 	public void Read(List<byte> buffer)
 	{
-		// read next varint because there isn't really a palette
-		VarInt.ReadNext(buffer);
+
 	}
 }
