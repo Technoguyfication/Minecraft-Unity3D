@@ -74,7 +74,10 @@ public class LoginTester : MonoBehaviour
 									if ((blk.Type != Block.BlockType.AIR) && (blk.Type != Block.BlockType.CAVE_AIR))
 									{
 										GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-										cube.transform.position = new Vector3(x + (chunk.Position.X * 16), y, z + (chunk.Position.Z * 16));
+
+										// unfortunately, unity's X and Z are flipped from minecraft's coordinate system
+										// I'll figure out the best way to fix this moving on
+										cube.transform.position = new Vector3(z + (chunk.Position.X * 16), y, x + (chunk.Position.Z * 16));
 										cube.name = ((int)blk.Type).ToString();
 
 										switch (blk.Type)
