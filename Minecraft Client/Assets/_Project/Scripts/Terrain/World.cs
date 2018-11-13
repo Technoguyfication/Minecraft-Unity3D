@@ -44,6 +44,24 @@ public class World
 			return _chunks.Find(c => c.Position.Equals(pos));
 	}
 
+	/// <summary>
+	/// Gets the 6 blocks surrounding a block, in order: +X -X +Y -Y +Z -Z
+	/// </summary>
+	/// <param name="pos"></param>
+	/// <returns></returns>
+	public Block[] GetNeighbors(BlockPos pos)
+	{
+		return new Block[6]
+		{
+			GetBlock(new BlockPos() { X = pos.X + 1, Y = pos.Y, Z = pos.Z }),
+			GetBlock(new BlockPos() { X = pos.X - 1, Y = pos.Y, Z = pos.Z }),
+			GetBlock(new BlockPos() { X = pos.X, Y = pos.Y + 1, Z = pos.Z }),
+			GetBlock(new BlockPos() { X = pos.X, Y = pos.Y - 1, Z = pos.Z }),
+			GetBlock(new BlockPos() { X = pos.X, Y = pos.Y, Z = pos.Z + 1 }),
+			GetBlock(new BlockPos() { X = pos.X, Y = pos.Y, Z = pos.Z - 1 }),
+		};
+	}
+
 	public enum DimensionType
 	{
 		OVERWORLD = 0,

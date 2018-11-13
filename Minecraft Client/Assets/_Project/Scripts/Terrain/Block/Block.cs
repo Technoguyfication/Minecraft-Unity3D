@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class Block {
+	public bool IsSolid { get; }
 
 	public Block()
 	{
