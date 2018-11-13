@@ -22,12 +22,12 @@ public class World
 	/// </summary>
 	/// <param name="pos"></param>
 	/// <returns></returns>
-	public Block GetBlock(BlockPos pos)
+	public BlockState GetBlock(BlockPos pos)
 	{
 		Chunk c = GetChunk(pos.GetChunk());
 
 		if (c == null)
-			return null;
+			return new BlockState(BlockType.VOID_AIR);	// use void air for unloaded chunks
 		else
 			return c.GetBlockAt(pos);
 	}
@@ -47,9 +47,9 @@ public class World
 	/// </summary>
 	/// <param name="pos"></param>
 	/// <returns></returns>
-	public Block[] GetNeighbors(BlockPos pos)
+	public BlockState[] GetNeighbors(BlockPos pos)
 	{
-		return new Block[6]
+		return new BlockState[6]
 		{
 			GetBlock(new BlockPos() { X = pos.X + 1, Y = pos.Y, Z = pos.Z }),
 			GetBlock(new BlockPos() { X = pos.X - 1, Y = pos.Y, Z = pos.Z }),

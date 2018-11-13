@@ -25,7 +25,7 @@ public class Chunk
 	/// <summary>
 	/// Blocks stored in chunks as WXYZ where W = chunk index in column and XYZ are block coords relative to chunk
 	/// </summary>
-	private readonly Block[,,] _blocks = new Block[16, 256, 16];
+	private readonly BlockState[,,] _blocks = new BlockState[16, 256, 16];
 	private readonly int[,,] _blockLights = new int[16, 256, 16];
 	private readonly int[,,] _skylights = new int[16, 256, 16];
 
@@ -61,10 +61,10 @@ public class Chunk
 	/// </summary>
 	/// <param name="pos"></param>
 	/// <returns></returns>
-	public Block GetBlockAt(BlockPos pos)
+	public BlockState GetBlockAt(BlockPos pos)
 	{
 		if (pos.Y > 255 || pos.Y < 0)
-			return new Block(Block.BlockType.AIR);
+			return new BlockState(BlockType.VOID_AIR);
 
 		var chunkPos = pos.GetPosWithinChunk();
 		return _blocks[chunkPos.X, chunkPos.Y, chunkPos.Z];
@@ -153,7 +153,7 @@ public class Chunk
 							blockData &= individualValueMask;
 
 							uint blockState = palette.GetBlockState(blockData);
-							Block blk = new Block((Block.BlockType)(blockState));
+							BlockState blk = new BlockState((BlockType)blockState);
 
 							_blocks[x, y + (16 * w), z] = blk;
 						}
@@ -204,7 +204,7 @@ public class Chunk
 					for (int x = 0; x < 16; x++)
 						for (int y = 0; y < 16; y++)
 							for (int z = 0; z < 16; z++)
-								_blocks[x, y + (16 * w), z] = new Block(Block.BlockType.AIR);
+								_blocks[x, y + (16 * w), z] = new BlockState(BlockType.AIR);
 				}
 			}
 		}

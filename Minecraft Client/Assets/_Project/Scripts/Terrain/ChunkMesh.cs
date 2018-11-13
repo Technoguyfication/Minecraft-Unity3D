@@ -32,25 +32,25 @@ public class ChunkMesh : MonoBehaviour
 		int triangleIndex = 0;
 
 		// iterate through each block in chunk
-		for (int x = 4; x < 16; x++)
+		for (int x = 0; x < 16; x++)
 		{
-			for (int y = 65; y < 256; y++)
+			for (int y = 0; y < 256; y++)
 			{
-				for (int z = 4; z < 16; z++)
+				for (int z = 0; z < 16; z++)
 				{
 					BlockPos pos = new BlockPos { X = x, Y = y, Z = z };
-					Block[] neighbors = chunk.World.GetNeighbors(pos.GetWorldPos(chunk));
-					Block block = chunk.World.GetBlock(pos.GetWorldPos(chunk));
+					BlockState[] neighbors = chunk.World.GetNeighbors(pos.GetWorldPos(chunk));
+					BlockState block = chunk.World.GetBlock(pos.GetWorldPos(chunk));
 					Vector3 blockPosUnity = new Vector3(pos.Z, pos.Y, pos.X);
 
 					// check if we need to render this block
-					if (HasAllNeighbors(neighbors) || !(block?.IsSolid ?? false))
+					if (HasAllNeighbors(neighbors) || !block.IsSolid)	// don't render unsolid blocks for now
 						continue;
 
 					// iterate through each face and add to mesh if it's visible
 					for (int i = 0; i < 6; i++)
 					{
-						if (!(neighbors[i]?.IsSolid ?? false))
+						if (!neighbors[i].IsSolid)
 						{
 							Vector3[] newVertices = new Vector3[4];
 							Vector3[] faceVertices = GetVertices(i);
@@ -82,10 +82,10 @@ public class ChunkMesh : MonoBehaviour
 
 	}
 
-	private bool HasAllNeighbors(Block[] blocks)
+	private bool HasAllNeighbors(BlockState[] blocks)
 	{
 		foreach (var neighbor in blocks)
-			if (neighbor?.Type == Block.BlockType.AIR)
+			if (neighbor.IsSolid)
 				return false;
 
 		return true;
@@ -121,8 +121,8 @@ public class ChunkMesh : MonoBehaviour
 				{
 					new Vector3(0.5f, 0.5f, -0.5f),
 					new Vector3(-0.5f, 0.5f, -0.5f),
-					new Vector3(0.5f, 0.5f, -0.5f),
 					new Vector3(-0.5f, 0.5f, 0.5f),
+					new Vector3(0.5f, 0.5f, 0.5f),
 				};
 			case 3:
 				return new Vector3[]

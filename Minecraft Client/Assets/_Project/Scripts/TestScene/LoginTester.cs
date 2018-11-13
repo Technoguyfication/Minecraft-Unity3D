@@ -10,7 +10,7 @@ public class LoginTester : MonoBehaviour
 	public ushort port;
 	public string username;
 
-	public GameObject meshTest;
+	public GameObject[] meshTest;
 
 	int frames = 0;
 
@@ -75,7 +75,10 @@ public class LoginTester : MonoBehaviour
 
 		frames++;
 
-		Chunk c = world.GetChunk(new ChunkPos() { X = -22, Z = -7 });
-		meshTest.GetComponent<ChunkMesh>().GenerateMesh(c);
+		for (int i = 0; i < meshTest.Length; i++)
+		{
+			Chunk c = world.GetChunk(new ChunkPos() { X = -22, Z = (-7 + i) });
+			meshTest[i].GetComponent<ChunkMesh>().GenerateMesh(c);
+		}
 	}
 }
