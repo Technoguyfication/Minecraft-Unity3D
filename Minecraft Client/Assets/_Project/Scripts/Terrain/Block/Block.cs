@@ -3,7 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class Block {
-	public bool IsSolid { get; }
+	public bool IsSolid { get
+		{
+			return Type != BlockType.AIR && Type != BlockType.CAVE_AIR;
+		}
+	}
 
 	public Block()
 	{

@@ -63,6 +63,9 @@ public class Chunk
 	/// <returns></returns>
 	public Block GetBlockAt(BlockPos pos)
 	{
+		if (pos.Y > 255 || pos.Y < 0)
+			return new Block(Block.BlockType.AIR);
+
 		var chunkPos = pos.GetPosWithinChunk();
 		return _blocks[chunkPos.X, chunkPos.Y, chunkPos.Z];
 	}

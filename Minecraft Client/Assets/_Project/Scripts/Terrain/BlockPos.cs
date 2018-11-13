@@ -31,9 +31,19 @@ public struct BlockPos
 	{
 		return new BlockPos()
 		{
-			X = X % 16,
+			X = Utility.Mod(X, 16),
 			Y = Y,
-			Z = Z % 16
+			Z = Utility.Mod(Z, 16)
+		};
+	}
+
+	public BlockPos GetWorldPos(Chunk chunk)
+	{
+		return new BlockPos()
+		{
+			X = X + (16 * chunk.Position.X),
+			Y = Y,
+			Z = Z + (16 * chunk.Position.Z)
 		};
 	}
 }

@@ -9,7 +9,8 @@ public class World
 {
 	public DimensionType Dimension { get; set; }
 
-	private readonly List<Chunk> _chunks;
+	// only for now until i get chunk loading implemented
+	public List<Chunk> _chunks;
 
 	public World()
 	{
@@ -38,10 +39,7 @@ public class World
 	/// <returns></returns>
 	public Chunk GetChunk(ChunkPos pos)
 	{
-		if (!_chunks.Exists(c => c.Position.Equals(pos)))
-			return null;
-		else
-			return _chunks.Find(c => c.Position.Equals(pos));
+		return _chunks.Find(c => c.Position.Equals(pos));
 	}
 
 	/// <summary>
