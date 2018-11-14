@@ -60,6 +60,8 @@ public class LoginTester : MonoBehaviour
 					var chunk = new Chunk(packet, world);
 					world._chunks.Add(chunk);
 				}
+
+				Debug.Log($"ID: {p.ID.ToString("X")} Length: {p.Payload.Length}");
 			}
 		}
 	}
@@ -78,7 +80,7 @@ public class LoginTester : MonoBehaviour
 		for (int i = 0; i < meshTest.Length; i++)
 		{
 			Chunk c = world.GetChunk(new ChunkPos() { X = -22, Z = (-7 + i) });
-			meshTest[i].GetComponent<ChunkMesh>().GenerateMesh(c);
+			//meshTest[i].GetComponent<ChunkMesh>().GenerateMesh(c);
 		}
 	}
 }

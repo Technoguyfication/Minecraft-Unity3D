@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 using System.Threading;
 using UnityEngine;
+using Ionic.Zlib;
 
 public class NetworkClient : IDisposable
 {
@@ -13,7 +14,9 @@ public class NetworkClient : IDisposable
 	/// </summary>
 	public const int PROTOCOL_VERSION = 404;
 
-	public ProtocolState State;
+	public ProtocolState State { get; set; } = ProtocolState.HANDSHAKING;
+
+	private int _compressionThreshold = -1;
 
 	/// <summary>
 	/// Gets whether the client is connected to a server or not
@@ -26,7 +29,7 @@ public class NetworkClient : IDisposable
 
 	public NetworkClient()
 	{
-		State = ProtocolState.HANDSHAKING;
+
 	}
 
 	~NetworkClient()
@@ -142,16 +145,43 @@ public class NetworkClient : IDisposable
 	/// <returns></returns>
 	public PacketData ReadNextPacket()
 	{
-		int length;
 		int packetId;
 		byte[] payload;
 
 		lock (StreamReadLock)
 		{
-			length = VarInt.ReadNext(ReadBytes);
-			List<byte> buffer = new List<byte>(ReadBytes(length));
+			int length = VarInt.ReadNext(ReadBytes);
+			List<byte> buffer = new List<byte>();
+
+			// check if data is compressed
+			if (_compressionThreshold >= 0)
+			{
+				int dataLength = VarInt.ReadNext(ReadBytes);
+				length -= VarInt.GetBytes(dataLength).Length;	// remove size of data length from rest of packet length
+				if (dataLength != 0)
+				{
+					byte[] compressedBuffer = ReadBytes(length);
+					buffer.AddRange(ZlibStream.UncompressBuffer(compressedBuffer));
+				}
+				else
+				{
+					buffer.AddRange(ReadBytes(length));
+				}
+			}
+			else
+			{
+				buffer.AddRange(ReadBytes(length));
+			}
+
 			packetId = VarInt.ReadNext(buffer);
 			payload = buffer.ToArray();
+		}
+
+		// todo: re-enable this once an actual game manager gets made
+		if (/*State == ProtocolState.LOGIN &&*/ packetId == 0x03)   // set compression packet
+		{
+			_compressionThreshold = VarInt.ReadNext(new List<byte>(payload));
+			return ReadNextPacket();
 		}
 
 		return new PacketData
