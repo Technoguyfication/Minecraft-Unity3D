@@ -56,12 +56,11 @@ public class LoginTester : MonoBehaviour
 				if (p.ID == 0x22)
 				{
 					var packet = new ChunkDataPacket(p);
-					Debug.Log($"Loading chunk at ({packet.Position.X}, {packet.Position.Z}): Ground up continuous: {packet.GroundUpContinuous}, Primary Bitmask: {packet.PrimaryBitmask}, Data length: {packet.Data.Length}");
 					var chunk = new Chunk(packet, world);
 					world._chunks.Add(chunk);
 				}
 
-				Debug.Log($"ID: {p.ID.ToString("X")} Length: {p.Payload.Length}");
+				//Debug.Log($"ID: {p.ID.ToString("X")} Length: {p.Payload.Length}");
 			}
 		}
 	}
@@ -79,10 +78,10 @@ public class LoginTester : MonoBehaviour
 
 		for (int i = 0; i < world._chunks.Count; i++)
 		{
-			Chunk c = world.GetChunk(new ChunkPos() { X = -22, Z = (-7 + i) });
+			Chunk c = world._chunks[i];
 			var meshTest = Instantiate(meshTestPrefab);
 			meshTest.GetComponent<ChunkMesh>().GenerateMesh(c);
-			meshTest.transform.position = new Vector3(c.Position.Z * 16, 0, c.Position.X);
+			meshTest.transform.position = new Vector3(c.Position.Z * 16, 0, c.Position.X * 16);
 		}
 	}
 }

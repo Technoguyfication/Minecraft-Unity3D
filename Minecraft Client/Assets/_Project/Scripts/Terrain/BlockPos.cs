@@ -46,4 +46,23 @@ public struct BlockPos
 			Z = Z + (16 * chunk.Position.Z)
 		};
 	}
+
+	public override string ToString()
+	{
+		return $"{X}, {Z}";
+	}
+
+	public override int GetHashCode()
+	{
+		return $"{X} + {Z}".GetHashCode();
+	}
+
+	public override bool Equals(object obj)
+	{
+		BlockPos? pos = obj as BlockPos?;
+		if (pos == null)
+			return false;
+		else
+			return (((BlockPos)pos).X == X) && (((BlockPos)pos).Z == Z);
+	}
 }

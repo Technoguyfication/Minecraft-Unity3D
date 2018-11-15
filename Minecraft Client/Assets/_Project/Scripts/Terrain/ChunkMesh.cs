@@ -32,11 +32,11 @@ public class ChunkMesh : MonoBehaviour
 		int triangleIndex = 0;
 
 		// iterate through each block in chunk
-		for (int x = 0; x < 16; x++)
+		for (int z = 0; z < 16; z++)
 		{
 			for (int y = 0; y < 256; y++)
 			{
-				for (int z = 0; z < 16; z++)
+				for (int x = 0; x < 16; x++)
 				{
 					BlockPos pos = new BlockPos { X = x, Y = y, Z = z };
 					BlockState[] neighbors = chunk.World.GetNeighbors(pos.GetWorldPos(chunk));
@@ -78,6 +78,7 @@ public class ChunkMesh : MonoBehaviour
 			triangles = triangles.ToArray()
 		};
 		newMesh.RecalculateNormals();
+
 		GetComponent<MeshFilter>().mesh = newMesh;
 
 	}
