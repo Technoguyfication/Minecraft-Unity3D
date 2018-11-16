@@ -25,12 +25,12 @@ public struct BlockState
 
 	public BlockType State { get; set; }
 
-	public static explicit operator int(BlockState s)
+	public static explicit operator uint(BlockState s)
 	{
-		return (int)s.State;
+		return (uint)s.State;
 	}
 
-	public static explicit operator BlockState(int i)
+	public static explicit operator BlockState(uint i)
 	{
 		return new BlockState() { State = (BlockType)i };
 	}

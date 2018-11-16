@@ -49,12 +49,12 @@ public struct BlockPos
 
 	public override string ToString()
 	{
-		return $"{X}, {Z}";
+		return $"{X}, {Y}, {Z}";
 	}
 
 	public override int GetHashCode()
 	{
-		return $"{X} + {Z}".GetHashCode();
+		return $"{X} + {Y} + {Z}".GetHashCode();
 	}
 
 	public override bool Equals(object obj)
@@ -63,6 +63,6 @@ public struct BlockPos
 		if (pos == null)
 			return false;
 		else
-			return (((BlockPos)pos).X == X) && (((BlockPos)pos).Z == Z);
+			return (((BlockPos)pos).X == X) && (((BlockPos)pos).Y == Y) && (((BlockPos)pos).Z == Z);
 	}
 }

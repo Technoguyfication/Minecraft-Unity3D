@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-public enum BlockType : int
+public enum BlockType : uint
 {
 	GENERIC_SOLID,
 

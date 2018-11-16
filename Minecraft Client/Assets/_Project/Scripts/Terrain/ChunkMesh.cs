@@ -34,17 +34,19 @@ public class ChunkMesh : MonoBehaviour
 		// iterate through each block in chunk
 		for (int z = 0; z < 16; z++)
 		{
-			for (int y = 0; y < 256; y++)
+			for (int y = 0; y < chunk.MaxHeight; y++)
 			{
 				for (int x = 0; x < 16; x++)
 				{
 					BlockPos pos = new BlockPos { X = x, Y = y, Z = z };
-					BlockState[] neighbors = chunk.World.GetNeighbors(pos.GetWorldPos(chunk));
 					BlockState block = chunk.World.GetBlock(pos.GetWorldPos(chunk));
 					Vector3 blockPosUnity = new Vector3(pos.Z, pos.Y, pos.X);
 
 					// check if we need to render this block
-					if (HasAllNeighbors(neighbors) || !block.IsSolid)	// don't render unsolid blocks for now
+					if (!block.IsSolid)
+						continue;
+					BlockState[] neighbors = chunk.World.GetNeighbors(pos.GetWorldPos(chunk));
+					if (HasAllNeighbors(neighbors))
 						continue;
 
 					// iterate through each face and add to mesh if it's visible
@@ -55,13 +57,14 @@ public class ChunkMesh : MonoBehaviour
 							Vector3[] newVertices = new Vector3[4];
 							Vector3[] faceVertices = GetVertices(i);
 
-							// translate vertices to relative block position
+							// translate vertices to relative block position so we can add them to the right place in the mesh
 							for (int j = 0; j < 4; j++)
 							{
 								newVertices[j] = faceVertices[j] + blockPosUnity;
 							}
 
-							vertices.AddRange(newVertices); // add vertices to mesh
+							// add mesh vertices
+							vertices.AddRange(newVertices);
 
 							// connect triangles
 							triangles.AddRange(new int[] { triangleIndex, 1 + triangleIndex, 2 + triangleIndex, triangleIndex, 2 + triangleIndex, 3 + triangleIndex });

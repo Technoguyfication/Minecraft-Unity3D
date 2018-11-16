@@ -75,13 +75,17 @@ public class LoginTester : MonoBehaviour
 		}
 
 		frames++;
+		System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
 
-		for (int i = 0; i < world._chunks.Count; i++)
+		for (int i = 0; i < 3; i++)
 		{
 			Chunk c = world._chunks[i];
 			var meshTest = Instantiate(meshTestPrefab);
+			sw.Start();
 			meshTest.GetComponent<ChunkMesh>().GenerateMesh(c);
-			meshTest.transform.position = new Vector3(c.Position.Z * 16, 0, c.Position.X * 16);
+			sw.Stop();
+			Debug.Log($"Took {sw.ElapsedMilliseconds / 1000f}s to generate chunk at {c.Position}");
+			meshTest.transform.position = new Vector3(c.Position.X * 16, 0, c.Position.Z * 16);
 		}
 	}
 }

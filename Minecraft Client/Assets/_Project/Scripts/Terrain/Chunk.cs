@@ -23,6 +23,11 @@ public class Chunk
 	public bool IsLoaded { get; private set; }
 
 	/// <summary>
+	/// The height of the heighest block in this chunk, rounded up to nearest 16
+	/// </summary>
+	public int MaxHeight { get; private set; }
+
+	/// <summary>
 	/// Blocks stored in chunks as WXYZ where W = chunk index in column and XYZ are block coords relative to chunk
 	/// </summary>
 	private readonly BlockState[,,] _blocks = new BlockState[16, 256, 16];
@@ -102,6 +107,11 @@ public class Chunk
 			// check bitmask to see if we're reading data for this section
 			if ((packet.PrimaryBitmask & (1) << w) != 0)
 			{
+				// set max block height to the height of this chunk
+				int maxBlockHeight = (w + 1) * 16;
+				if (maxBlockHeight > MaxHeight)
+					MaxHeight = maxBlockHeight;
+
 				// read bits per block
 				byte bitsPerBlock = data.Read(1)[0];
 				if (bitsPerBlock < 4)
@@ -155,7 +165,7 @@ public class Chunk
 							uint blockState = palette.GetBlockState(blockData);
 							BlockState blk = new BlockState((BlockType)blockState);
 
-							_blocks[x, y + (16 * w), z] = blk;
+							_blocks[x, y + (16 * w), z] = blk;	// convert coordinate system here
 						}
 					}
 				}

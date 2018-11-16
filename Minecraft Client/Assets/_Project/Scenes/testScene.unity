@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -325,7 +325,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2cb2399ee6f2e844787cd45a38f3d032, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hostname: localhost
+  hostname: pi.tkno.pw
   port: 25565
   username: mcplayer
   meshTestPrefab: {fileID: 1308276761640730, guid: 678dac4d0913b334aa9e53206927c4c9,
