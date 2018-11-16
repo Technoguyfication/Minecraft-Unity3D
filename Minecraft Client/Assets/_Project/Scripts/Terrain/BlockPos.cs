@@ -18,7 +18,7 @@ public struct BlockPos
 	{
 		return new ChunkPos()
 		{
-			X = X / 16,
+			X = X / 16 - (X < 0 ? 1 : 0),
 			Z = Z / 16
 		};
 	}
