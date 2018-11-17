@@ -40,6 +40,7 @@ public class MainMenuController : MonoBehaviour
 	{
 		string hostname = AddressInput.text;
 		int port = int.Parse(PortInput.text);
+		Debug.Log("Starting game load coroutine");
 		StartCoroutine(GameManager.ConnectToServerCoroutine(hostname, port));
 	}
 

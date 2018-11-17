@@ -6,6 +6,9 @@ using UnityEngine.SceneManagement;
 using System;
 using System.Threading;
 
+/// <summary>
+/// Manages everything for a game, or connection to a server
+/// </summary>
 public class GameManager : MonoBehaviour
 {
 
@@ -14,6 +17,7 @@ public class GameManager : MonoBehaviour
 
 	public string Username = "mcplayer";
 
+	private PlayerController _player = null;
 	private NetworkClient _client;
 	private List<Packet> _packetSendQueue = new List<Packet>();
 	private List<PacketData> _packetReceiveQueue = new List<PacketData>();
@@ -90,16 +94,20 @@ public class GameManager : MonoBehaviour
 	public IEnumerator ConnectToServerCoroutine(string hostname, int port)
 	{
 		// open loading screen
-		AsyncOperation loadTask = SceneManager.LoadSceneAsync("LoadingScreen", LoadSceneMode.Additive);
-		while (!loadTask.isDone)
+		AsyncOperation loadLoadingScreenTask = SceneManager.LoadSceneAsync("LoadingScreen", LoadSceneMode.Additive);
+		while (!loadLoadingScreenTask.isDone)
 			yield return null;
+
+		Debug.Log("Loading screen opened");
 
 		SceneManager.SetActiveScene(SceneManager.GetSceneByName("LoadingScreen"));
 		SceneManager.MoveGameObjectToScene(gameObject, SceneManager.GetSceneByName("LoadingScreen"));
-		AsyncOperation unloadTask = SceneManager.UnloadSceneAsync("MainMenu");
+		AsyncOperation unloadMainMenuTask = SceneManager.UnloadSceneAsync("MainMenu");
 
-		while (!unloadTask.isDone)
+		while (!unloadMainMenuTask.isDone)
 			yield return null;
+
+		Debug.Log("Closed main menu");
 
 		// find loading screen controller
 		LoadingScreenController controller = GameObject.FindGameObjectWithTag("Loading Screen Controller").GetComponent<LoadingScreenController>();
@@ -117,7 +125,7 @@ public class GameManager : MonoBehaviour
 			yield return null;
 
 		if (connectTask.IsFaulted || !_client.Connected)
-			throw (Exception)connectTask.Exception ?? new UnityException("Disconnected from server");
+			throw (Exception)connectTask.Exception ?? new UnityException("Connection failed: Unknown");
 
 		controller.UpdateSubtitleText("Connection established. Asking server nicely to let us play.");
 
@@ -179,6 +187,16 @@ public class GameManager : MonoBehaviour
 			Dimension = joinGame.Dimension,
 		};
 
+		// open game scene
+		AsyncOperation loadGameTask = SceneManager.LoadSceneAsync("Game", LoadSceneMode.Additive);
+		while (!loadGameTask.isDone)
+			yield return null;
+		SceneManager.SetActiveScene(SceneManager.GetSceneByName("Game"));
+		SceneManager.MoveGameObjectToScene(gameObject, SceneManager.GetSceneByName("Game"));
+
+		// set up references in game scene
+		_currentWorld.ChunkRenderer = GameObject.FindGameObjectWithTag("Chunk Renderer").GetComponent<ChunkRenderer>();
+
 		controller.UpdateSubtitleText("Downloading terrain...");
 
 		// start network worker tasks
@@ -193,6 +211,8 @@ public class GameManager : MonoBehaviour
 			NetworkWriteWorker(_cancellationTokenSource.Token);
 		}, _cancellationTokenSource.Token);
 		_netWriteTask.Start();
+
+		_initialized = true;
 	}
 
 	/// <summary>
@@ -201,6 +221,8 @@ public class GameManager : MonoBehaviour
 	/// <param name="data"></param>
 	private void HandlePacket(PacketData data)
 	{
+		Debug.Log(data.ID.ToString("X"));
+
 		switch ((ClientboundIDs)data.ID)
 		{
 			case ClientboundIDs.DISCONNECT:
@@ -208,6 +230,9 @@ public class GameManager : MonoBehaviour
 				break;
 			case ClientboundIDs.KEEP_ALIVE:
 				DispatchWritePacket(new ServerKeepAlivePacket() { Payload = data.Payload });
+				break;
+			case ClientboundIDs.CHUNK_DATA:
+				_currentWorld.AddChunkData(new ChunkDataPacket(data));
 				break;
 		}
 	}

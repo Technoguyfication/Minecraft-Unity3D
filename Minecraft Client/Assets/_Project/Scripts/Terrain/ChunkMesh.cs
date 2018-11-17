@@ -3,12 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// The physical representation of a chunk in-game
+/// </summary>
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshCollider))]
 [RequireComponent(typeof(MeshRenderer))]
 public class ChunkMesh : MonoBehaviour
 {
-	public Chunk Chunk;
+	public Chunk Chunk { get; set; }
 
 	// Use this for initialization
 	void Start()
@@ -26,7 +29,7 @@ public class ChunkMesh : MonoBehaviour
 	/// Generates a mesh from a chunk
 	/// </summary>
 	/// <param name="chunk"></param>
-	public void GenerateMesh()
+	public Mesh GenerateMesh()
 	{
 		List<Vector3> vertices = new List<Vector3>();
 		List<int> triangles = new List<int>();
@@ -85,11 +88,16 @@ public class ChunkMesh : MonoBehaviour
 			vertices = vertices.ToArray(),
 			triangles = triangles.ToArray()
 		};
-		//newMesh.RecalculateNormals();
+		newMesh.RecalculateNormals();
 
-		GetComponent<MeshFilter>().mesh = newMesh;
+		return newMesh;
 	}
-	
+
+	public void SetMesh(Mesh mesh)
+	{
+		GetComponent<MeshFilter>().mesh = mesh;
+	}
+
 	private bool HasAllNeighbors(bool[] blocks)
 	{
 		foreach (var neighbor in blocks)
@@ -160,5 +168,16 @@ public class ChunkMesh : MonoBehaviour
 			default:
 				throw new ArgumentException($"Face {face} does not exist on cube!");
 		}
+	}
+
+	public override bool Equals(object other)
+	{
+		ChunkMesh mesh = other as ChunkMesh;
+		return mesh.Equals(Chunk);
+	}
+
+	public override int GetHashCode()
+	{
+		return Chunk.GetHashCode();
 	}
 }

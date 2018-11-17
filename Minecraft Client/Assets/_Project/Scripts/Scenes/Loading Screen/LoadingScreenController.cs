@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class LoadingScreenController : MonoBehaviour {
 
+	public GameObject LoadingScreenCanvas;
 	public Text SubtitleText;
 
 	// Use this for initialization
@@ -15,6 +16,11 @@ public class LoadingScreenController : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		
+	}
+
+	public void HideLoadingScreen()
+	{
+		LoadingScreenCanvas.SetActive(false);
 	}
 
 	public void UpdateSubtitleText(string text)

@@ -165,7 +165,7 @@ public class Chunk
 							uint blockState = palette.GetBlockState(blockData);
 							BlockState blk = new BlockState((BlockType)blockState);
 
-							_blocks[x, y + (16 * w), z] = blk;	// convert coordinate system here
+							_blocks[x, y + (16 * w), z] = blk;  // convert coordinate system here
 						}
 					}
 				}
@@ -232,7 +232,7 @@ public class Chunk
 	public override bool Equals(object obj)
 	{
 		Chunk c = obj as Chunk;
-		return c.Position.Equals(Position);
+		return c?.Position.Equals(Position) ?? false;
 	}
 
 	public override int GetHashCode()

@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
-
+/// <summary>
+/// Defines a single dimension the player can play in.
+/// </summary>
 public class World
 {
 	public DimensionType Dimension { get; set; }
+	public ChunkRenderer ChunkRenderer;
 
 	private List<Chunk> _chunks;
-	private ChunkRenderer _chunkRenderer;
 
 	public World()
 	{
@@ -42,18 +45,44 @@ public class World
 		return _chunks.Find(c => c.Position.Equals(pos));
 	}
 
-	public void AddChunk(Chunk chunk)
+	/// <summary>
+	/// Adds chunk data to the world
+	/// </summary>
+	/// <param name="chunkData"></param>
+	public void AddChunkData(ChunkDataPacket chunkData)
 	{
-		// make sure we don't leak chunks
-		if (_chunks.Contains(chunk))
-			throw new ArgumentException("Chunk already exists in world!");
+		Debug.Log($"Adding chunk data at {chunkData.Position.X}, {chunkData.Position.Z}");
 
-		_chunks.Add(chunk);
+		// if the chunk already exists, add data
+		// otherwise, make a new chunk
+		var existingChunk = _chunks.Find(c => c.Position.Equals(chunkData.Position));
+		if (existingChunk != null)	// chunk already exists
+		{
+			if (chunkData.GroundUpContinuous)
+			{
+				// discreetly unload chunk
+				UnloadChunk(chunkData.Position);
+			}
+
+			existingChunk.AddChunkData(chunkData);
+			ChunkRenderer.MarkChunkForRegeneration(existingChunk);
+		}
+		else
+		{
+			Chunk chunk = new Chunk(chunkData, this);
+			_chunks.Add(chunk);
+			ChunkRenderer.AddChunk(chunk);
+		}
 	}
 
+	/// <summary>
+	/// Unloads a chunk from the world.
+	/// </summary>
+	/// <param name="pos"></param>
 	public void UnloadChunk(ChunkPos pos)
 	{
 		_chunks.RemoveAll(c => c.Position.Equals(pos));
+		ChunkRenderer.UnloadChunk(pos);
 	}
 
 	/// <summary>

@@ -55,7 +55,7 @@ public class LoginTester : MonoBehaviour
 				catch (Exception)
 				{ break; }
 
-				if (p.ID == 0x22)
+				/*if (p.ID == 0x22)
 				{
 					var packet = new ChunkDataPacket(p);
 					var chunk = new Chunk(packet, world);
@@ -64,7 +64,7 @@ public class LoginTester : MonoBehaviour
 						return;
 					else
 						chunks++;
-				}
+				}*/
 
 				//Debug.Log($"ID: {p.ID.ToString("X")} Length: {p.Payload.Length}");
 			}
@@ -80,7 +80,7 @@ public class LoginTester : MonoBehaviour
 			return;
 		}
 
-		frames++;
+	/*	frames++;
 		System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
 
 		for (int i = 0; i < world._chunks.Count; i++)
@@ -94,6 +94,6 @@ public class LoginTester : MonoBehaviour
 			meshTest.transform.position = new Vector3(c.Position.Z * 16, 0, c.Position.X * 16);
 			meshTest.name = c.Position.ToString();
 			sw.Reset();
-		}
+		}*/
 	}
 }

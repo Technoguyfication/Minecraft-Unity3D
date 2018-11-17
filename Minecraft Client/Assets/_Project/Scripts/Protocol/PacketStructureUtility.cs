@@ -39,6 +39,18 @@ public static class PacketStructureUtility
 		return BitConverter.ToUInt64(ulongRaw.ReverseIfLittleEndian(), 0);
 	}
 
+	public static float GetSingle(List<byte> bytes)
+	{
+		byte[] floatRaw = bytes.Read(4).ToArray();
+		return BitConverter.ToSingle(floatRaw.ReverseIfLittleEndian(), 0);
+	}
+
+	public static double GetDouble(List<byte> bytes)
+	{
+		byte[] doubleRaw = bytes.Read(8).ToArray();
+		return BitConverter.ToDouble(doubleRaw.ReverseIfLittleEndian(), 0);
+	}
+
 	public static bool GetBoolean(List<byte> bytes)
 	{
 		byte[] boolRaw = bytes.Read(1, 0).ToArray();

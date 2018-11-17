@@ -140,6 +140,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02ea3fbb6803d4e4dbfb22f35661817b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  LoadingScreenCanvas: {fileID: 428891662}
   SubtitleText: {fileID: 792475819}
 --- !u!4 &144786504
 Transform:
@@ -166,7 +167,7 @@ GameObject:
   - component: {fileID: 428891664}
   - component: {fileID: 428891663}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: LoadingScreenCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
