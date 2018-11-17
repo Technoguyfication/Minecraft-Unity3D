@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using UnityEngine.SceneManagement;
 using System;
 using System.Threading;
+using System.Collections.Concurrent;
 
 /// <summary>
 /// Manages everything for a game, or connection to a server
@@ -19,8 +20,8 @@ public class GameManager : MonoBehaviour
 
 	private PlayerController _player = null;
 	private NetworkClient _client;
-	private List<Packet> _packetSendQueue = new List<Packet>();
-	private List<PacketData> _packetReceiveQueue = new List<PacketData>();
+	private BlockingCollection<Packet> _packetSendQueue = new BlockingCollection<Packet>();
+	private BlockingCollection<PacketData> _packetReceiveQueue = new BlockingCollection<PacketData>();
 	private Task _netReadTask;
 	private Task _netWriteTask;
 	private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
@@ -58,7 +59,7 @@ public class GameManager : MonoBehaviour
 			}
 
 			// handle packets in queue
-			lock (_packetReceiveQueue)
+			if (_packetReceiveQueue.Count > 0)
 			{
 				foreach (PacketData data in _packetReceiveQueue)
 				{
@@ -82,10 +83,7 @@ public class GameManager : MonoBehaviour
 	/// </summary>
 	private void DispatchWritePacket(Packet packet)
 	{
-		lock (_packetSendQueue)
-		{
-			_packetSendQueue.Add(packet);
-		}
+		_packetSendQueue.Add(packet);
 	}
 
 	/// <summary>
@@ -241,23 +239,20 @@ public class GameManager : MonoBehaviour
 	{
 		while (!ct.IsCancellationRequested)
 		{
-			lock (_packetReceiveQueue)
+			PacketData data;
+			try
 			{
-				PacketData data;
-				try
-				{
-					data = _client.ReadNextPacket();
-				}
-				catch (Exception)
-				{
-					// if the thread is supposed to be cancelled, regard all errors as by-products of the socket closing
-					if (ct.IsCancellationRequested)
-						return;
-					else
-						throw;
-				}
-				_packetReceiveQueue.Add(data);
+				data = _client.ReadNextPacket();
 			}
+			catch (Exception)
+			{
+				// if the thread is supposed to be cancelled, regard all errors as by-products of the socket closing
+				if (ct.IsCancellationRequested)
+					return;
+				else
+					throw;
+			}
+			_packetReceiveQueue.Add(data);
 		}
 	}
 
@@ -265,22 +260,19 @@ public class GameManager : MonoBehaviour
 	{
 		while (!ct.IsCancellationRequested)
 		{
-			lock (_packetSendQueue)
+			try
 			{
-				try
-				{
-					// send all packets in queue
-					_client.WritePackets(_packetSendQueue);
-					_packetSendQueue.Clear();
-				}
-				catch (Exception)
-				{
-					// if the thread is supposed to be cancelled, regard all errors as by-products of the socket closing
-					if (ct.IsCancellationRequested)
-						return;
-					else
-						throw;
-				}
+				// send all packets in queue
+				foreach (Packet p in _packetSendQueue)
+					_client.WritePacket(p);
+			}
+			catch (Exception)
+			{
+				// if the thread is supposed to be cancelled, regard all errors as by-products of the socket closing
+				if (ct.IsCancellationRequested)
+					return;
+				else
+					throw;
 			}
 		}
 	}
