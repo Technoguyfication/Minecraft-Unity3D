@@ -43,6 +43,8 @@ public class LoginTester : MonoBehaviour
 				client.Disconnect();
 			}).Start();
 
+			int chunks = 0;
+
 			while (true)
 			{
 				PacketData p;
@@ -58,6 +60,10 @@ public class LoginTester : MonoBehaviour
 					var packet = new ChunkDataPacket(p);
 					var chunk = new Chunk(packet, world);
 					world._chunks.Add(chunk);
+					if (chunks > 5)
+						return;
+					else
+						chunks++;
 				}
 
 				//Debug.Log($"ID: {p.ID.ToString("X")} Length: {p.Payload.Length}");
@@ -84,7 +90,7 @@ public class LoginTester : MonoBehaviour
 			sw.Start();
 			meshTest.GetComponent<ChunkMesh>().GenerateMesh(c);
 			sw.Stop();
-			Debug.Log($"Took {sw.ElapsedMilliseconds / 1000f}s to generate chunk at {c.Position}");
+			Debug.Log($"Took {sw.ElapsedMilliseconds / 1000d}s to generate chunk at {c.Position}");
 			meshTest.transform.position = new Vector3(c.Position.Z * 16, 0, c.Position.X * 16);
 			meshTest.name = c.Position.ToString();
 			sw.Reset();

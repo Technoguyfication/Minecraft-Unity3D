@@ -9,7 +9,6 @@ public class GameManager : MonoBehaviour {
 	[Header("Prefabs")]
 	public GameObject PlayerPrefab;
 
-
 	// Use this for initialization
 	void Start () {
 		
@@ -29,8 +28,33 @@ public class GameManager : MonoBehaviour {
 	/// <summary>
 	/// Signals the game manager to connect to a server
 	/// </summary>
-	public void ConnectToServer()
+	public void ConnectToServer(string hostname, int port)
 	{
 
 	}
+}
+
+public enum GameMode : int
+{
+	SURVIVAL = 0,
+	CREATIVE = 1,
+	ADVENTURE = 2,
+	SPECTATOR = 3
+}
+
+public enum Difficulty : int
+{
+	PEACEFUL = 0,
+	EASY = 1,
+	MEDIUM = 2,
+	HARD = 3
+}
+
+public enum LevelType
+{
+	DEFAULT,
+	FLAT,
+	LARGE_BIOMES,
+	AMPLIFIED,
+	DEFAULT_1_1
 }

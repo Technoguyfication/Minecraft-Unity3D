@@ -40,19 +40,23 @@ public class ChunkMesh : MonoBehaviour
 				{
 					BlockPos pos = new BlockPos { X = x, Y = y, Z = z };
 					BlockState block = chunk.World.GetBlock(pos.GetWorldPos(chunk));
-					Vector3 blockPosUnity = new Vector3(pos.Z, pos.Y, pos.X);
 
 					// check if we need to render this block
-					if (!block.IsSolid)
+					if (!block.IsRendered)
 						continue;
-					BlockState[] neighbors = chunk.World.GetNeighbors(pos.GetWorldPos(chunk));
+
+					// if this block is surrounded by solid blocks we dont't need to render it
+					bool[] neighbors = chunk.World.GetNeighbors(pos.GetWorldPos(chunk));
 					if (HasAllNeighbors(neighbors))
 						continue;
+
+					// unity-style position of this block within the chunk to offset verts
+					Vector3 blockPosUnity = new Vector3(pos.Z, pos.Y, pos.X);
 
 					// iterate through each face and add to mesh if it's visible
 					for (int i = 0; i < 6; i++)
 					{
-						if (!neighbors[i].IsSolid)
+						if (!neighbors[i])
 						{
 							Vector3[] newVertices = new Vector3[4];
 							Vector3[] faceVertices = GetVertices(i);
@@ -80,16 +84,15 @@ public class ChunkMesh : MonoBehaviour
 			vertices = vertices.ToArray(),
 			triangles = triangles.ToArray()
 		};
-		newMesh.RecalculateNormals();
+		//newMesh.RecalculateNormals();
 
 		GetComponent<MeshFilter>().mesh = newMesh;
-
 	}
-
-	private bool HasAllNeighbors(BlockState[] blocks)
+	
+	private bool HasAllNeighbors(bool[] blocks)
 	{
 		foreach (var neighbor in blocks)
-			if (neighbor.IsSolid)
+			if (!neighbor)
 				return false;
 
 		return true;

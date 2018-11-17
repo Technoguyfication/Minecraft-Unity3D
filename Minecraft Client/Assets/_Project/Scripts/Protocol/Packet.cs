@@ -45,3 +45,15 @@ public abstract class Packet
 		return builder.ToArray();
 	}
 }
+
+
+[Serializable]
+public class MalformedPacketException : Exception
+{
+	public MalformedPacketException() { }
+	public MalformedPacketException(string message) : base(message) { }
+	public MalformedPacketException(string message, Exception inner) : base(message, inner) { }
+	protected MalformedPacketException(
+	  System.Runtime.Serialization.SerializationInfo info,
+	  System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+}

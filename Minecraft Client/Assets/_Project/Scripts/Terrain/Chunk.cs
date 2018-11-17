@@ -78,7 +78,7 @@ public class Chunk
 	public int GetBlockLightLevel(BlockPos pos)
 	{
 		var chunkPos = pos.GetPosWithinChunk();
-		return _blockLights[pos.X, pos.Y, pos.Z];
+		return _blockLights[chunkPos.X, chunkPos.Y, chunkPos.Z];
 	}
 
 	public int GetSkyLightLevel(BlockPos pos)
@@ -87,7 +87,7 @@ public class Chunk
 			throw new Exception("Sky lights do not exist in this dimension!");
 
 		var chunkPos = pos.GetPosWithinChunk();
-		return _skylights[pos.X, pos.Y, pos.Z];
+		return _blockLights[chunkPos.X, chunkPos.Y, chunkPos.Z];
 	}
 
 	public void AddChunkData(ChunkDataPacket packet)

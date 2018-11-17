@@ -43,20 +43,21 @@ public class World
 	}
 
 	/// <summary>
-	/// Gets the 6 blocks surrounding a block, in order: +X -X +Y -Y +Z -Z
+	/// Gets whether 6 blocks surrounding a block are solid, in order: +X -X +Y -Y +Z -Z
 	/// </summary>
 	/// <param name="pos"></param>
 	/// <returns></returns>
-	public BlockState[] GetNeighbors(BlockPos pos)
+	public bool[] GetNeighbors(BlockPos pos)
 	{
-		return new BlockState[6]
+		// this code is so ugly but idk what else to do with it honestly
+		return new bool[6]
 		{
-			GetBlock(new BlockPos() { X = pos.X + 1, Y = pos.Y, Z = pos.Z }),
-			GetBlock(new BlockPos() { X = pos.X - 1, Y = pos.Y, Z = pos.Z }),
-			GetBlock(new BlockPos() { X = pos.X, Y = pos.Y + 1, Z = pos.Z }),
-			GetBlock(new BlockPos() { X = pos.X, Y = pos.Y - 1, Z = pos.Z }),
-			GetBlock(new BlockPos() { X = pos.X, Y = pos.Y, Z = pos.Z + 1 }),
-			GetBlock(new BlockPos() { X = pos.X, Y = pos.Y, Z = pos.Z - 1 }),
+			GetBlock(new BlockPos() { X = pos.X + 1, Y = pos.Y, Z = pos.Z }).IsSolid,
+			GetBlock(new BlockPos() { X = pos.X - 1, Y = pos.Y, Z = pos.Z }).IsSolid,
+			GetBlock(new BlockPos() { X = pos.X, Y = pos.Y + 1, Z = pos.Z }).IsSolid,
+			GetBlock(new BlockPos() { X = pos.X, Y = pos.Y - 1, Z = pos.Z }).IsSolid,
+			GetBlock(new BlockPos() { X = pos.X, Y = pos.Y, Z = pos.Z + 1 }).IsSolid,
+			GetBlock(new BlockPos() { X = pos.X, Y = pos.Y, Z = pos.Z - 1 }).IsSolid,
 		};
 	}
 

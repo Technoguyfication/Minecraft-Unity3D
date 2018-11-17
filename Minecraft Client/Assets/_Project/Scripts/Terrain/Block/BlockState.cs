@@ -23,6 +23,17 @@ public struct BlockState
 		}
 	}
 
+	/// <summary>
+	/// Whether this block can be rendered I.E. not air, etc.
+	/// </summary>
+	public bool IsRendered
+	{
+		get
+		{
+			return IsSolid;
+		}
+	}
+
 	public BlockType State { get; set; }
 
 	public static explicit operator uint(BlockState s)
