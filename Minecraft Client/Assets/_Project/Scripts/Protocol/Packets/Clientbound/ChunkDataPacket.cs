@@ -26,13 +26,10 @@ public class ChunkDataPacket : Packet
 
 	public ChunkDataPacket()
 	{
-
+		PacketID = (int)ClientboundIDs.CHUNK_DATA;
 	}
 
-	public ChunkDataPacket(PacketData data) : base(data)
-	{
-
-	}
+	public ChunkDataPacket(PacketData data) : base(data) { }
 
 	public override byte[] Payload
 	{

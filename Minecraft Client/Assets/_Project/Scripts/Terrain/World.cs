@@ -9,8 +9,8 @@ public class World
 {
 	public DimensionType Dimension { get; set; }
 
-	// only for now until i get chunk loading implemented
-	public List<Chunk> _chunks;
+	private List<Chunk> _chunks;
+	private ChunkRenderer _chunkRenderer;
 
 	public World()
 	{
@@ -40,6 +40,20 @@ public class World
 	public Chunk GetChunk(ChunkPos pos)
 	{
 		return _chunks.Find(c => c.Position.Equals(pos));
+	}
+
+	public void AddChunk(Chunk chunk)
+	{
+		// make sure we don't leak chunks
+		if (_chunks.Contains(chunk))
+			throw new ArgumentException("Chunk already exists in world!");
+
+		_chunks.Add(chunk);
+	}
+
+	public void UnloadChunk(ChunkPos pos)
+	{
+		_chunks.RemoveAll(c => c.Position.Equals(pos));
 	}
 
 	/// <summary>

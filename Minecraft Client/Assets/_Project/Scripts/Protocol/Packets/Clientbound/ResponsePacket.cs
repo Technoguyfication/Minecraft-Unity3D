@@ -11,7 +11,7 @@ public class ResponsePacket : Packet
 {
 	public ResponsePacket()
 	{
-
+		PacketID = (int)ClientboundIDs.STATUS_RESPONSE;
 	}
 
 	public ResponsePacket(PacketData data) : base(data) { }

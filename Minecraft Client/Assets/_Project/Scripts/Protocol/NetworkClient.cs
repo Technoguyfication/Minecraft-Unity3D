@@ -39,9 +39,7 @@ public class NetworkClient : IDisposable
 
 	public void Dispose()
 	{
-		if (Client?.Connected ?? false)
-			Disconnect();
-
+		Disconnect();
 		Client?.Dispose();
 	}
 
@@ -60,16 +58,12 @@ public class NetworkClient : IDisposable
 	}
 
 	/// <summary>
-	/// Disconnect from a server, sending the correct packets if needed
+	/// Disconnect from a server
 	/// </summary>
 	public void Disconnect()
 	{
-		// TODO: use the correct protocol for disconnecting
-
-		if (!Client.Connected)
+		if (!Client?.Connected ?? false)
 			return;
-
-		Client.Dispose();
 	}
 
 	/// <summary>

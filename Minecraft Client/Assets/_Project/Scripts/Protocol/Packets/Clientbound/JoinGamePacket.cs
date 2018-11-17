@@ -21,6 +21,7 @@ public class JoinGamePacket : Packet
 			List<byte> buffer = new List<byte>(value);
 			PlayerEntityId = PacketStructureUtility.GetInt32(buffer);
 			GameMode = (GameMode)buffer.Read(1)[0];
+			Dimension = (World.DimensionType)PacketStructureUtility.GetInt32(buffer);
 			Difficulty = (Difficulty)buffer.Read(1)[0];
 			MaxPlayers = buffer.Read(1)[0];
 
@@ -57,7 +58,7 @@ public class JoinGamePacket : Packet
 
 	public JoinGamePacket()
 	{
-		PacketID = 0x25;
+		PacketID = (int)ClientboundIDs.JOIN_GAME;
 	}
 
 	public JoinGamePacket(PacketData data) : base(data) { } // packet id should be set correctly if this ctor is used

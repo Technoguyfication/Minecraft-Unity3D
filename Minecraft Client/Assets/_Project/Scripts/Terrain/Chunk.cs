@@ -225,4 +225,18 @@ public class Chunk
 			//throw new NotImplementedException();
 		}
 	}
+
+	// equality is determined by chunk position
+	// we should never have duplicate chunks in a world
+	// empahsis on "should"
+	public override bool Equals(object obj)
+	{
+		Chunk c = obj as Chunk;
+		return c.Position.Equals(Position);
+	}
+
+	public override int GetHashCode()
+	{
+		return Position.GetHashCode();
+	}
 }

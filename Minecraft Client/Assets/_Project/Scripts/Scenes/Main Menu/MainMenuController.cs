@@ -11,6 +11,8 @@ public class MainMenuController : MonoBehaviour
 	public InputField AddressInput;
 	public InputField PortInput;
 
+	public GameManager GameManager;
+
 	// Use this for initialization
 	void Start()
 	{
@@ -32,6 +34,13 @@ public class MainMenuController : MonoBehaviour
 		int port = int.Parse(PortInput.text);
 
 		StartCoroutine(QueryServerCoroutine(hostname, port));
+	}
+
+	public void ConnectToServer()
+	{
+		string hostname = AddressInput.text;
+		int port = int.Parse(PortInput.text);
+		StartCoroutine(GameManager.ConnectToServerCoroutine(hostname, port));
 	}
 
 	private IEnumerator QueryServerCoroutine(string hostname, int port)
@@ -64,7 +73,7 @@ public class MainMenuController : MonoBehaviour
 					new HandshakePacket()
 					{
 						 Address = hostname,
-						 Port = (ushort)port,
+						 Port = port,
 						 NextState = NetworkClient.ProtocolState.STATUS
 					},
 					new RequestPacket()

@@ -8,6 +8,7 @@ using UnityEngine;
 [RequireComponent(typeof(MeshRenderer))]
 public class ChunkMesh : MonoBehaviour
 {
+	public Chunk Chunk;
 
 	// Use this for initialization
 	void Start()
@@ -25,7 +26,7 @@ public class ChunkMesh : MonoBehaviour
 	/// Generates a mesh from a chunk
 	/// </summary>
 	/// <param name="chunk"></param>
-	public void GenerateMesh(Chunk chunk)
+	public void GenerateMesh()
 	{
 		List<Vector3> vertices = new List<Vector3>();
 		List<int> triangles = new List<int>();
@@ -34,19 +35,19 @@ public class ChunkMesh : MonoBehaviour
 		// iterate through each block in chunk
 		for (int z = 0; z < 16; z++)
 		{
-			for (int y = 0; y < chunk.MaxHeight; y++)
+			for (int y = 0; y < Chunk.MaxHeight; y++)
 			{
 				for (int x = 0; x < 16; x++)
 				{
 					BlockPos pos = new BlockPos { X = x, Y = y, Z = z };
-					BlockState block = chunk.World.GetBlock(pos.GetWorldPos(chunk));
+					BlockState block = Chunk.World.GetBlock(pos.GetWorldPos(Chunk));
 
 					// check if we need to render this block
 					if (!block.IsRendered)
 						continue;
 
 					// if this block is surrounded by solid blocks we dont't need to render it
-					bool[] neighbors = chunk.World.GetNeighbors(pos.GetWorldPos(chunk));
+					bool[] neighbors = Chunk.World.GetNeighbors(pos.GetWorldPos(Chunk));
 					if (HasAllNeighbors(neighbors))
 						continue;
 

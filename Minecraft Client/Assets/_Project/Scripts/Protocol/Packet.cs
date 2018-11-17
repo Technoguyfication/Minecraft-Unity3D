@@ -46,6 +46,42 @@ public abstract class Packet
 	}
 }
 
+/// <summary>
+/// States are assumed to be PLAY unless prepended e.x. STATUS_RESPONSE vs CHUNK_DATA
+/// </summary>
+public enum ClientboundIDs : int
+{
+	// status
+	STATUS_RESPONSE = 0x00,
+	STATUS_PONG = 0x01,
+
+	// login
+	LOGIN_DISCONNECT = 0x00,
+	LOGIN_ENCRYPTION_REQUEST = 0x01,
+	LOGIN_SUCCESS = 0x02,
+	LOGIN_SET_COMPRESSION = 0x03,
+
+	// play
+	CHUNK_DATA = 0x22,
+	KEEP_ALIVE = 0x21,
+	JOIN_GAME = 0x25,
+	DISCONNECT = 0x1b,
+	PLAYER_POSITION_AND_LOOK = 0x32,
+}
+
+public enum ServerboundIDs : int
+{
+	// status
+	STATUS_REQUEST = 0x00,
+	STATUS_PING = 0x01,
+
+	// login
+	LOGIN_START = 0x00,
+	ENCRYPTION_RESPONSE = 0x01,
+	KEEP_ALIVE = 0x0E,
+
+}
+
 
 [Serializable]
 public class MalformedPacketException : Exception
