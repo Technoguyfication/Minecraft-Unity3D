@@ -11,12 +11,12 @@ using UnityEngine;
 [RequireComponent(typeof(MeshRenderer))]
 public class ChunkMesh : MonoBehaviour
 {
-	public Chunk Chunk { get; set; }
+	public Chunk Chunk { get; set; } = null;
 
 	// Use this for initialization
 	void Start()
 	{
-
+		name = Chunk.Position.ToString();
 	}
 
 	// Update is called once per frame
@@ -29,7 +29,7 @@ public class ChunkMesh : MonoBehaviour
 	/// Generates a mesh from a chunk
 	/// </summary>
 	/// <param name="chunk"></param>
-	public Mesh GenerateMesh()
+	public ChunkMeshData GenerateMesh()
 	{
 		List<Vector3> vertices = new List<Vector3>();
 		List<int> triangles = new List<int>();
@@ -83,14 +83,12 @@ public class ChunkMesh : MonoBehaviour
 			}
 		}
 
-		Mesh newMesh = new Mesh
+		return new ChunkMeshData()
 		{
-			vertices = vertices.ToArray(),
-			triangles = triangles.ToArray()
+			Chunk = this,
+			Vertices = vertices.ToArray(),
+			Triangles = triangles.ToArray()
 		};
-		newMesh.RecalculateNormals();
-
-		return newMesh;
 	}
 
 	public void SetMesh(Mesh mesh)
@@ -173,7 +171,9 @@ public class ChunkMesh : MonoBehaviour
 	public override bool Equals(object other)
 	{
 		ChunkMesh mesh = other as ChunkMesh;
-		return mesh.Equals(Chunk);
+		if (other == null)
+			return false;
+		return mesh.Chunk.Position.Equals(Chunk.Position);
 	}
 
 	public override int GetHashCode()

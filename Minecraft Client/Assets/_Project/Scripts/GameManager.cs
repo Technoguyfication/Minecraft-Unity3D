@@ -219,8 +219,6 @@ public class GameManager : MonoBehaviour
 	/// <param name="data"></param>
 	private void HandlePacket(PacketData data)
 	{
-		Debug.Log(data.ID.ToString("X"));
-
 		switch ((ClientboundIDs)data.ID)
 		{
 			case ClientboundIDs.DISCONNECT:

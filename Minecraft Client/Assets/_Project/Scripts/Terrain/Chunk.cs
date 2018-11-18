@@ -239,4 +239,9 @@ public class Chunk
 	{
 		return Position.GetHashCode();
 	}
+
+	public override string ToString()
+	{
+		return $"({Position.X}, {Position.Z})";
+	}
 }

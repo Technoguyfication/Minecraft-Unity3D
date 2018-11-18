@@ -16,11 +16,16 @@ public class ChunkRenderer : MonoBehaviour
 
 	private List<ChunkMesh> _chunkMeshes = new List<ChunkMesh>();
 	private BlockingCollection<ChunkMesh> _regenerationQueue = new BlockingCollection<ChunkMesh>();
-	private BlockingCollection<MeshData> _finishedMeshes = new BlockingCollection<MeshData>();
+	private BlockingCollection<ChunkMeshData> _finishedMeshes = new BlockingCollection<ChunkMeshData>();
 	private Task _regenerationTask;
 	private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
 	public ChunkRenderer()
+	{
+
+	}
+
+	private void Start()
 	{
 		// start chunk regen task
 		_regenerationTask = new Task(() =>
@@ -32,12 +37,22 @@ public class ChunkRenderer : MonoBehaviour
 
 	private void Update()
 	{
+		// check regeneration worker
+		if (_regenerationTask.IsFaulted)
+			throw _regenerationTask.Exception;
+
 		// add generated meshes to chunks
 		if (_finishedMeshes.Count > 0)
 		{
 			foreach (var meshData in _finishedMeshes)
 			{
-				meshData.Chunk.SetMesh(meshData.Mesh);
+				Mesh mesh = new Mesh()
+				{
+					vertices = meshData.Vertices,
+					triangles = meshData.Triangles
+				};
+
+				meshData.Chunk.SetMesh(mesh);
 			}
 		}
 	}
@@ -48,8 +63,10 @@ public class ChunkRenderer : MonoBehaviour
 	/// <param name="chunk"></param>
 	public void AddChunk(Chunk chunk)
 	{
-		var chunkMeshObject = Instantiate(ChunkMeshPrefab, new Vector3(chunk.Position.Z, 0, chunk.Position.X), Quaternion.identity);
+		var chunkMeshObject = Instantiate(ChunkMeshPrefab, new Vector3(chunk.Position.Z * 16, 0, chunk.Position.X * 16), Quaternion.identity);
 		var chunkMesh = chunkMeshObject.GetComponent<ChunkMesh>();
+		chunkMesh.Chunk = chunk;
+		chunkMesh.name = chunk.Position.ToString();
 
 		// add chunkmesh to list
 		_chunkMeshes.Add(chunkMesh);
@@ -71,7 +88,7 @@ public class ChunkRenderer : MonoBehaviour
 	public void UnloadChunk(ChunkMesh chunkMesh)
 	{
 		// check if chunk exists
-		if (!_chunkMeshes.Contains(chunkMesh))
+		if (!_chunkMeshes.Contains(chunkMesh) || chunkMesh == null)
 			return;
 
 		_chunkMeshes.Remove(chunkMesh);
@@ -80,7 +97,8 @@ public class ChunkRenderer : MonoBehaviour
 
 	public void UnloadChunk(ChunkPos pos)
 	{
-		UnloadChunk(_chunkMeshes.Find(cm => cm.Chunk.Position.Equals(pos)));
+		UnloadChunk(_chunkMeshes.Find(cm => 
+		cm.Chunk.Position.Equals(pos)));
 	}
 
 	public void UnloadAllChunks()
@@ -106,7 +124,7 @@ public class ChunkRenderer : MonoBehaviour
 	/// <param name="chunk"></param>
 	public void MarkChunkForRegeneration(Chunk chunk)
 	{
-		_regenerationQueue.Add(GetChunkMesh(chunk));
+		MarkChunkForRegeneration(GetChunkMesh(chunk));
 	}
 
 	/// <summary>
@@ -121,7 +139,7 @@ public class ChunkRenderer : MonoBehaviour
 
 	private void RegenerationWorker(CancellationToken token)
 	{
-		while (token.IsCancellationRequested)
+		while (!token.IsCancellationRequested)
 		{
 			// generate mesh on another thread
 			ChunkMesh chunkMesh = _regenerationQueue.Take(token);
@@ -130,17 +148,18 @@ public class ChunkRenderer : MonoBehaviour
 			if (!_chunkMeshes.Contains(chunkMesh))
 				continue;
 
-			Mesh newMesh = chunkMesh.GenerateMesh();
+			var meshData = chunkMesh.GenerateMesh();
 
 			// add finished mesh to queue so we can quickly add it to our chunk object
-			_finishedMeshes.Add(new MeshData() { Mesh = newMesh, Chunk = chunkMesh });
+			_finishedMeshes.Add(meshData);
 		}
 	}
 }
 
-struct MeshData
+public struct ChunkMeshData
 {
 	public ChunkMesh Chunk { get; set; }
-	public Mesh Mesh { get; set; }
+	public Vector3[] Vertices { get; set; }
+	public int[] Triangles { get; set; }
 }
 
