@@ -42,7 +42,12 @@ public class World
 	/// <returns></returns>
 	public Chunk GetChunk(ChunkPos pos)
 	{
-		return _chunks.Find(c => c.Position.Equals(pos));
+		try
+		{
+			return _chunks.Find(c => c.Position.Equals(pos));
+		}
+		catch (Exception)
+		{ throw; }
 	}
 
 	/// <summary>
@@ -60,8 +65,8 @@ public class World
 		{
 			if (chunkData.GroundUpContinuous)
 			{
-				// discreetly unload chunk
-				UnloadChunk(chunkData.Position);
+				Debug.LogWarning($"Packet data for chunk at {chunkData.Position} tried to load GroundUpContinuous for already loaded chunk!");
+				return;
 			}
 
 			existingChunk.AddChunkData(chunkData);

@@ -21,7 +21,7 @@ public class GameManager : MonoBehaviour
 	private PlayerController _player = null;
 	private NetworkClient _client;
 	private BlockingCollection<Packet> _packetSendQueue = new BlockingCollection<Packet>();
-	private BlockingCollection<PacketData> _packetReceiveQueue = new BlockingCollection<PacketData>();
+	private List<PacketData> _packetReceiveQueue = new List<PacketData>();
 	private Task _netReadTask;
 	private Task _netWriteTask;
 	private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
@@ -59,12 +59,13 @@ public class GameManager : MonoBehaviour
 			}
 
 			// handle packets in queue
-			if (_packetReceiveQueue.Count > 0)
+			lock (_packetReceiveQueue)
 			{
-				foreach (PacketData data in _packetReceiveQueue)
+				foreach (var packet in _packetReceiveQueue)
 				{
-					HandlePacket(data);
+					HandlePacket(packet);
 				}
+				_packetReceiveQueue.Clear();
 			}
 		}
 	}
@@ -250,7 +251,10 @@ public class GameManager : MonoBehaviour
 				else
 					throw;
 			}
-			_packetReceiveQueue.Add(data);
+			lock (_packetReceiveQueue)
+			{
+				_packetReceiveQueue.Add(data);
+			}
 		}
 	}
 

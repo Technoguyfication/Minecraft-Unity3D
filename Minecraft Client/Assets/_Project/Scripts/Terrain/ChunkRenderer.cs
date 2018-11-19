@@ -16,14 +16,9 @@ public class ChunkRenderer : MonoBehaviour
 
 	private List<ChunkMesh> _chunkMeshes = new List<ChunkMesh>();
 	private BlockingCollection<ChunkMesh> _regenerationQueue = new BlockingCollection<ChunkMesh>();
-	private BlockingCollection<ChunkMeshData> _finishedMeshes = new BlockingCollection<ChunkMeshData>();
+	private List<ChunkMeshData> _finishedMeshes = new List<ChunkMeshData>();
 	private Task _regenerationTask;
 	private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
-
-	public ChunkRenderer()
-	{
-
-	}
 
 	private void Start()
 	{
@@ -42,7 +37,7 @@ public class ChunkRenderer : MonoBehaviour
 			throw _regenerationTask.Exception;
 
 		// add generated meshes to chunks
-		if (_finishedMeshes.Count > 0)
+		lock(_finishedMeshes)
 		{
 			foreach (var meshData in _finishedMeshes)
 			{
@@ -51,9 +46,10 @@ public class ChunkRenderer : MonoBehaviour
 					vertices = meshData.Vertices,
 					triangles = meshData.Triangles
 				};
-
+				mesh.RecalculateNormals();
 				meshData.Chunk.SetMesh(mesh);
 			}
+			_finishedMeshes.Clear();
 		}
 	}
 
@@ -151,7 +147,10 @@ public class ChunkRenderer : MonoBehaviour
 			var meshData = chunkMesh.GenerateMesh();
 
 			// add finished mesh to queue so we can quickly add it to our chunk object
-			_finishedMeshes.Add(meshData);
+			lock (_finishedMeshes)
+			{
+				_finishedMeshes.Add(meshData);
+			}
 		}
 	}
 }
