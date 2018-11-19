@@ -232,6 +232,7 @@ public class GameManager : MonoBehaviour
 				break;
 			case ClientboundIDs.KEEP_ALIVE:
 				DispatchWritePacket(new ServerKeepAlivePacket() { Payload = data.Payload });
+				Debug.Log($"Sending keep-alive: {BitConverter.ToInt64(data.Payload.ReverseIfLittleEndian(), 0)}");
 				break;
 			case ClientboundIDs.CHUNK_DATA:
 				_currentWorld.AddChunkData(new ChunkDataPacket(data));
