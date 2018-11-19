@@ -9,27 +9,53 @@ public class PlayerController : MonoBehaviour {
 	public float SneakSpeed = 1.31f;
 	public float WalkSpeed = 4.17f;
 	public float SprintSpeed = 5.612f;
-	public float JumpHeight = 1.25f;	// sometimes changes (potions, etc.)
+	public float JumpHeight = 1.25f;    // sometimes changes (potions, etc.)
 	public GameObject Camera;
-
-	private float _cameraRotationX = 0f;
-	private float _cameraRotationY = 0f;
 	private float _cameraMinX = -90f;
 	private float _cameraMaxX = 90f;
 
-	// Use this for initialization
-	void Start () {
-		
+	/// <summary>
+	/// Whether the player is touching the ground or not
+	/// </summary>
+	public bool OnGround
+	{
+		get
+		{
+			// perform raycast to check if we are grounded
+			return Physics.Raycast(transform.position, -Vector3.up, GetComponent<BoxCollider>().bounds.extents.y + 0.01f);
+		}
 	}
-	
+
+	public double X { get { return transform.position.z; } }
+	public double FeetY { get { return transform.position.y; } }
+	public double Z { get { return transform.position.x; } }
+	public float Yaw { get; set; } = 0f;
+	public float Pitch { get; set; } = 0f;
+
+	// Use this for initialization
+	void Start() {
+
+	}
+
+	public void SetPosition(Vector3 position)
+	{
+		transform.position = position;
+	}
+
+	public void SetRotation(Quaternion rotation)
+	{
+		Yaw = rotation.eulerAngles.x;
+		Pitch = rotation.eulerAngles.y;
+	}
+
 	// Update is called once per frame
 	void Update () {
-		_cameraRotationX -= Input.GetAxis("Mouse Y") * MouseSensitivity;
-		_cameraRotationX = Mathf.Clamp(_cameraRotationX, _cameraMinX, _cameraMaxX);
+		Yaw -= Input.GetAxis("Mouse Y") * MouseSensitivity;
+		Yaw = Mathf.Clamp(Yaw, _cameraMinX, _cameraMaxX);
 
-		_cameraRotationY += Input.GetAxis("Mouse X") * MouseSensitivity;
+		Pitch += Input.GetAxis("Mouse X") * MouseSensitivity;
 
-		Camera.transform.localEulerAngles = new Vector3(_cameraRotationX, _cameraRotationY, 0);
+		Camera.transform.localEulerAngles = new Vector3(Yaw, Pitch, 0);
 
 		// jumping
 		if (Input.GetKeyDown(KeyCode.Space))

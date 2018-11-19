@@ -34,16 +34,6 @@ public abstract class Packet
 	{
 		return $"Length: {Length} ID: {PacketID} Data (raw): {BitConverter.ToString(Payload)}";
 	}
-
-	public static byte[] GetRaw(Packet p)
-	{
-		List<byte> builder = new List<byte>();
-		builder.AddRange(VarInt.GetBytes(p.Length));
-		builder.AddRange(VarInt.GetBytes(p.PacketID));
-		builder.AddRange(p.Payload);
-
-		return builder.ToArray();
-	}
 }
 
 /// <summary>

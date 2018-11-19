@@ -28,6 +28,8 @@ public class GameManager : MonoBehaviour
 	private bool _initialized = false;
 	private World _currentWorld;
 	private string _playerUuid;
+	private LoadingScreenController _loadingScreen;
+	private int _lastTick = 0;
 
 	// Use this for initialization
 	void Start()
@@ -109,8 +111,8 @@ public class GameManager : MonoBehaviour
 		Debug.Log("Closed main menu");
 
 		// find loading screen controller
-		LoadingScreenController controller = GameObject.FindGameObjectWithTag("Loading Screen Controller").GetComponent<LoadingScreenController>();
-		controller.UpdateSubtitleText($"Attempting to connect to {hostname}:{port}");
+		_loadingScreen = GameObject.FindGameObjectWithTag("Loading Screen Controller").GetComponent<LoadingScreenController>();
+		_loadingScreen.UpdateSubtitleText($"Attempting to connect to {hostname}:{port}");
 
 		// set up network client
 		_client = new NetworkClient();
@@ -126,7 +128,7 @@ public class GameManager : MonoBehaviour
 		if (connectTask.IsFaulted || !_client.Connected)
 			throw (Exception)connectTask.Exception ?? new UnityException("Connection failed: Unknown");
 
-		controller.UpdateSubtitleText("Connection established. Asking server nicely to let us play.");
+		_loadingScreen.UpdateSubtitleText("Connection established. Asking server nicely to let us play.");
 
 		// perform handshake/login
 		LoginSuccessPacket loginSuccess = null;
@@ -196,7 +198,7 @@ public class GameManager : MonoBehaviour
 		// set up references in game scene
 		_currentWorld.ChunkRenderer = GameObject.FindGameObjectWithTag("Chunk Renderer").GetComponent<ChunkRenderer>();
 
-		controller.UpdateSubtitleText("Downloading terrain...");
+		_loadingScreen.UpdateSubtitleText("Downloading terrain...");
 
 		// start network worker tasks
 		_netReadTask = new Task(() =>
@@ -212,6 +214,9 @@ public class GameManager : MonoBehaviour
 		_netWriteTask.Start();
 
 		_initialized = true;
+
+		// start tick loop
+		StartCoroutine(ClientTickLoopCoroutine(_cancellationTokenSource.Token));
 	}
 
 	/// <summary>
@@ -231,6 +236,65 @@ public class GameManager : MonoBehaviour
 			case ClientboundIDs.CHUNK_DATA:
 				_currentWorld.AddChunkData(new ChunkDataPacket(data));
 				break;
+			case ClientboundIDs.PLAYER_POSITION_AND_LOOK:
+				HandlePositionAndLook(new ClientPlayerPositionAndLookPacket(data));
+				break;
+		}
+	}
+
+	private void HandlePositionAndLook(ClientPlayerPositionAndLookPacket packet)
+	{
+		Vector3 pos = new Vector3((float)packet.Z, (float)packet.Y, (float)packet.X);
+		Quaternion rot = Quaternion.Euler(packet.Pitch, packet.Yaw, 0);
+
+		// check if we need to spawn the player for the first time
+		if (_player == null)
+		{
+			_player = Instantiate(PlayerPrefab).GetComponent<PlayerController>();
+			_loadingScreen.HideLoadingScreen();
+		}
+
+		// update player position
+		_player.SetPosition(pos);
+		_player.SetRotation(rot);
+
+		Debug.Log($"Moved player to {pos}, {rot}");
+
+		DispatchWritePacket(new TeleportConfirmPacket()
+		{
+			TeleportID = packet.TeleportID
+		});
+	}
+
+	/// <summary>
+	/// Runs 20 times per second for each tick
+	/// </summary>
+	/// <param name="ct"></param>
+	private IEnumerator ClientTickLoopCoroutine(CancellationToken ct)
+	{
+		while (!ct.IsCancellationRequested)
+		{
+			// wait for next tick
+			while (_lastTick > (int)(Time.unscaledTime / 1000f) - 50)
+				yield return null;
+
+			// update player position
+			// TODO: only update look / position if player has moved
+			if (_player != null)
+			{
+				DispatchWritePacket(new ServerPlayerPositionAndLookPacket()
+				{
+					X = _player.X,
+					FeetY = _player.FeetY,
+					Z = _player.Z,
+					Yaw = _player.Yaw,
+					Pitch = _player.Pitch,
+					OnGround = _player.OnGround
+				});
+			}
+
+			// update tick time
+			_lastTick = (int)(Time.unscaledTime / 1000f);
 		}
 	}
 

@@ -4,8 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-
-class Biome
+/// <summary>
+/// Represents a biome in-game
+/// </summary>
+public struct Biome
 {
+	public int BiomeID { get; set; }
 }
 

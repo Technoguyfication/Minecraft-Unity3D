@@ -102,8 +102,41 @@ public class NetworkClient : IDisposable
 	{
 		lock (StreamWriteLock)
 		{
-			byte[] buffer = Packet.GetRaw(p);
-			Write(buffer, 0, buffer.Length);
+			List<byte> buffer = new List<byte>();
+
+			// check if compression enabled
+			if (_compressionThreshold >= 0)
+			{
+				List<byte> uncompressedBody = new List<byte>(VarInt.GetBytes(p.PacketID));
+				uncompressedBody.AddRange(p.Payload);
+
+				if (uncompressedBody.Count >= _compressionThreshold)
+				{
+					// compress data
+					byte[] compressedBody = ZlibStream.CompressBuffer(uncompressedBody.ToArray());
+
+					// add the packet payload data first, and we will insert the length of the data at the beginning of the packet
+					buffer.AddRange(VarInt.GetBytes(uncompressedBody.Count));
+					buffer.AddRange(compressedBody);
+					buffer.InsertRange(0, VarInt.GetBytes(buffer.Count));
+				}
+				else
+				{
+					// data length below compression threshold
+					buffer.AddRange(VarInt.GetBytes(uncompressedBody.Count + 1));	// add one for length of data length
+					buffer.Add(0);  // 0 data length for uncompressed payload
+					buffer.AddRange(uncompressedBody);
+				}
+			}
+			else
+			{
+				// no compression
+				buffer.AddRange(VarInt.GetBytes(p.Length));
+				buffer.AddRange(VarInt.GetBytes(p.PacketID));
+				buffer.AddRange(p.Payload);
+			}
+
+			Write(buffer.ToArray(), 0, buffer.Count);
 		}
 	}
 

@@ -94,6 +94,7 @@ public class ChunkMesh : MonoBehaviour
 	public void SetMesh(Mesh mesh)
 	{
 		GetComponent<MeshFilter>().mesh = mesh;
+		GetComponent<MeshCollider>().sharedMesh = mesh;
 	}
 
 	private bool HasAllNeighbors(bool[] blocks)

@@ -42,12 +42,10 @@ public class World
 	/// <returns></returns>
 	public Chunk GetChunk(ChunkPos pos)
 	{
-		try
-		{
+		if (_chunks.Exists(c => c.Position.Equals(pos)))
 			return _chunks.Find(c => c.Position.Equals(pos));
-		}
-		catch (Exception)
-		{ throw; }
+		else
+			return null;
 	}
 
 	/// <summary>
