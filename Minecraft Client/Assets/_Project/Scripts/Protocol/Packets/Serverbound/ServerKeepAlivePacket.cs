@@ -6,7 +6,19 @@ using System.Threading.Tasks;
 
 public class ServerKeepAlivePacket : Packet
 {
-	public override byte[] Payload { get; set; }
+	public long KeepAliveID { get; set; }
+
+	public override byte[] Payload
+	{
+		set
+		{
+			throw new NotImplementedException();
+		}
+		get
+		{
+			return BitConverter.GetBytes(KeepAliveID).ReverseIfLittleEndian();
+		}
+	}
 
 	public ServerKeepAlivePacket()
 	{

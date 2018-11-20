@@ -6,7 +6,19 @@ using System.Threading.Tasks;
 
 public class ClientKeepAlivePacket : Packet
 {
-	public override byte[] Payload { get; set; }
+	public long KeepAliveID { get; set; }
+
+	public override byte[] Payload
+	{
+		set
+		{
+			KeepAliveID = PacketStructureUtility.GetInt64(new List<byte>(value));
+		}
+		get
+		{
+			throw new NotImplementedException();
+		}
+	}
 
 	public ClientKeepAlivePacket()
 	{

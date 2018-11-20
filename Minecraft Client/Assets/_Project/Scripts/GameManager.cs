@@ -231,7 +231,7 @@ public class GameManager : MonoBehaviour
 				Disconnect(new DisconnectPacket(data).JSONResponse);
 				break;
 			case ClientboundIDs.KEEP_ALIVE:
-				DispatchWritePacket(new ServerKeepAlivePacket() { Payload = data.Payload });
+				DispatchWritePacket(new ServerKeepAlivePacket() { KeepAliveID = new ClientKeepAlivePacket(data).KeepAliveID });
 				Debug.Log($"Sending keep-alive: {BitConverter.ToInt64(data.Payload.ReverseIfLittleEndian(), 0)}");
 				break;
 			case ClientboundIDs.CHUNK_DATA:
