@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour
 	public GameObject PlayerPrefab;
 
 	public string Username = "mcplayer";
+	public DebugCanvas DebugCanvas;
 
 	private PlayerController _player = null;
 	private NetworkClient _client;
@@ -29,7 +30,7 @@ public class GameManager : MonoBehaviour
 	private World _currentWorld;
 	private string _playerUuid;
 	private LoadingScreenController _loadingScreen;
-	private int _lastTick = 0;
+	private float _lastTick = 0f;
 
 	// Use this for initialization
 	void Start()
@@ -86,6 +87,7 @@ public class GameManager : MonoBehaviour
 	/// </summary>
 	private void DispatchWritePacket(Packet packet)
 	{
+		DebugCanvas.TxPackets++;
 		_packetSendQueue.Add(packet);
 	}
 
@@ -240,6 +242,8 @@ public class GameManager : MonoBehaviour
 			case ClientboundIDs.PLAYER_POSITION_AND_LOOK:
 				HandlePositionAndLook(new ClientPlayerPositionAndLookPacket(data));
 				break;
+			default:
+				break;
 		}
 	}
 
@@ -247,6 +251,8 @@ public class GameManager : MonoBehaviour
 	{
 		Vector3 pos = new Vector3((float)packet.Z, (float)packet.Y, (float)packet.X);
 		Quaternion rot = Quaternion.Euler(packet.Pitch, packet.Yaw, 0);
+
+		Debug.Log($"Moved player to {pos.ToString()} / {rot.ToString()}");
 
 		// check if we need to spawn the player for the first time
 		if (_player == null)
@@ -276,8 +282,10 @@ public class GameManager : MonoBehaviour
 		while (!ct.IsCancellationRequested)
 		{
 			// wait for next tick
-			while (_lastTick > (int)(Time.unscaledTime / 1000f) - 50)
+			while (_lastTick > (Time.unscaledTime - 0.05f))
 				yield return null;
+
+			DebugCanvas.TickCount++;
 
 			// update player position
 			// TODO: only update look / position if player has moved
@@ -295,7 +303,7 @@ public class GameManager : MonoBehaviour
 			}
 
 			// update tick time
-			_lastTick = (int)(Time.unscaledTime / 1000f);
+			_lastTick = Time.unscaledTime;
 		}
 	}
 
@@ -316,6 +324,7 @@ public class GameManager : MonoBehaviour
 				else
 					throw;
 			}
+			DebugCanvas.RxPackets++;
 			lock (_packetReceiveQueue)
 			{
 				_packetReceiveQueue.Add(data);
@@ -330,7 +339,7 @@ public class GameManager : MonoBehaviour
 			try
 			{
 				// send all packets in queue
-				foreach (Packet p in _packetSendQueue)
+				foreach (Packet p in _packetSendQueue.GetConsumingEnumerable())
 					_client.WritePacket(p);
 			}
 			catch (Exception)

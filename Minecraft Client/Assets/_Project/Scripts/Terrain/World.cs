@@ -42,10 +42,20 @@ public class World
 	/// <returns></returns>
 	public Chunk GetChunk(ChunkPos pos)
 	{
-		if (_chunks.Exists(c => c.Position.Equals(pos)))
+		if (IsChunkLoaded(pos))
 			return _chunks.Find(c => c.Position.Equals(pos));
 		else
 			return null;
+	}
+
+	/// <summary>
+	/// Returns whether the client has a chunk loaded
+	/// </summary>
+	/// <param name="pos"></param>
+	/// <returns></returns>
+	public bool IsChunkLoaded(ChunkPos pos)
+	{
+		return _chunks.Exists(c => c.Position.Equals(pos));
 	}
 
 	/// <summary>

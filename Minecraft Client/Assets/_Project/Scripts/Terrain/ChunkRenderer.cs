@@ -54,6 +54,16 @@ public class ChunkRenderer : MonoBehaviour
 	}
 
 	/// <summary>
+	/// Returns whether a chunk is generated
+	/// </summary>
+	/// <param name="pos"></param>
+	/// <returns></returns>
+	public bool IsChunkGenerated(ChunkPos pos)
+	{
+		return _chunkMeshes.Exists(c => c.Chunk.Position.Equals(pos));
+	}
+
+	/// <summary>
 	/// Adds a chunk to the list of chunks we are rendering, and marks it for mesh regeneration
 	/// </summary>
 	/// <param name="chunk"></param>
