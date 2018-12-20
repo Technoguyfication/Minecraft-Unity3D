@@ -204,8 +204,7 @@ public class NetworkClient : IDisposable
 			payload = buffer.ToArray();
 		}
 
-		// todo: re-enable this once an actual game manager gets made
-		if (/*State == ProtocolState.LOGIN &&*/ packetId == 0x03)   // set compression packet
+		if (State == ProtocolState.LOGIN && packetId == 0x03)   // set compression packet
 		{
 			_compressionThreshold = VarInt.ReadNext(new List<byte>(payload));
 			return ReadNextPacket();

@@ -154,6 +154,8 @@ public class GameManager : MonoBehaviour
 				}
 			});
 
+			_client.State = NetworkClient.ProtocolState.LOGIN;
+
 			// get response
 			while (true)
 			{
@@ -171,7 +173,10 @@ public class GameManager : MonoBehaviour
 				}
 
 				if (loginSuccess != null && joinGame != null)
+				{
+					_client.State = NetworkClient.ProtocolState.PLAY;
 					break;
+				}
 			}
 		});
 		loginTask.Start();
