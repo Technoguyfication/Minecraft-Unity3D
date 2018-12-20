@@ -61,9 +61,9 @@ public class PlayerController : MonoBehaviour
 		{
 			return new BlockPos()
 			{
-				X = (int)X,
+				X = (int)X - ((X < 0) ? 1 : 0),
 				Y = (int)FeetY,
-				Z = (int)Z
+				Z = (int)Z - ((Z < 0) ? 1 : 0)
 			};
 		}
 	}
@@ -91,12 +91,17 @@ public class PlayerController : MonoBehaviour
 	{
 		Pitch -= Input.GetAxis("Mouse Y") * MouseSensitivity;
 		Pitch = Mathf.Clamp(Pitch, _cameraMinX, _cameraMaxX);
-		Pitch = Utility.Mod(Pitch, 90.1f);
 
 		Yaw += Input.GetAxis("Mouse X") * MouseSensitivity;
-		Yaw = Utility.Mod(Yaw, 180.1f);
 
 		Camera.transform.localEulerAngles = new Vector3(Pitch, Yaw, 0);
+
+		// clamp wrapping rotation of camera
+		Yaw %= 360;
+		if (Yaw > 180)
+			Yaw += 360;
+		else
+			Yaw -= 360;
 
 		// jumping
 		if (Input.GetKey(KeyCode.Space) && OnGround)

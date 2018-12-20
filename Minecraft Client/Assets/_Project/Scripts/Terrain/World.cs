@@ -14,10 +14,12 @@ public class World
 	public ChunkRenderer ChunkRenderer;
 
 	private List<Chunk> _chunks;
+	private DebugCanvas _debugCanvas;
 
-	public World()
+	public World(DebugCanvas debug = null)
 	{
 		_chunks = new List<Chunk>();
+		_debugCanvas = debug;
 	}
 
 	/// <summary>

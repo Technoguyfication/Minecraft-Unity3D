@@ -190,7 +190,7 @@ public class GameManager : MonoBehaviour
 
 		// set settings from server
 		_playerUuid = loginSuccess.UUID;
-		_currentWorld = new World()
+		_currentWorld = new World(DebugCanvas)
 		{
 			Dimension = joinGame.Dimension,
 		};
@@ -204,6 +204,7 @@ public class GameManager : MonoBehaviour
 
 		// set up references in game scene
 		_currentWorld.ChunkRenderer = GameObject.FindGameObjectWithTag("Chunk Renderer").GetComponent<ChunkRenderer>();
+		_currentWorld.ChunkRenderer.DebugCanvas = DebugCanvas;
 
 		_loadingScreen.UpdateSubtitleText("Downloading terrain...");
 

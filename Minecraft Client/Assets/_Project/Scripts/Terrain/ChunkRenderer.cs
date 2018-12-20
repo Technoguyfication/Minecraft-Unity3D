@@ -13,6 +13,7 @@ using UnityEngine;
 public class ChunkRenderer : MonoBehaviour
 {
 	public GameObject ChunkMeshPrefab;
+	public DebugCanvas DebugCanvas;
 
 	private List<ChunkMesh> _chunkMeshes = new List<ChunkMesh>();
 	private BlockingCollection<ChunkMesh> _regenerationQueue = new BlockingCollection<ChunkMesh>();
@@ -46,8 +47,12 @@ public class ChunkRenderer : MonoBehaviour
 					vertices = meshData.Vertices,
 					triangles = meshData.Triangles
 				};
+				// todo: create normals with mesh
 				mesh.RecalculateNormals();
 				meshData.Chunk.SetMesh(mesh);
+
+				// add chunk time to debug screen
+				DebugCanvas.AverageChunkTime.Add(meshData.Time);
 			}
 			_finishedMeshes.Clear();
 		}
@@ -145,6 +150,8 @@ public class ChunkRenderer : MonoBehaviour
 
 	private void RegenerationWorker(CancellationToken token)
 	{
+		var sw = new System.Diagnostics.Stopwatch();
+
 		while (!token.IsCancellationRequested)
 		{
 			// generate mesh on another thread
@@ -154,7 +161,12 @@ public class ChunkRenderer : MonoBehaviour
 			if (!_chunkMeshes.Contains(chunkMesh))
 				continue;
 
+			// time how long it takes to generate mesh
+			sw.Restart();
 			var meshData = chunkMesh.GenerateMesh();
+			sw.Stop();
+
+			meshData.Time = sw.Elapsed.Milliseconds / 1000f;
 
 			// add finished mesh to queue so we can quickly add it to our chunk object
 			lock (_finishedMeshes)
@@ -170,5 +182,6 @@ public struct ChunkMeshData
 	public ChunkMesh Chunk { get; set; }
 	public Vector3[] Vertices { get; set; }
 	public int[] Triangles { get; set; }
+	public float Time { get; set; }
 }
 
