@@ -69,7 +69,7 @@ public class ChunkRenderer : MonoBehaviour
 	/// <param name="chunk"></param>
 	public void AddChunk(Chunk chunk)
 	{
-		var chunkMeshObject = Instantiate(ChunkMeshPrefab, new Vector3(chunk.Position.Z * 16, 0, chunk.Position.X * 16), Quaternion.identity);
+		var chunkMeshObject = Instantiate(ChunkMeshPrefab, new Vector3(chunk.Position.Z * 16, 0.5f, chunk.Position.X * 16), Quaternion.identity);
 		var chunkMesh = chunkMeshObject.GetComponent<ChunkMesh>();
 		chunkMesh.Chunk = chunk;
 		chunkMesh.name = chunk.Position.ToString();
