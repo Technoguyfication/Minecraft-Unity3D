@@ -255,7 +255,7 @@ public class GameManager : MonoBehaviour
 	private void HandlePositionAndLook(ClientPlayerPositionAndLookPacket packet)
 	{
 		Vector3 pos = new Vector3((float)packet.Z, (float)packet.Y, (float)packet.X);
-		Quaternion rot = Quaternion.Euler(packet.Pitch, packet.Yaw, 0);
+		Quaternion rot = Quaternion.Euler(packet.Yaw, packet.Pitch, 0);
 
 		Debug.Log($"Moved player to {pos.ToString()} / {rot.ToString()}");
 
@@ -264,6 +264,7 @@ public class GameManager : MonoBehaviour
 		{
 			_player = Instantiate(PlayerPrefab).GetComponent<PlayerController>();
 			_loadingScreen.HideLoadingScreen();
+			DebugCanvas.Player = _player;
 		}
 
 		// update player position

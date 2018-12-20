@@ -34,8 +34,8 @@ public class PlayerController : MonoBehaviour
 	public double X { get { return transform.position.z; } }
 	public double FeetY { get { return transform.position.y; } }
 	public double Z { get { return transform.position.x; } }
-	public float Yaw { get; set; } = 0f;
 	public float Pitch { get; set; } = 0f;
+	public float Yaw { get; set; } = 0f;
 
 	/// <summary>
 	/// The block this player is in
@@ -67,19 +67,19 @@ public class PlayerController : MonoBehaviour
 
 	public void SetRotation(Quaternion rotation)
 	{
-		Yaw = rotation.eulerAngles.x;
-		Pitch = rotation.eulerAngles.y;
+		Pitch = rotation.eulerAngles.x;
+		Yaw = rotation.eulerAngles.y;
 	}
 
 	// Update is called once per frame
 	void Update()
 	{
-		Yaw -= Input.GetAxis("Mouse Y") * MouseSensitivity;
-		Yaw = Mathf.Clamp(Yaw, _cameraMinX, _cameraMaxX);
+		Pitch -= Input.GetAxis("Mouse Y") * MouseSensitivity;
+		Pitch = Mathf.Clamp(Pitch, _cameraMinX, _cameraMaxX);
 
-		Pitch += Input.GetAxis("Mouse X") * MouseSensitivity;
+		Yaw += Input.GetAxis("Mouse X") * MouseSensitivity;
 
-		Camera.transform.localEulerAngles = new Vector3(Yaw, Pitch, 0);
+		Camera.transform.localEulerAngles = new Vector3(Pitch, Yaw, 0);
 
 		// jumping
 		if (Input.GetKey(KeyCode.Space) && OnGround)
