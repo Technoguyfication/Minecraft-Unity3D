@@ -36,6 +36,19 @@ public class ServerPlayerPositionAndLookPacket : Packet
 		PacketID = (int)ServerboundIDs.PLAYER_POSITION_AND_LOOK;
 	}
 
+	public static ServerPlayerPositionAndLookPacket FromPlayer(PlayerController player)
+	{
+		return new ServerPlayerPositionAndLookPacket()
+		{
+			X = player.X,
+			FeetY = player.FeetY,
+			Z = player.Z,
+			Yaw = player.Yaw - 90,
+			Pitch = player.Pitch,
+			OnGround = player.OnGround
+		};
+	}
+
 	public ServerPlayerPositionAndLookPacket(PacketData data) : base(data) { } // packet id should be set correctly if this ctor is used
 
 }

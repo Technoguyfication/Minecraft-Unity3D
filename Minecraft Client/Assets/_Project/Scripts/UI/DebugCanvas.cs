@@ -7,6 +7,7 @@ public class DebugCanvas : MonoBehaviour {
 	public Text TxText;
 	public Text RxText;
 	public Text Ticks;
+	public Text BlockPosition;
 	public Text Position;
 
 	public PlayerController Player = null;
@@ -26,7 +27,8 @@ public class DebugCanvas : MonoBehaviour {
 		Ticks.text = $"Client Ticks: {TickCount.ToString()}";
 		if (Player != null)
 		{
-			Position.text = $"({Player.BlockPos.ToString()}); ({Player.BlockPos.GetPosWithinChunk().ToString()}) in ({Player.BlockPos.GetChunk().ToString()})";
+			BlockPosition.text = $"({Player.BlockPos.ToString()}); ({Player.BlockPos.GetPosWithinChunk().ToString()}) in ({Player.BlockPos.GetChunk().ToString()})";
+			Position.text = $"Pos: {Player.MinecraftPosition} Facing: ({Player.Yaw} / {Player.Pitch})";
 		}
 	}
 }

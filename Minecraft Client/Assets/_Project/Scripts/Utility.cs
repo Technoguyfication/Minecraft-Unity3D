@@ -55,4 +55,9 @@ public static class Utility {
 	{
 		return (x % m + m) % m;
 	}
+
+	public static float Mod(float x, float m)
+	{
+		return (x % m + m) % m;
+	}
 }

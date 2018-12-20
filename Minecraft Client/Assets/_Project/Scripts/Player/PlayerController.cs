@@ -31,6 +31,21 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Gets a Vector3 representing the minecraft position of the player.
+	/// </summary>
+	public Vector3 MinecraftPosition
+	{
+		get
+		{
+			return new Vector3((float)Z, (float)FeetY, (float)X);
+		}
+		set
+		{
+			SetPosition(new Vector3(value.z, value.y, value.x));
+		}
+	}
+
 	public double X { get { return transform.position.z; } }
 	public double FeetY { get { return transform.position.y; } }
 	public double Z { get { return transform.position.x; } }
@@ -76,15 +91,17 @@ public class PlayerController : MonoBehaviour
 	{
 		Pitch -= Input.GetAxis("Mouse Y") * MouseSensitivity;
 		Pitch = Mathf.Clamp(Pitch, _cameraMinX, _cameraMaxX);
+		Pitch = Utility.Mod(Pitch, 90.1f);
 
 		Yaw += Input.GetAxis("Mouse X") * MouseSensitivity;
+		Yaw = Utility.Mod(Yaw, 180.1f);
 
 		Camera.transform.localEulerAngles = new Vector3(Pitch, Yaw, 0);
 
 		// jumping
 		if (Input.GetKey(KeyCode.Space) && OnGround)
 		{
-			_rigidbody.velocity = new Vector3(_rigidbody.velocity.x, Mathf.Sqrt(2 * Mathf.Abs(Physics.gravity.y) * 1.25f), _rigidbody.velocity.y);
+			_rigidbody.velocity = new Vector3(_rigidbody.velocity.x, Mathf.Sqrt(2 * Mathf.Abs(Physics.gravity.y) * JumpHeight), _rigidbody.velocity.y);
 		}
 	}
 

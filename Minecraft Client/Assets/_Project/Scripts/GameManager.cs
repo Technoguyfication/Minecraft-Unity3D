@@ -297,15 +297,7 @@ public class GameManager : MonoBehaviour
 			// TODO: only update look / position if player has moved
 			if (_player != null)
 			{
-				DispatchWritePacket(new ServerPlayerPositionAndLookPacket()
-				{
-					X = _player.X,
-					FeetY = _player.FeetY,
-					Z = _player.Z,
-					Yaw = _player.Yaw,
-					Pitch = _player.Pitch,
-					OnGround = _player.OnGround
-				});
+				DispatchWritePacket(ServerPlayerPositionAndLookPacket.FromPlayer(_player));
 			}
 
 			// update tick time
