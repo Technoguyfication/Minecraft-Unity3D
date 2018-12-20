@@ -14,7 +14,7 @@ public class World
 	public ChunkRenderer ChunkRenderer;
 
 	private List<Chunk> _chunks;
-	private DebugCanvas _debugCanvas;
+	private readonly DebugCanvas _debugCanvas;
 
 	public World(DebugCanvas debug = null)
 	{
@@ -96,6 +96,7 @@ public class World
 	/// <param name="pos"></param>
 	public void UnloadChunk(ChunkPos pos)
 	{
+		Debug.Log($"Removing chunk at {pos}");
 		_chunks.RemoveAll(c => c.Position.Equals(pos));
 		ChunkRenderer.UnloadChunk(pos);
 	}

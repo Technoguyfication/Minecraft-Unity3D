@@ -70,6 +70,12 @@ public class GameManager : MonoBehaviour
 				}
 				_packetReceiveQueue.Clear();
 			}
+
+			// freeze player gravity if we're not in a loaded chunk
+			if (_player != null)
+			{
+				_player.UseGravity = _currentWorld.ChunkRenderer.IsChunkGenerated(_player.BlockPos.GetChunk());
+			}
 		}
 	}
 
@@ -247,6 +253,9 @@ public class GameManager : MonoBehaviour
 				break;
 			case ClientboundIDs.PLAYER_POSITION_AND_LOOK:
 				HandlePositionAndLook(new ClientPlayerPositionAndLookPacket(data));
+				break;
+			case ClientboundIDs.UNLOAD_CHUNK:
+				_currentWorld.UnloadChunk(new UnloadChunkPacket(data).Position);
 				break;
 			default:
 				break;

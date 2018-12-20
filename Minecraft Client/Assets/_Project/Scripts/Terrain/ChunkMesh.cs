@@ -11,6 +11,7 @@ using UnityEngine;
 [RequireComponent(typeof(MeshRenderer))]
 public class ChunkMesh : MonoBehaviour
 {
+	public bool IsGenerated { get; set; } = false;
 	public Chunk Chunk { get; set; } = null;
 
 	// Use this for initialization

@@ -53,6 +53,7 @@ public enum ClientboundIDs : int
 
 	// play
 	CHUNK_DATA = 0x22,
+	UNLOAD_CHUNK = 0x1f,
 	KEEP_ALIVE = 0x21,
 	JOIN_GAME = 0x25,
 	DISCONNECT = 0x1b,

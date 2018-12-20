@@ -13,8 +13,9 @@ public class PlayerController : MonoBehaviour
 	public float JumpHeight = 1.25f;    // sometimes changes (potions, etc.)
 	public GameObject Camera;
 	public GameObject Physical;
-	private float _cameraMinX = -90f;
-	private float _cameraMaxX = 90f;
+	public bool UseGravity = true;
+	private readonly float _cameraMinX = -90f;
+	private readonly float _cameraMaxX = 90f;
 
 	private BoxCollider _collider;
 	private Rigidbody _rigidbody;
@@ -129,6 +130,7 @@ public class PlayerController : MonoBehaviour
 		// so the user moves in the direction they are looking
 		Vector3 rotatedVelocity = Quaternion.Euler(0, Camera.transform.rotation.eulerAngles.y, 0) * inputVelocity;
 
+		_rigidbody.useGravity = UseGravity;
 		_rigidbody.velocity = rotatedVelocity;
 	}
 }

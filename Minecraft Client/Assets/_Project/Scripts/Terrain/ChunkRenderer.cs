@@ -17,7 +17,7 @@ public class ChunkRenderer : MonoBehaviour
 
 	private List<ChunkMesh> _chunkMeshes = new List<ChunkMesh>();
 	private BlockingCollection<ChunkMesh> _regenerationQueue = new BlockingCollection<ChunkMesh>();
-	private List<ChunkMeshData> _finishedMeshes = new List<ChunkMeshData>();
+	private List<ChunkMeshData> _finishedMeshData = new List<ChunkMeshData>();
 	private Task _regenerationTask;
 	private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
@@ -38,9 +38,9 @@ public class ChunkRenderer : MonoBehaviour
 			throw _regenerationTask.Exception;
 
 		// add generated meshes to chunks
-		lock(_finishedMeshes)
+		lock(_finishedMeshData)
 		{
-			foreach (var meshData in _finishedMeshes)
+			foreach (var meshData in _finishedMeshData)
 			{
 				Mesh mesh = new Mesh()
 				{
@@ -50,11 +50,12 @@ public class ChunkRenderer : MonoBehaviour
 				// todo: create normals with mesh
 				mesh.RecalculateNormals();
 				meshData.Chunk.SetMesh(mesh);
+				meshData.Chunk.IsGenerated = true;
 
 				// add chunk time to debug screen
 				DebugCanvas.AverageChunkTime.Add(meshData.Time);
 			}
-			_finishedMeshes.Clear();
+			_finishedMeshData.Clear();
 		}
 	}
 
@@ -65,7 +66,7 @@ public class ChunkRenderer : MonoBehaviour
 	/// <returns></returns>
 	public bool IsChunkGenerated(ChunkPos pos)
 	{
-		return _chunkMeshes.Exists(c => c.Chunk.Position.Equals(pos));
+		return _chunkMeshes.Exists(c => c.Chunk.Position.Equals(pos) && c.IsGenerated);
 	}
 
 	/// <summary>
@@ -169,9 +170,9 @@ public class ChunkRenderer : MonoBehaviour
 			meshData.Time = sw.Elapsed.Milliseconds / 1000f;
 
 			// add finished mesh to queue so we can quickly add it to our chunk object
-			lock (_finishedMeshes)
+			lock (_finishedMeshData)
 			{
-				_finishedMeshes.Add(meshData);
+				_finishedMeshData.Add(meshData);
 			}
 		}
 	}
