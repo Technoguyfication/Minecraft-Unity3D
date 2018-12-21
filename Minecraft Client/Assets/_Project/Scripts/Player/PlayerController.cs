@@ -35,7 +35,7 @@ public class PlayerController : MonoBehaviour
 		{
 			// raycast from all four corners of hitbox to determine if player on on ground
 			// it's assumed the Physical object has the same X and Z scale
-			float physicalWidth = Physical.transform.localScale.x;
+			float physicalWidth = Physical.transform.localScale.x / 2;
 			Vector3[] castPoints = new Vector3[]
 				{
 					new Vector3(physicalWidth, 0, physicalWidth),
@@ -47,7 +47,7 @@ public class PlayerController : MonoBehaviour
 			// if any rays hit, we're on the ground
 			foreach (var castPoint in castPoints)
 			{
-				if (Physics.Raycast(Physical.transform.position + castPoint, -Vector3.up, _collider.bounds.extents.y + 0.01f))
+				if (Physics.Raycast(Physical.transform.position + castPoint, -Vector3.up, _collider.bounds.extents.y + 0.00001f))
 					return true;
 			}
 
