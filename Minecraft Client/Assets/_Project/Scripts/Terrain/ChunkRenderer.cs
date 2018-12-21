@@ -51,11 +51,11 @@ public class ChunkRenderer : MonoBehaviour
 					Mesh mesh = new Mesh()
 					{
 						vertices = meshData.Vertices,
-						triangles = meshData.Triangles
+						triangles = meshData.Triangles,
+						normals = meshData.Normals
 					};
-					// todo: create normals with mesh
-					mesh.RecalculateNormals();
-					meshData.ChunkMesh?.SetMesh(mesh);
+
+					meshData.ChunkMesh.SetMesh(mesh);
 					meshData.ChunkMesh.IsGenerated = true;
 
 					// add chunk time to debug screen
@@ -212,6 +212,7 @@ public struct ChunkMeshData
 {
 	public ChunkMesh ChunkMesh { get; set; }
 	public Vector3[] Vertices { get; set; }
+	public Vector3[] Normals { get; set; }
 	public int[] Triangles { get; set; }
 	public float Time { get; set; }
 }

@@ -101,7 +101,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1818212769120596}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -483.5303, y: 62.514954, z: -245.72484}
+  m_LocalPosition: {x: -3.4974382, y: 3.1465213, z: 10.102499}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4451104517691868}
@@ -129,7 +129,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1729968927608002}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.87, z: 0}
+  m_LocalPosition: {x: 0, y: 0.9, z: 0}
   m_LocalScale: {x: 0.6, y: 1.8, z: 0.6}
   m_Children: []
   m_Father: {fileID: 4261384238173106}
@@ -311,3 +311,4 @@ MonoBehaviour:
   JumpHeight: 1.25
   Camera: {fileID: 1484566796131458}
   Physical: {fileID: 1729968927608002}
+  UseGravity: 1

@@ -38,6 +38,7 @@ public class ChunkMesh : MonoBehaviour
 	{
 		List<Vector3> vertices = new List<Vector3>();
 		List<int> triangles = new List<int>();
+		List<Vector3> normals = new List<Vector3>();
 		int triangleIndex = 0;
 
 		// iterate through each block in chunk
@@ -71,9 +72,11 @@ public class ChunkMesh : MonoBehaviour
 							Vector3[] faceVertices = GetVertices(i);
 
 							// translate vertices to relative block position so we can add them to the right place in the mesh
+							// also add normals
 							for (int j = 0; j < 4; j++)
 							{
 								newVertices[j] = faceVertices[j] + blockPosUnity;
+								normals.Add(GetNormals(i));
 							}
 
 							// add mesh vertices
@@ -92,6 +95,7 @@ public class ChunkMesh : MonoBehaviour
 		{
 			ChunkMesh = this,
 			Vertices = vertices.ToArray(),
+			Normals = normals.ToArray(),
 			Triangles = triangles.ToArray()
 		};
 	}
@@ -171,6 +175,27 @@ public class ChunkMesh : MonoBehaviour
 
 			default:
 				throw new ArgumentException($"Face {face} does not exist on cube!");
+		}
+	}
+
+	private Vector3 GetNormals(int face)
+	{
+		switch (face)
+		{
+			case 0:
+				return Vector3.forward;
+			case 1:
+				return Vector3.back;
+			case 2:
+				return Vector3.up;
+			case 3:
+				return Vector3.down;
+			case 4:
+				return Vector3.right;
+			case 5:
+				return Vector3.left;
+			default:
+				throw new ArgumentException($"Face {face} does not exist");
 		}
 	}
 
