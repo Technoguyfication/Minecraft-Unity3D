@@ -44,22 +44,27 @@ public class ChunkMesh : MonoBehaviour
 			{
 				for (int x = 0; x < 16; x++)
 				{
+					UnityEngine.Profiling.Profiler.BeginSample("Block lookup");
 					BlockPos pos = new BlockPos { X = x, Y = y, Z = z };
 					BlockState block = Chunk.World.GetBlock(pos.GetWorldPos(Chunk));
+					UnityEngine.Profiling.Profiler.EndSample();
 
 					// check if we need to render this block
 					if (!block.IsRendered)
 						continue;
 
+					UnityEngine.Profiling.Profiler.BeginSample("Finding neighbors");
 					// if this block is surrounded by solid blocks we dont't need to render it
 					bool[] neighbors = Chunk.World.GetNeighbors(pos.GetWorldPos(Chunk));
 					if (HasAllNeighbors(neighbors))
 						continue;
+					UnityEngine.Profiling.Profiler.EndSample();
 
 					// unity-style position of this block within the chunk to offset verts
 					Vector3 blockPosUnity = new Vector3(pos.Z, pos.Y, pos.X);
 
 					// iterate through each face and add to mesh if it's visible
+					UnityEngine.Profiling.Profiler.BeginSample("Mesh building");
 					for (int i = 0; i < 6; i++)
 					{
 						if (!neighbors[i])
@@ -83,6 +88,7 @@ public class ChunkMesh : MonoBehaviour
 							triangleIndex += 4;
 						}
 					}
+					UnityEngine.Profiling.Profiler.EndSample();
 				}
 			}
 		}

@@ -183,6 +183,8 @@ public class ChunkRenderer : MonoBehaviour
 	{
 		var sw = new System.Diagnostics.Stopwatch();
 
+		UnityEngine.Profiling.Profiler.BeginThreadProfiling("rendering", "chunk mesh generation");
+
 		while (!token.IsCancellationRequested)
 		{
 			// generate mesh on another thread
@@ -205,6 +207,8 @@ public class ChunkRenderer : MonoBehaviour
 				_finishedMeshData.Add(meshData);
 			}
 		}
+
+		UnityEngine.Profiling.Profiler.EndThreadProfiling();
 	}
 }
 
