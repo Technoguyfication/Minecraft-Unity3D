@@ -108,8 +108,8 @@ public class World
 	{
 		lock (_chunks)
 		{
-			_chunks.RemoveAll(c => c.Position.Equals(pos));
 			ChunkRenderer.UnloadChunk(pos);
+			_chunks.RemoveAll(c => c.Position.Equals(pos));
 		}
 	}
 

@@ -113,8 +113,8 @@ public class ChunkRenderer : MonoBehaviour
 			if (!_chunkMeshes.Contains(chunkMesh) || chunkMesh == null)
 				return;
 
-			_chunkMeshes.Remove(chunkMesh);
 			Destroy(chunkMesh.gameObject);
+			_chunkMeshes.Remove(chunkMesh);
 		}
 	}
 
