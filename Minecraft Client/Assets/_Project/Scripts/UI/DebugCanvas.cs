@@ -34,7 +34,7 @@ public class DebugCanvas : MonoBehaviour
 		if (Player != null)
 		{
 			BlockPosition.text = $"({Player.BlockPos.ToString()}); or ({Player.BlockPos.GetPosWithinChunk().ToString()}) in chunk ({Player.BlockPos.GetChunk().ToString()})";
-			Position.text = $"Pos: {Player.MinecraftPosition} Facing: ({Player.Yaw.ToString("0.00")} / {Player.Pitch.ToString("0.00")})";
+			Position.text = $"Pos: {Player.MinecraftPosition} Facing: ({Player.Yaw.ToString("0.0")} / {Player.Pitch.ToString("0.0")})";
 		}
 
 		// calculate chunk time
