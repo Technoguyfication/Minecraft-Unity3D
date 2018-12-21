@@ -132,6 +132,7 @@ public class PlayerController : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
+		// simplify pitch
 		if (Pitch > 90f)
 		{
 			Pitch %= 90f;
@@ -140,6 +141,22 @@ public class PlayerController : MonoBehaviour
 		else
 		{
 			Pitch %= 90f;
+		}
+
+		// simplify yaw
+		if (Yaw > 180f)
+		{
+			Yaw %= 360f;
+			Yaw -= 360f;
+		}
+		else if (Yaw < -180f)
+		{
+			Yaw %= 360f;
+			Yaw += 360f;
+		}
+		else
+		{
+			Yaw %= 360f;
 		}
 
 		Pitch -= Input.GetAxis("Mouse Y") * MouseSensitivity;
