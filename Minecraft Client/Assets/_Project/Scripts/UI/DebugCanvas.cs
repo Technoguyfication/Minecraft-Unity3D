@@ -30,17 +30,17 @@ public class DebugCanvas : MonoBehaviour
 	{
 		TxText.text = $"Tx: {TxPackets.ToString()}";
 		RxText.text = $"Recv: {RxPackets.ToString()}";
-		Ticks.text = $"Client Ticks: {TickCount.ToString()}";
+		Ticks.text = $"Local Ticks: {TickCount.ToString()}";
 		if (Player != null)
 		{
-			BlockPosition.text = $"({Player.BlockPos.ToString()}); ({Player.BlockPos.GetPosWithinChunk().ToString()}) in ({Player.BlockPos.GetChunk().ToString()})";
-			Position.text = $"Pos: {Player.MinecraftPosition} Facing: ({Player.Yaw} / {Player.Pitch})";
+			BlockPosition.text = $"({Player.BlockPos.ToString()}); or ({Player.BlockPos.GetPosWithinChunk().ToString()}) in chunk ({Player.BlockPos.GetChunk().ToString()})";
+			Position.text = $"Pos: {Player.MinecraftPosition} Facing: ({Player.Yaw.ToString("0.00")} / {Player.Pitch.ToString("0.00")})";
 		}
 
 		// calculate chunk time
 		if (AverageChunkTime.Count > 0)
 		{
-			ChunkTime.text = $"Average time for last 25 chunks: {AverageChunkTime.Average().ToString("0.00")}s";
+			ChunkTime.text = $"Avg chunk gen time: {AverageChunkTime.Average().ToString("0.00")}s";
 			if (AverageChunkTime.Count > 25)
 			{
 				AverageChunkTime.RemoveRange(0, AverageChunkTime.Count - 25);

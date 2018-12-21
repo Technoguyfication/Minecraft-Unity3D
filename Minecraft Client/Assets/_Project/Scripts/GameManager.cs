@@ -271,10 +271,18 @@ public class GameManager : MonoBehaviour
 
 	private void HandlePositionAndLook(ClientPlayerPositionAndLookPacket packet)
 	{
-		Vector3 pos = new Vector3((float)packet.Z, (float)packet.Y, (float)packet.X);
-		Quaternion rot = Quaternion.Euler(packet.Pitch, packet.Yaw, 0);
+		// calculate absolute or relative position for player
+		// https://wiki.vg/Protocol#Player_Position_And_Look_.28clientbound.29
+		// ^ see flag table
+		Vector3 pos = new Vector3(
+			(float)packet.X + (((packet.Flags & 0x01) != 0) ? _player.MinecraftPosition.x : 0f),
+			(float)packet.Y + (((packet.Flags & 0x02) != 0) ? _player.MinecraftPosition.y : 0f),
+			(float)packet.Z + (((packet.Flags & 0x04) != 0) ? _player.MinecraftPosition.z : 0f));
 
-		Debug.Log($"Moved player to {pos.ToString()} / {rot.ToString()}");
+		Quaternion rot = Quaternion.Euler(
+			packet.Pitch + (((packet.Flags & 0x10) != 0) ? _player.Pitch : 0),
+			packet.Yaw + (((packet.Flags & 0x08) != 0) ? _player.Yaw : 0) + 90,
+			0);
 
 		// check if we need to spawn the player for the first time
 		if (_player == null)
@@ -286,10 +294,10 @@ public class GameManager : MonoBehaviour
 		}
 
 		// update player position
-		_player.SetPosition(pos);
+		_player.MinecraftPosition = pos;
 		_player.SetRotation(rot);
 
-		Debug.Log($"Moved player to {pos}, {rot}");
+		Debug.Log($"Moved player to {pos}, {rot.eulerAngles}");
 
 		DispatchWritePacket(new TeleportConfirmPacket()
 		{

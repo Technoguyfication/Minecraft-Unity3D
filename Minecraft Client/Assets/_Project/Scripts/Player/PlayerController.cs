@@ -19,8 +19,8 @@ public class PlayerController : MonoBehaviour
 	public delegate void OnGroundEventHandler(object sender, OnGroundEventArgs e);
 	public event OnGroundEventHandler OnGroundChanged;
 
-	private readonly float _cameraMinX = -90f;
-	private readonly float _cameraMaxX = 90f;
+	private readonly float _cameraMinX = -89.9f;
+	private readonly float _cameraMaxX = 89.9f;
 
 	private BoxCollider _collider;
 	private Rigidbody _rigidbody;
@@ -70,6 +70,21 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// The Unity-style position of the player
+	/// </summary>
+	public Vector3 UnityPosition
+	{
+		get
+		{
+			return transform.position;
+		}
+		set
+		{
+			SetPosition(value);
+		}
+	}
+
 	public double X { get { return transform.position.z; } }
 	public double FeetY { get { return transform.position.y; } }
 	public double Z { get { return transform.position.x; } }
@@ -99,7 +114,11 @@ public class PlayerController : MonoBehaviour
 		_rigidbody = GetComponent<Rigidbody>();
 	}
 
-	public void SetPosition(Vector3 position)
+	/// <summary>
+	/// Sets the Unity position of the object
+	/// </summary>
+	/// <param name="position"></param>
+	private void SetPosition(Vector3 position)
 	{
 		transform.position = position;
 	}
@@ -113,19 +132,22 @@ public class PlayerController : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
+		if (Pitch > 90f)
+		{
+			Pitch %= 90f;
+			Pitch -= 90f;
+		}
+		else
+		{
+			Pitch %= 90f;
+		}
+
 		Pitch -= Input.GetAxis("Mouse Y") * MouseSensitivity;
 		Pitch = Mathf.Clamp(Pitch, _cameraMinX, _cameraMaxX);
 
 		Yaw += Input.GetAxis("Mouse X") * MouseSensitivity;
 
 		Camera.transform.localEulerAngles = new Vector3(Pitch, Yaw, 0);
-
-		// clamp wrapping rotation of camera
-		Yaw %= 360;
-		if (Yaw > 180)
-			Yaw += 360;
-		else
-			Yaw -= 360;
 
 		// jumping
 		if (Input.GetKey(KeyCode.Space) && OnGround)
