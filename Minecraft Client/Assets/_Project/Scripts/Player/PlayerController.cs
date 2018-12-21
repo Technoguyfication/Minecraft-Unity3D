@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -14,11 +15,16 @@ public class PlayerController : MonoBehaviour
 	public GameObject Camera;
 	public GameObject Physical;
 	public bool UseGravity = true;
+
+	public delegate void OnGroundEventHandler(object sender, OnGroundEventArgs e);
+	public event OnGroundEventHandler OnGroundChanged;
+
 	private readonly float _cameraMinX = -90f;
 	private readonly float _cameraMaxX = 90f;
 
 	private BoxCollider _collider;
 	private Rigidbody _rigidbody;
+	private bool _wasOnGround = true;
 
 	/// <summary>
 	/// Whether the player is touching the ground or not
@@ -130,7 +136,19 @@ public class PlayerController : MonoBehaviour
 		// so the user moves in the direction they are looking
 		Vector3 rotatedVelocity = Quaternion.Euler(0, Camera.transform.rotation.eulerAngles.y, 0) * inputVelocity;
 
+		// check if player ground status changed
+		if (OnGround != _wasOnGround)
+		{
+			_wasOnGround = OnGround;
+			OnGroundChanged?.Invoke(this, new OnGroundEventArgs() { OnGround = OnGround });
+		}
+
 		_rigidbody.useGravity = UseGravity;
 		_rigidbody.velocity = rotatedVelocity;
 	}
+}
+
+public class OnGroundEventArgs : EventArgs
+{
+	public bool OnGround { get; set; }
 }

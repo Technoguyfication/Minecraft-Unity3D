@@ -181,7 +181,7 @@ public class GameManager : MonoBehaviour
 					case ClientboundIDs.JOIN_GAME:
 						joinGame = new JoinGamePacket(packet);
 						break;
-					case ClientboundIDs.DISCONNECT:
+					case ClientboundIDs.LOGIN_DISCONNECT:
 						throw new Exception($"Disconnected from server: {new DisconnectPacket(packet).JSONResponse}");
 				}
 
@@ -280,6 +280,7 @@ public class GameManager : MonoBehaviour
 		if (_player == null)
 		{
 			_player = Instantiate(PlayerPrefab).GetComponent<PlayerController>();
+			_player.OnGroundChanged += PlayerOnGroundChanged;
 			_loadingScreen.HideLoadingScreen();
 			DebugCanvas.Player = _player;
 		}
@@ -294,6 +295,11 @@ public class GameManager : MonoBehaviour
 		{
 			TeleportID = packet.TeleportID
 		});
+	}
+
+	private void PlayerOnGroundChanged(object sender, OnGroundEventArgs e)
+	{
+		DispatchWritePacket(new ServerPlayerPacket() { OnGround = e.OnGround });
 	}
 
 	/// <summary>
