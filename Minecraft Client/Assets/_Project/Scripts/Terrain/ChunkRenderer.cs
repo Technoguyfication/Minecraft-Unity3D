@@ -38,24 +38,31 @@ public class ChunkRenderer : MonoBehaviour
 			throw _regenerationTask.Exception;
 
 		// add generated meshes to chunks
-		lock(_finishedMeshData)
+		lock (_finishedMeshData)
 		{
-			foreach (var meshData in _finishedMeshData)
+			lock (_chunkMeshes)
 			{
-				Mesh mesh = new Mesh()
+				foreach (var meshData in _finishedMeshData)
 				{
-					vertices = meshData.Vertices,
-					triangles = meshData.Triangles
-				};
-				// todo: create normals with mesh
-				mesh.RecalculateNormals();
-				meshData.Chunk.SetMesh(mesh);
-				meshData.Chunk.IsGenerated = true;
+					// if the chunk has been unloaded the mesh data will become an orhpan, so ignore it
+					if (!_chunkMeshes.Contains(meshData.ChunkMesh))
+						continue;
 
-				// add chunk time to debug screen
-				DebugCanvas.AverageChunkTime.Add(meshData.Time);
+					Mesh mesh = new Mesh()
+					{
+						vertices = meshData.Vertices,
+						triangles = meshData.Triangles
+					};
+					// todo: create normals with mesh
+					mesh.RecalculateNormals();
+					meshData.ChunkMesh?.SetMesh(mesh);
+					meshData.ChunkMesh.IsGenerated = true;
+
+					// add chunk time to debug screen
+					DebugCanvas.AverageChunkTime.Add(meshData.Time);
+				}
+				_finishedMeshData.Clear();
 			}
-			_finishedMeshData.Clear();
 		}
 	}
 
@@ -66,7 +73,10 @@ public class ChunkRenderer : MonoBehaviour
 	/// <returns></returns>
 	public bool IsChunkGenerated(ChunkPos pos)
 	{
-		return _chunkMeshes.Exists(c => c.Chunk.Position.Equals(pos) && c.IsGenerated);
+		lock (_chunkMeshes)
+		{
+			return _chunkMeshes.Exists(c => c.Chunk.Position.Equals(pos) && c.IsGenerated);
+		}
 	}
 
 	/// <summary>
@@ -76,48 +86,62 @@ public class ChunkRenderer : MonoBehaviour
 	public void AddChunk(Chunk chunk)
 	{
 		var chunkMeshObject = Instantiate(ChunkMeshPrefab, new Vector3((chunk.Position.Z * 16) + 0.5f, 0.5f, (chunk.Position.X * 16) + 0.5f), Quaternion.identity);
+		chunkMeshObject.transform.parent = this.transform;
 		var chunkMesh = chunkMeshObject.GetComponent<ChunkMesh>();
 		chunkMesh.Chunk = chunk;
 		chunkMesh.name = chunk.Position.ToString();
 
-		// add chunkmesh to list
-		_chunkMeshes.Add(chunkMesh);
+		lock (_chunkMeshes)
+		{
+			// add chunkmesh to list
+			_chunkMeshes.Add(chunkMesh);
 
-		// (re)generate
-		MarkChunkForRegeneration(chunkMesh);
+			// (re)generate
+			MarkChunkForRegeneration(chunkMesh);
+		}
 	}
 
 	/// <summary>
-	/// Unloads a chunk and destroys it's mesh in the world
+	/// Unloads a chunkmesh
 	/// </summary>
-	/// <param name="chunk"></param>
-	public void UnloadChunk(Chunk chunk)
+	/// <param name="chunkMesh"></param>
+	public void UnloadChunkMesh(ChunkMesh chunkMesh)
 	{
-		var chunkMesh = _chunkMeshes.Find(cm => cm.Chunk.Equals(chunk));
-		UnloadChunk(chunkMesh);
+		lock (_chunkMeshes)
+		{
+			// check if chunk exists
+			if (!_chunkMeshes.Contains(chunkMesh) || chunkMesh == null)
+				return;
+
+			_chunkMeshes.Remove(chunkMesh);
+			Destroy(chunkMesh.gameObject);
+		}
 	}
 
-	public void UnloadChunk(ChunkMesh chunkMesh)
-	{
-		// check if chunk exists
-		if (!_chunkMeshes.Contains(chunkMesh) || chunkMesh == null)
-			return;
-
-		_chunkMeshes.Remove(chunkMesh);
-		Destroy(chunkMesh.gameObject);
-	}
-
+	/// <summary>
+	/// Unloads a chunkmesh at the specified position
+	/// </summary>
+	/// <param name="pos"></param>
 	public void UnloadChunk(ChunkPos pos)
 	{
-		UnloadChunk(_chunkMeshes.Find(cm => 
-		cm.Chunk.Position.Equals(pos)));
+		lock (_chunkMeshes)
+		{
+			UnloadChunkMesh(_chunkMeshes.Find(cm =>
+			cm.Chunk.Position.Equals(pos)));
+		}
 	}
 
-	public void UnloadAllChunks()
+	/// <summary>
+	/// Unloads all chunkmeshes
+	/// </summary>
+	public void UnloadAllChunkMeshes()
 	{
-		foreach (var chunkMesh in _chunkMeshes)
+		lock (_chunkMeshes)
 		{
-			UnloadChunk(chunkMesh);
+			foreach (var chunkMesh in _chunkMeshes)
+			{
+				UnloadChunkMesh(chunkMesh);
+			}
 		}
 	}
 
@@ -136,7 +160,10 @@ public class ChunkRenderer : MonoBehaviour
 	/// <param name="chunk"></param>
 	public void MarkChunkForRegeneration(Chunk chunk)
 	{
-		MarkChunkForRegeneration(GetChunkMesh(chunk));
+		lock (_chunkMeshes)
+		{
+			MarkChunkForRegeneration(GetChunkMesh(chunk));
+		}
 	}
 
 	/// <summary>
@@ -146,7 +173,10 @@ public class ChunkRenderer : MonoBehaviour
 	/// <returns></returns>
 	private ChunkMesh GetChunkMesh(Chunk chunk)
 	{
-		return _chunkMeshes.Find(cm => cm.Chunk.Equals(chunk));
+		lock (_chunkMeshes)
+		{
+			return _chunkMeshes.Find(cm => cm.Chunk.Equals(chunk));
+		}
 	}
 
 	private void RegenerationWorker(CancellationToken token)
@@ -180,7 +210,7 @@ public class ChunkRenderer : MonoBehaviour
 
 public struct ChunkMeshData
 {
-	public ChunkMesh Chunk { get; set; }
+	public ChunkMesh ChunkMesh { get; set; }
 	public Vector3[] Vertices { get; set; }
 	public int[] Triangles { get; set; }
 	public float Time { get; set; }

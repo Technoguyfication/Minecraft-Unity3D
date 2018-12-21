@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour
 
 	[Header("Prefabs")]
 	public GameObject PlayerPrefab;
+	public GameObject ChunkRendererPrefab;
 
 	public string Username = "mcplayer";
 	public DebugCanvas DebugCanvas;
@@ -77,6 +78,12 @@ public class GameManager : MonoBehaviour
 				_player.UseGravity = _currentWorld.ChunkRenderer.IsChunkGenerated(_player.BlockPos.GetChunk());
 			}
 		}
+	}
+
+	private void OnDestroy()
+	{
+		Disconnect("Game stopped");
+		_client.Dispose();
 	}
 
 	public void Disconnect(string reason)
@@ -209,7 +216,7 @@ public class GameManager : MonoBehaviour
 		SceneManager.MoveGameObjectToScene(gameObject, SceneManager.GetSceneByName("Game"));
 
 		// set up references in game scene
-		_currentWorld.ChunkRenderer = GameObject.FindGameObjectWithTag("Chunk Renderer").GetComponent<ChunkRenderer>();
+		_currentWorld.ChunkRenderer = Instantiate(ChunkRendererPrefab, Vector3.zero, Quaternion.identity).GetComponent<ChunkRenderer>();
 		_currentWorld.ChunkRenderer.DebugCanvas = DebugCanvas;
 
 		_loadingScreen.UpdateSubtitleText("Downloading terrain...");
@@ -265,7 +272,7 @@ public class GameManager : MonoBehaviour
 	private void HandlePositionAndLook(ClientPlayerPositionAndLookPacket packet)
 	{
 		Vector3 pos = new Vector3((float)packet.Z, (float)packet.Y, (float)packet.X);
-		Quaternion rot = Quaternion.Euler(packet.Yaw, packet.Pitch, 0);
+		Quaternion rot = Quaternion.Euler(packet.Pitch, packet.Yaw, 0);
 
 		Debug.Log($"Moved player to {pos.ToString()} / {rot.ToString()}");
 

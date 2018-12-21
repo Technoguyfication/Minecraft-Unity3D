@@ -143,6 +143,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PlayerPrefab: {fileID: 1818212769120596, guid: 9491017758607d74c814f7b89d3a3829,
     type: 2}
+  ChunkRendererPrefab: {fileID: 1373419148536406, guid: 3ed795cc8aaa4484da1c4aa8a115fc40,
+    type: 2}
   Username: mcplayer
   DebugCanvas: {fileID: 1103229369}
 --- !u!4 &13402249

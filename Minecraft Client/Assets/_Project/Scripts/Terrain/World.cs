@@ -29,12 +29,15 @@ public class World
 	/// <returns></returns>
 	public BlockState GetBlock(BlockPos pos)
 	{
-		Chunk c = GetChunk(pos.GetChunk());
+		lock (_chunks)
+		{
+			Chunk c = GetChunk(pos.GetChunk());
 
-		if (c == null)
-			return new BlockState(BlockType.VOID_AIR);	// use void air for unloaded chunks
-		else
-			return c.GetBlockAt(pos);
+			if (c == null)
+				return new BlockState(BlockType.VOID_AIR);  // use void air for unloaded chunks
+			else
+				return c.GetBlockAt(pos);
+		}
 	}
 
 	/// <summary>
@@ -44,10 +47,13 @@ public class World
 	/// <returns></returns>
 	public Chunk GetChunk(ChunkPos pos)
 	{
-		if (IsChunkLoaded(pos))
-			return _chunks.Find(c => c.Position.Equals(pos));
-		else
-			return null;
+		lock (_chunks)
+		{
+			if (IsChunkLoaded(pos))
+				return _chunks.Find(c => c.Position.Equals(pos));
+			else
+				return null;
+		}
 	}
 
 	/// <summary>
@@ -57,7 +63,10 @@ public class World
 	/// <returns></returns>
 	public bool IsChunkLoaded(ChunkPos pos)
 	{
-		return _chunks.Exists(c => c.Position.Equals(pos));
+		lock (_chunks)
+		{
+			return _chunks.Exists(c => c.Position.Equals(pos));
+		}
 	}
 
 	/// <summary>
@@ -66,27 +75,28 @@ public class World
 	/// <param name="chunkData"></param>
 	public void AddChunkData(ChunkDataPacket chunkData)
 	{
-		Debug.Log($"Adding chunk data at {chunkData.Position.X}, {chunkData.Position.Z}");
-
-		// if the chunk already exists, add data
-		// otherwise, make a new chunk
-		var existingChunk = _chunks.Find(c => c.Position.Equals(chunkData.Position));
-		if (existingChunk != null)	// chunk already exists
+		lock (_chunks)
 		{
-			if (chunkData.GroundUpContinuous)
+			// if the chunk already exists, add data
+			// otherwise, make a new chunk
+			var existingChunk = _chunks.Find(c => c.Position.Equals(chunkData.Position));
+			if (existingChunk != null)  // chunk already exists
 			{
-				Debug.LogWarning($"Packet data for chunk at {chunkData.Position} tried to load GroundUpContinuous for already loaded chunk!");
-				return;
-			}
+				if (chunkData.GroundUpContinuous)
+				{
+					Debug.LogWarning($"Packet data for chunk at {chunkData.Position} tried to load GroundUpContinuous for already loaded chunk!");
+					return;
+				}
 
-			existingChunk.AddChunkData(chunkData);
-			ChunkRenderer.MarkChunkForRegeneration(existingChunk);
-		}
-		else
-		{
-			Chunk chunk = new Chunk(chunkData, this);
-			_chunks.Add(chunk);
-			ChunkRenderer.AddChunk(chunk);
+				existingChunk.AddChunkData(chunkData);
+				ChunkRenderer.MarkChunkForRegeneration(existingChunk);
+			}
+			else
+			{
+				Chunk chunk = new Chunk(chunkData, this);
+				_chunks.Add(chunk);
+				ChunkRenderer.AddChunk(chunk);
+			}
 		}
 	}
 
@@ -96,9 +106,11 @@ public class World
 	/// <param name="pos"></param>
 	public void UnloadChunk(ChunkPos pos)
 	{
-		Debug.Log($"Removing chunk at {pos}");
-		_chunks.RemoveAll(c => c.Position.Equals(pos));
-		ChunkRenderer.UnloadChunk(pos);
+		lock (_chunks)
+		{
+			_chunks.RemoveAll(c => c.Position.Equals(pos));
+			ChunkRenderer.UnloadChunk(pos);
+		}
 	}
 
 	/// <summary>
@@ -108,16 +120,19 @@ public class World
 	/// <returns></returns>
 	public bool[] GetNeighbors(BlockPos pos)
 	{
-		// this code is so ugly but idk what else to do with it honestly
-		return new bool[6]
+		lock (_chunks)
 		{
-			GetBlock(new BlockPos() { X = pos.X + 1, Y = pos.Y, Z = pos.Z }).IsSolid,
-			GetBlock(new BlockPos() { X = pos.X - 1, Y = pos.Y, Z = pos.Z }).IsSolid,
-			GetBlock(new BlockPos() { X = pos.X, Y = pos.Y + 1, Z = pos.Z }).IsSolid,
-			GetBlock(new BlockPos() { X = pos.X, Y = pos.Y - 1, Z = pos.Z }).IsSolid,
-			GetBlock(new BlockPos() { X = pos.X, Y = pos.Y, Z = pos.Z + 1 }).IsSolid,
-			GetBlock(new BlockPos() { X = pos.X, Y = pos.Y, Z = pos.Z - 1 }).IsSolid,
-		};
+			// this code is so ugly but idk what else to do with it honestly
+			return new bool[6]
+			{
+				GetBlock(new BlockPos() { X = pos.X + 1, Y = pos.Y, Z = pos.Z }).IsSolid,
+				GetBlock(new BlockPos() { X = pos.X - 1, Y = pos.Y, Z = pos.Z }).IsSolid,
+				GetBlock(new BlockPos() { X = pos.X, Y = pos.Y + 1, Z = pos.Z }).IsSolid,
+				GetBlock(new BlockPos() { X = pos.X, Y = pos.Y - 1, Z = pos.Z }).IsSolid,
+				GetBlock(new BlockPos() { X = pos.X, Y = pos.Y, Z = pos.Z + 1 }).IsSolid,
+				GetBlock(new BlockPos() { X = pos.X, Y = pos.Y, Z = pos.Z - 1 }).IsSolid,
+			};
+		}
 	}
 
 	public enum DimensionType

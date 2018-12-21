@@ -13,11 +13,15 @@ public class ChunkMesh : MonoBehaviour
 {
 	public bool IsGenerated { get; set; } = false;
 	public Chunk Chunk { get; set; } = null;
+	private MeshCollider _collider;
+	private MeshFilter _meshFilter;
 
 	// Use this for initialization
 	void Start()
 	{
 		name = Chunk.Position.ToString();
+		_collider = GetComponent<MeshCollider>();
+		_meshFilter = GetComponent<MeshFilter>();
 	}
 
 	// Update is called once per frame
@@ -86,7 +90,7 @@ public class ChunkMesh : MonoBehaviour
 
 		return new ChunkMeshData()
 		{
-			Chunk = this,
+			ChunkMesh = this,
 			Vertices = vertices.ToArray(),
 			Triangles = triangles.ToArray()
 		};
@@ -94,8 +98,8 @@ public class ChunkMesh : MonoBehaviour
 
 	public void SetMesh(Mesh mesh)
 	{
-		GetComponent<MeshFilter>().mesh = mesh;
-		GetComponent<MeshCollider>().sharedMesh = mesh;
+		_meshFilter.mesh = mesh;
+		_collider.sharedMesh = mesh;
 	}
 
 	private bool HasAllNeighbors(bool[] blocks)

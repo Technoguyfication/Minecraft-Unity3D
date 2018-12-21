@@ -23,7 +23,7 @@ public class DisconnectPacket : Packet
 
 	public DisconnectPacket()
 	{
-		PacketID = default(int);
+		PacketID = (int)ClientboundIDs.DISCONNECT;
 	}
 
 	public DisconnectPacket(PacketData data) : base(data) { } // packet id should be set correctly if this ctor is used
