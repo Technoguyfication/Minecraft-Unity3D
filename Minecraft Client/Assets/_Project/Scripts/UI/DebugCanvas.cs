@@ -18,6 +18,8 @@ public class DebugCanvas : MonoBehaviour
 	public int RxPackets = 0;
 	public int TickCount = 0;
 	public List<float> AverageChunkTime = new List<float>();
+	public int QueuedChunks = 0;
+	public int FinishedChunks = 0;
 
 	// Use this for initialization
 	void Start()
@@ -40,7 +42,7 @@ public class DebugCanvas : MonoBehaviour
 		// calculate chunk time
 		if (AverageChunkTime.Count > 0)
 		{
-			ChunkTime.text = $"Avg chunk gen time: {AverageChunkTime.Average().ToString("0.0000")}s";
+			ChunkTime.text = $"Chunk gen: {AverageChunkTime.Average().ToString("0.0000")}s; Q: {QueuedChunks}; F: {FinishedChunks}";
 			if (AverageChunkTime.Count > 25)
 			{
 				AverageChunkTime.RemoveRange(0, AverageChunkTime.Count - 25);

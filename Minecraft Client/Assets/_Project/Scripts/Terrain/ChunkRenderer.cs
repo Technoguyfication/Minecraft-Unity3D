@@ -47,6 +47,8 @@ public class ChunkRenderer : MonoBehaviour
 		{
 			lock (_chunkMeshes)
 			{
+				DebugCanvas.FinishedChunks = _finishedMeshData.Count;
+
 				foreach (var meshData in _finishedMeshData)
 				{
 					// if the chunk has been unloaded the mesh data will become an orhpan, so ignore it
@@ -192,6 +194,8 @@ public class ChunkRenderer : MonoBehaviour
 
 		while (!token.IsCancellationRequested)
 		{
+			DebugCanvas.QueuedChunks = _regenerationQueue.Count;
+
 			// generate mesh on another thread
 			ChunkMesh chunkMesh;
 			try
