@@ -55,6 +55,8 @@ public class ChunkRenderer : MonoBehaviour
 					if (!_chunkMeshes.Contains(meshData.ChunkMesh))
 						continue;
 
+					UnityEngine.Profiling.Profiler.BeginSample("Mesh assignment");
+
 					Mesh mesh = new Mesh()
 					{
 						vertices = meshData.Vertices,
@@ -64,6 +66,8 @@ public class ChunkRenderer : MonoBehaviour
 
 					meshData.ChunkMesh.SetMesh(mesh);
 					meshData.ChunkMesh.IsGenerated = true;
+
+					UnityEngine.Profiling.Profiler.EndSample();
 
 					// add chunk time to debug screen
 					DebugCanvas.AverageChunkTime.Add(meshData.Time);
@@ -190,7 +194,7 @@ public class ChunkRenderer : MonoBehaviour
 	{
 		var sw = new System.Diagnostics.Stopwatch();
 
-		UnityEngine.Profiling.Profiler.BeginThreadProfiling("rendering", "chunk mesh generation");
+		UnityEngine.Profiling.Profiler.BeginThreadProfiling("chunk generation", "mesh generation");
 
 		while (!token.IsCancellationRequested)
 		{
