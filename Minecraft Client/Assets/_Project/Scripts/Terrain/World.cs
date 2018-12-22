@@ -16,6 +16,12 @@ public class World
 	private List<Chunk> _chunks;
 	private readonly DebugCanvas _debugCanvas;
 
+	/// <summary>
+	/// Returns an empty chunk
+	/// </summary>
+	/// <returns></returns>
+	public Chunk EmptyChunk => new Chunk(0, 0, this);
+
 	public World(DebugCanvas debug = null)
 	{
 		_chunks = new List<Chunk>();
@@ -110,28 +116,6 @@ public class World
 		{
 			ChunkRenderer.UnloadChunk(pos);
 			_chunks.RemoveAll(c => c.Position.Equals(pos));
-		}
-	}
-
-	/// <summary>
-	/// Gets whether 6 blocks surrounding a block are solid, in order: +X -X +Y -Y +Z -Z
-	/// </summary>
-	/// <param name="pos"></param>
-	/// <returns></returns>
-	public bool[] GetNeighbors(BlockPos pos)
-	{
-		lock (_chunks)
-		{
-			// this code is so ugly but idk what else to do with it honestly
-			return new bool[6]
-			{
-				GetBlock(new BlockPos() { X = pos.X + 1, Y = pos.Y, Z = pos.Z }).IsSolid,
-				GetBlock(new BlockPos() { X = pos.X - 1, Y = pos.Y, Z = pos.Z }).IsSolid,
-				GetBlock(new BlockPos() { X = pos.X, Y = pos.Y + 1, Z = pos.Z }).IsSolid,
-				GetBlock(new BlockPos() { X = pos.X, Y = pos.Y - 1, Z = pos.Z }).IsSolid,
-				GetBlock(new BlockPos() { X = pos.X, Y = pos.Y, Z = pos.Z + 1 }).IsSolid,
-				GetBlock(new BlockPos() { X = pos.X, Y = pos.Y, Z = pos.Z - 1 }).IsSolid,
-			};
 		}
 	}
 

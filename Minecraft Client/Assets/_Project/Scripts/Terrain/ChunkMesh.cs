@@ -24,16 +24,18 @@ public class ChunkMesh : MonoBehaviour
 			new BlockPos() { Z = -1 },
 		};
 
+	private readonly ChunkPos[] _neighborChunkPositions = new ChunkPos[]
+		{
+			new ChunkPos() { X = 1 },
+			new ChunkPos() { X = -1 },
+			new ChunkPos() { Z = 1 },
+			new ChunkPos() { Z = -1 },
+		};
+
 	// Use this for initialization
 	void Start()
 	{
 		name = Chunk.Position.ToString();
-	}
-
-	// Update is called once per frame
-	void Update()
-	{
-
 	}
 
 	/// <summary>
@@ -47,9 +49,12 @@ public class ChunkMesh : MonoBehaviour
 		List<Vector3> normals = new List<Vector3>();
 		int triangleIndex = 0;
 
-		// store chunk blocks here
-		BlockState[] blocks = Chunk.BlockArray;
-		bool[] neighbors = new bool[6];
+		// store neighbor chunks so we don't have to look them up through the World
+		Chunk[] neighborChunks = new Chunk[4];
+		for (int i = 0; i < 4; i++)
+		{
+			neighborChunks[i] = Chunk.World.GetChunk(_neighborChunkPositions[i] + Chunk.Position) ?? Chunk.World.EmptyChunk;
+		}
 
 		// iterate through each block in chunk
 		for (int z = 0; z < 16; z++)
@@ -61,10 +66,12 @@ public class ChunkMesh : MonoBehaviour
 					int blockIndex = Chunk.GetBlockIndex(x, y, z);
 
 					// check if we need to render this block
-					if (!blocks[blockIndex].IsRendered)
+					if (!Chunk.BlockArray[blockIndex].IsRendered)
 						continue;
 
 					UnityEngine.Profiling.Profiler.BeginSample("Finding neighbors");
+
+					bool[] neighbors = new bool[6];
 					BlockPos pos = new BlockPos() { X = x, Y = y, Z = z };
 					for (int i = 0; i < 6; i++)
 					{
@@ -72,9 +79,35 @@ public class ChunkMesh : MonoBehaviour
 
 						// check if we can use our "locally" cached chunk data to check this block
 						if (Chunk.ExistsInside(neighborPos))
-							neighbors[i] = blocks[Chunk.GetBlockIndex(neighborPos)].IsSolid;
+						{
+							neighbors[i] = Chunk.BlockArray[Chunk.GetBlockIndex(neighborPos)].IsSolid;
+						}
 						else
-							neighbors[i] = Chunk.World.GetBlock(neighborPos.GetWorldPos(Chunk)).IsSolid;
+						{
+							Chunk neighborChunk;
+
+							// find which neighbor chunk the block is in
+							switch (i)
+							{
+								case 0:
+									neighborChunk = neighborChunks[0];
+									break;
+								case 1:
+									neighborChunk = neighborChunks[1];
+									break;
+								case 4:
+									neighborChunk = neighborChunks[2];
+									break;
+								case 5:
+									neighborChunk = neighborChunks[3];
+									break;
+								default:
+									neighbors[i] = Chunk.World.GetBlock(neighborPos.GetWorldPos(Chunk)).IsSolid;
+									continue;
+							}
+
+							neighbors[i] = neighborChunk.GetBlockAt(neighborPos).IsSolid;
+						}
 					}
 
 					UnityEngine.Profiling.Profiler.EndSample();

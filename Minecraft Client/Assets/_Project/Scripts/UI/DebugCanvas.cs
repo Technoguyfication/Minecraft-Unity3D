@@ -40,7 +40,7 @@ public class DebugCanvas : MonoBehaviour
 		// calculate chunk time
 		if (AverageChunkTime.Count > 0)
 		{
-			ChunkTime.text = $"Avg chunk gen time: {AverageChunkTime.Average().ToString("0.00")}s";
+			ChunkTime.text = $"Avg chunk gen time: {AverageChunkTime.Average().ToString("0.0000")}s";
 			if (AverageChunkTime.Count > 25)
 			{
 				AverageChunkTime.RemoveRange(0, AverageChunkTime.Count - 25);

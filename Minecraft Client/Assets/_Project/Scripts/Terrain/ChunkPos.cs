@@ -27,4 +27,13 @@ public struct ChunkPos
 		else
 			return (((ChunkPos)pos).X == X) && (((ChunkPos)pos).Z == Z);
 	}
+
+	public static ChunkPos operator +(ChunkPos left, ChunkPos right)
+	{
+		return new ChunkPos()
+		{
+			X = left.X + right.X,
+			Z = left.Z + right.Z
+		};
+	}
 }

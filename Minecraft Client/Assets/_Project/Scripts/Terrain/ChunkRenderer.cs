@@ -31,6 +31,11 @@ public class ChunkRenderer : MonoBehaviour
 		_regenerationTask.Start();
 	}
 
+	private void OnDestroy()
+	{
+		_cancellationTokenSource.Cancel();
+	}
+
 	private void Update()
 	{
 		// check regeneration worker
@@ -188,7 +193,15 @@ public class ChunkRenderer : MonoBehaviour
 		while (!token.IsCancellationRequested)
 		{
 			// generate mesh on another thread
-			ChunkMesh chunkMesh = _regenerationQueue.Take(token);
+			ChunkMesh chunkMesh;
+			try
+			{
+				chunkMesh = _regenerationQueue.Take(token);
+			}
+			catch (OperationCanceledException)
+			{
+				break;
+			}
 
 			// check that we are still keeping track of the chunk (i.e. it's not unloaded)
 			if (!_chunkMeshes.Contains(chunkMesh))
@@ -220,4 +233,3 @@ public struct ChunkMeshData
 	public int[] Triangles { get; set; }
 	public float Time { get; set; }
 }
-
