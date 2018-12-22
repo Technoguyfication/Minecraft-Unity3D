@@ -28,9 +28,9 @@ public class Chunk
 	public int MaxHeight { get; private set; }
 
 	/// <summary>
-	/// Blocks stored in chunks as WXYZ where W = chunk index in column and XYZ are block coords relative to chunk
+	/// Blocks stored as (((y * 16) + z) * 16) + x
 	/// </summary>
-	private readonly BlockState[,,] _blocks = new BlockState[16, 256, 16];
+	private readonly BlockState[] _blocks = new BlockState[256 * 16 * 16];
 	private readonly int[,,] _blockLights = new int[16, 256, 16];
 	private readonly int[,,] _skylights = new int[16, 256, 16];
 
@@ -54,6 +54,11 @@ public class Chunk
 		World = world;
 	}
 
+	/// <summary>
+	/// Creates a chunk from a <see cref="ChunkDataPacket"/> in the specified world
+	/// </summary>
+	/// <param name="packet"></param>
+	/// <param name="world"></param>
 	public Chunk(ChunkDataPacket packet, World world)
 	{
 		Position = packet.Position;
@@ -72,15 +77,25 @@ public class Chunk
 			return new BlockState(BlockType.VOID_AIR);
 
 		var chunkPos = pos.GetPosWithinChunk();
-		return _blocks[chunkPos.X, chunkPos.Y, chunkPos.Z];
+		return _blocks[GetBlockIndex(chunkPos)];
 	}
 
+	/// <summary>
+	/// Gets the block light level of a block
+	/// </summary>
+	/// <param name="pos"></param>
+	/// <returns></returns>
 	public int GetBlockLightLevel(BlockPos pos)
 	{
 		var chunkPos = pos.GetPosWithinChunk();
 		return _blockLights[chunkPos.X, chunkPos.Y, chunkPos.Z];
 	}
 
+	/// <summary>
+	/// Gets the sky light level of a block
+	/// </summary>
+	/// <param name="pos"></param>
+	/// <returns></returns>
 	public int GetSkyLightLevel(BlockPos pos)
 	{
 		if (World.Dimension != World.DimensionType.OVERWORLD)
@@ -90,6 +105,21 @@ public class Chunk
 		return _blockLights[chunkPos.X, chunkPos.Y, chunkPos.Z];
 	}
 
+	/// <summary>
+	/// Gets the index of a block inside a chunk section.
+	/// To find the chunk section, use <see cref="GetChunkSection(BlockPos)"/>
+	/// </summary>
+	/// <param name="pos"></param>
+	/// <returns></returns>
+	private int GetBlockIndex(BlockPos pos)
+	{
+		return (((pos.Y * 16) + pos.Z) * 16) + pos.X;
+	}
+
+	/// <summary>
+	/// Populates this chunk with data from a <see cref="ChunkDataPacket"/>
+	/// </summary>
+	/// <param name="packet"></param>
 	public void AddChunkData(ChunkDataPacket packet)
 	{
 		//check if data applies to this chunk
@@ -102,13 +132,13 @@ public class Chunk
 		var data = new List<byte>(packet.Data);
 
 		// chunk data
-		for (int w = 0; w < 16; w++)
+		for (int s = 0; s < 16; s++)
 		{
 			// check bitmask to see if we're reading data for this section
-			if ((packet.PrimaryBitmask & (1) << w) != 0)
+			if ((packet.PrimaryBitmask & (1) << s) != 0)
 			{
 				// set max block height to the height of this chunk
-				int maxBlockHeight = (w + 1) * 16;
+				int maxBlockHeight = (s + 1) * 16;
 				if (maxBlockHeight > MaxHeight)
 					MaxHeight = maxBlockHeight;
 
@@ -138,36 +168,30 @@ public class Chunk
 				}
 
 				// parse block data
-				for (int y = 0; y < 16; y++)    // for section height
+				for (int b = 0; b < 4096; b++)    // for section height
 				{
-					for (int z = 0; z < 16; z++)    // section width
+					int startLong = (b * bitsPerBlock) / 64;
+					int startOffset = (b * bitsPerBlock) % 64;
+					int endLong = ((b + 1) * bitsPerBlock - 1) / 64;
+
+					uint blockData;
+					if (startLong == endLong)
 					{
-						for (int x = 0; x < 16; x++)    // section width
-						{
-							int blockNumber = (((y * 16) + z) * 16) + x;
-							int startLong = (blockNumber * bitsPerBlock) / 64;
-							int startOffset = (blockNumber * bitsPerBlock) % 64;
-							int endLong = ((blockNumber + 1) * bitsPerBlock - 1) / 64;
-
-							uint blockData;
-							if (startLong == endLong)
-							{
-								blockData = (uint)(dataArray[startLong] >> startOffset);
-							}
-							else
-							{
-								int endOffset = 64 - startOffset;
-								blockData = (uint)(dataArray[startLong] >> startOffset | dataArray[endLong] << endOffset);
-							}
-
-							blockData &= individualValueMask;
-
-							uint blockState = palette.GetBlockState(blockData);
-							BlockState blk = new BlockState((BlockType)blockState);
-
-							_blocks[x, y + (16 * w), z] = blk;  // convert coordinate system here
-						}
+						blockData = (uint)(dataArray[startLong] >> startOffset);
 					}
+					else
+					{
+						int endOffset = 64 - startOffset;
+						blockData = (uint)(dataArray[startLong] >> startOffset | dataArray[endLong] << endOffset);
+					}
+
+					blockData &= individualValueMask;
+
+					uint blockState = palette.GetBlockState(blockData);
+					BlockState blk = new BlockState((BlockType)blockState);
+
+					// add block to block array
+					_blocks[b + (4096 * s)] = blk;
 				}
 
 				// parse block light data
@@ -180,8 +204,8 @@ public class Chunk
 							// light data takes 4 bits. because of this, we read two light values per byte
 							byte value = data.Read(1)[0];
 
-							_blockLights[x, y + (16 * w), z] = value & 0xf;
-							_blockLights[x + 1, y + (16 * w), z] = (value >> 4) & 0xf;
+							_blockLights[x, y + (16 * s), z] = value & 0xf;
+							_blockLights[x + 1, y + (16 * s), z] = (value >> 4) & 0xf;
 						}
 					}
 				}
@@ -199,8 +223,8 @@ public class Chunk
 								// light data takes 4 bits. because of this, we read two light values per byte
 								byte value = data.Read(1)[0];
 
-								_skylights[x, y + (16 * w), z] = value & 0xf;
-								_skylights[x + 1, y + (16 * w), z] = (value >> 4) & 0xf;
+								_skylights[x, y + (16 * s), z] = value & 0xf;
+								_skylights[x + 1, y + (16 * s), z] = (value >> 4) & 0xf;
 							}
 						}
 					}
@@ -211,10 +235,10 @@ public class Chunk
 				// fill chunk section with air if full chunk
 				if (packet.GroundUpContinuous)
 				{
-					for (int x = 0; x < 16; x++)
-						for (int y = 0; y < 16; y++)
-							for (int z = 0; z < 16; z++)
-								_blocks[x, y + (16 * w), z] = new BlockState(BlockType.AIR);
+					for (int i = 0; i < 4096; i++)
+					{
+						_blocks[s + (4096 * s)] = new BlockState(BlockType.AIR);
+					}
 				}
 			}
 		}
