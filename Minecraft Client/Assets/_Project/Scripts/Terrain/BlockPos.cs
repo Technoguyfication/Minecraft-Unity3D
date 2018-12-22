@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 public struct BlockPos
 {
@@ -64,5 +65,35 @@ public struct BlockPos
 			return false;
 		else
 			return (((BlockPos)pos).X == X) && (((BlockPos)pos).Y == Y) && (((BlockPos)pos).Z == Z);
+	}
+
+	public static BlockPos operator +(BlockPos left, BlockPos right)
+	{
+		return new BlockPos()
+		{
+			X = left.X + right.X,
+			Y = left.Y + right.Y,
+			Z = left.Z + right.Z
+		};
+	}
+
+	public static BlockPos operator *(BlockPos left, int right)
+	{
+		return new BlockPos()
+		{
+			X = left.X * right,
+			Y = left.Y * right,
+			Z = left.Z * right
+		};
+	}
+
+	public static BlockPos operator *(BlockPos left, BlockPos right)
+	{
+		return new BlockPos()
+		{
+			X = left.X * right.X,
+			Y = left.Y * right.Y,
+			Z = left.Z * right.Z
+		};
 	}
 }

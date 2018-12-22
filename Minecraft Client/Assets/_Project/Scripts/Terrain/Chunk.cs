@@ -29,8 +29,9 @@ public class Chunk
 
 	/// <summary>
 	/// Blocks stored as (((y * 16) + z) * 16) + x
+	/// This should not be used for normal block lookups, use <see cref="GetBlockAt(BlockPos)"/> instead
 	/// </summary>
-	private readonly BlockState[] _blocks = new BlockState[256 * 16 * 16];
+	public readonly BlockState[] BlockArray = new BlockState[256 * 16 * 16];
 	private readonly int[,,] _blockLights = new int[16, 256, 16];
 	private readonly int[,,] _skylights = new int[16, 256, 16];
 
@@ -77,7 +78,17 @@ public class Chunk
 			return new BlockState(BlockType.VOID_AIR);
 
 		var chunkPos = pos.GetPosWithinChunk();
-		return _blocks[GetBlockIndex(chunkPos)];
+		return BlockArray[GetBlockIndex(chunkPos)];
+	}
+
+	/// <summary>
+	/// Gets the block at an index
+	/// </summary>
+	/// <param name="index"></param>
+	/// <returns></returns>
+	public BlockState GetBlockAt(int index)
+	{
+		return BlockArray[index];
 	}
 
 	/// <summary>
@@ -111,9 +122,24 @@ public class Chunk
 	/// </summary>
 	/// <param name="pos"></param>
 	/// <returns></returns>
-	private int GetBlockIndex(BlockPos pos)
+	public static int GetBlockIndex(BlockPos pos)
 	{
-		return (((pos.Y * 16) + pos.Z) * 16) + pos.X;
+		return GetBlockIndex(pos.X, pos.Y, pos.Z);
+	}
+
+	public static int GetBlockIndex(int x, int y, int z)
+	{
+		return (((y * 16) + z) * 16) + x;
+	}
+
+	/// <summary>
+	/// Returns whether the specified position exists inside a chunk.
+	/// </summary>
+	/// <param name="pos"></param>
+	/// <returns></returns>
+	public static bool ExistsInside(BlockPos pos)
+	{
+		return pos.X >= 0 && pos.X < 16 && pos.Y >= 0 && pos.Y < 256 && pos.Z >= 0 && pos.Z < 16;
 	}
 
 	/// <summary>
@@ -191,7 +217,7 @@ public class Chunk
 					BlockState blk = new BlockState((BlockType)blockState);
 
 					// add block to block array
-					_blocks[b + (4096 * s)] = blk;
+					BlockArray[b + (4096 * s)] = blk;
 				}
 
 				// parse block light data
@@ -237,7 +263,7 @@ public class Chunk
 				{
 					for (int i = 0; i < 4096; i++)
 					{
-						_blocks[s + (4096 * s)] = new BlockState(BlockType.AIR);
+						BlockArray[s + (4096 * s)] = new BlockState(BlockType.AIR);
 					}
 				}
 			}
