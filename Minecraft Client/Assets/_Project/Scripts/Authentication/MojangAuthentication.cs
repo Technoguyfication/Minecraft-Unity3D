@@ -13,7 +13,8 @@ public static class MojangAuthentication
 {
 	public static string Username { get; private set; }
 
-	private const string RequestServer = @"https://authserver.mojang.com";
+	private const string LoginServer = @"https://authserver.mojang.com";
+	private const string SessionServer = @"https://sessionserver.mojang.com/session/minecraft/join";
 	private const string clientTokenPrefKey = "authClientToken";
 	private const string accessTokenPrefKey = "authAccessToken";
 
@@ -155,7 +156,7 @@ public static class MojangAuthentication
 	/// <returns></returns>
 	private static IEnumerator MakeRequest<T>(string endpoint, string jsonData, Action<ResponseData> callback)
 	{
-		var request = new UnityWebRequest($"{RequestServer}/{endpoint}", "POST")
+		var request = new UnityWebRequest($"{LoginServer}/{endpoint}", "POST")
 		{
 			timeout = 30
 		};
