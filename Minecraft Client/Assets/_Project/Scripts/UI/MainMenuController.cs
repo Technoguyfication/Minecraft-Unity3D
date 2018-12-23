@@ -12,7 +12,10 @@ public class MainMenuController : MonoBehaviour
 	[Header("Connect")]
 	public InputField AddressInput;
 	public InputField PortInput;
-	[Header("Authentication")]
+	[Header("Authentication Window")]
+	public InputField EmailInput;
+	public InputField PasswordInput;
+	[Header("Authentication Widget")]
 	public Image AuthStatusImage;
 	public Sprite AuthStatusImageGood;
 	public Color AuthStatusImageColorGood = Color.green;
@@ -64,18 +67,27 @@ public class MainMenuController : MonoBehaviour
 				case MojangAuthentication.AccountStatus.LOGGED_IN:
 					SetAuthImage(AuthImageStatus.VALID);
 					AuthStatusText.text = $"Logged in as {MojangAuthentication.Username}";
+					SetLoginLogoutButtons(true);
 					break;
 				case MojangAuthentication.AccountStatus.LOGGED_OUT:
 				case MojangAuthentication.AccountStatus.INVALID_CREDENTIALS:
 					SetAuthImage(AuthImageStatus.INVALID);
 					AuthStatusText.text = "Not Logged In";
+					SetLoginLogoutButtons(false);
 					break;
 				case MojangAuthentication.AccountStatus.NOT_PREMIUM:
 					SetAuthImage(AuthImageStatus.INVALID);
 					AuthStatusText.text = $"Logged in as {MojangAuthentication.Username}\nAccount not premium.";
+					SetLoginLogoutButtons(false);
 					break;
 			}
 		}));
+	}
+
+	private void SetLoginLogoutButtons(bool loggedIn)
+	{
+		LoginButton.interactable = !loggedIn;
+		LogoutButton.interactable = loggedIn;
 	}
 
 	private void SetAuthImage(AuthImageStatus status)

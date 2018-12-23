@@ -75,7 +75,7 @@ public static class MojangAuthentication
 	/// <returns></returns>
 	public static IEnumerator GetLoginStatus(Action<AccountStatus> callback)
 	{
-		if (AccessToken == null)
+		if (string.IsNullOrEmpty(AccessToken))
 		{
 			callback(AccountStatus.LOGGED_OUT);
 		}
