@@ -44,6 +44,8 @@ public class ChunkMesh : MonoBehaviour
 	/// <param name="chunk"></param>
 	public ChunkMeshData GenerateMesh()
 	{
+		// todo generate meshes of chunk sections instead of entire chunks
+
 		List<Vector3> vertices = new List<Vector3>();
 		List<int> triangles = new List<int>();
 		List<Vector3> normals = new List<Vector3>();
