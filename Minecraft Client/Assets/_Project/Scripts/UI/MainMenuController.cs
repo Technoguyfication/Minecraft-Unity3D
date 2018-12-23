@@ -8,9 +8,20 @@ using Debug = UnityEngine.Debug;
 
 public class MainMenuController : MonoBehaviour
 {
+	[Header("Connect")]
 	public InputField AddressInput;
 	public InputField PortInput;
+	[Header("Authentication")]
+	public Image AuthStatusImage;
+	public Sprite AuthStatusImageGood;
+	public Color AuthStatusImageColorGood = Color.green;
+	public Sprite AuthStatusImageBad;
+	public Color AuthStatusImageColorBad = Color.red;
+	public Text AuthStatusText;
+	public Button LoginButton;
+	public Button LogoutButton;
 
+	[Header("Other")]
 	public GameManager GameManager;
 
 	// Use this for initialization
@@ -21,6 +32,14 @@ public class MainMenuController : MonoBehaviour
 
 	// Update is called once per frame
 	void Update()
+	{
+
+	}
+
+	/// <summary>
+	/// Refreshes the ui login status
+	/// </summary>
+	public void RefreshLoginStatus()
 	{
 
 	}
