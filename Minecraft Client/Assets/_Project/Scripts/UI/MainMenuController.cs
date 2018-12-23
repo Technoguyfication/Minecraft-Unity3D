@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using Debug = UnityEngine.Debug;
 using System;
+using UnityEngine.EventSystems;
 
 public class MainMenuController : MonoBehaviour
 {
@@ -13,8 +14,10 @@ public class MainMenuController : MonoBehaviour
 	public InputField AddressInput;
 	public InputField PortInput;
 	[Header("Authentication Window")]
+	public GameObject LoginWindow;
 	public InputField EmailInput;
 	public InputField PasswordInput;
+	public Button WindowLoginButton;
 	[Header("Authentication Widget")]
 	public Image AuthStatusImage;
 	public Sprite AuthStatusImageGood;
@@ -23,14 +26,15 @@ public class MainMenuController : MonoBehaviour
 	public Color AuthStatusImageColorBad = Color.red;
 	public Sprite AuthStatusImageLoading;
 	public Text AuthStatusText;
-	public Button LoginButton;
+	public Button WidgetLoginButton;
 	public Button LogoutButton;
 
 	[Header("Other")]
 	public GameManager GameManager;
+	public GameObject ModalDimmer;
 
 	private bool _spinningLoginImage = false;
-	private readonly float _loginImageSpinSpeed = 400f;
+	private readonly float _loginImageSpinSpeed = 200f;
 
 	// Use this for initialization
 	void Start()
@@ -41,15 +45,92 @@ public class MainMenuController : MonoBehaviour
 	private void Awake()
 	{
 		RefreshLoginStatus();
+		RefreshLoginButton();
 	}
 
 	// Update is called once per frame
 	void Update()
 	{
+		// tab skip implementation
+		if (Input.GetKeyDown(KeyCode.Tab))
+		{
+			Selectable current = EventSystem.current.currentSelectedGameObject.GetComponent<Selectable>();
+			Selectable next;
+
+			if (Input.GetKey(KeyCode.LeftShift))
+			{
+				// inverted direction
+				next = current.FindSelectableOnUp();
+			}
+			else
+			{
+				next = current.FindSelectableOnDown();
+			}
+
+			if (next != null)
+			{
+				// check if next object is an inputfield
+				var inputField = next.GetComponent<InputField>();
+				if (inputField != null)
+				{
+					// select text caret
+					inputField.OnPointerClick(new PointerEventData(EventSystem.current));
+				}
+
+				EventSystem.current.SetSelectedGameObject(next.gameObject, new BaseEventData(EventSystem.current));
+			}
+		}
+
+		// spin spinner on login widget
 		if (_spinningLoginImage)
 		{
-			AuthStatusImage.rectTransform.Rotate(new Vector3(0, 0, _loginImageSpinSpeed * Time.deltaTime));
+			AuthStatusImage.rectTransform.Rotate(new Vector3(0, 0, -_loginImageSpinSpeed * Time.deltaTime));
 		}
+	}
+
+	/// <summary>
+	/// Opens the login window
+	/// </summary>
+	public void OpenModalLoginWindow()
+	{
+		LoginWindow.SetActive(true);
+		ModalDimmer.SetActive(true);
+	}
+
+	/// <summary>
+	/// Closes the login window
+	/// </summary>
+	public void CloseModalLoginWindow()
+	{
+		PasswordInput.text = string.Empty;  // clear login password
+		LoginWindow.SetActive(false);
+		ModalDimmer.SetActive(false);
+	}
+
+	/// <summary>
+	/// Checks if username and password are filled, and activates login button
+	/// </summary>
+	public void RefreshLoginButton()
+	{
+		WindowLoginButton.interactable = !string.IsNullOrEmpty(EmailInput.text) && !string.IsNullOrEmpty(PasswordInput.text);
+	}
+
+	/// <summary>
+	/// Logs the user in using the filled-in username and password
+	/// </summary>
+	public void LoginUser()
+	{
+		string username = EmailInput.text;
+		string password = PasswordInput.text;
+
+		// check that username and password are filled out
+		if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+		{
+			return;
+		}
+
+		SetAuthImage(AuthImageStatus.LOADING);
+		StartCoroutine(MojangAuthentication.Login(username, password, HandleLoginResponse));
 	}
 
 	/// <summary>
@@ -59,37 +140,49 @@ public class MainMenuController : MonoBehaviour
 	{
 		Debug.Log("Checking user login..");
 		Debug.Log($"Client auth server token: {MojangAuthentication.GetClientToken()}");
-		StartCoroutine(MojangAuthentication.GetLoginStatus((status) =>
-		{
-			// change ui based on status
-			switch (status)
-			{
-				case MojangAuthentication.AccountStatus.LOGGED_IN:
-					SetAuthImage(AuthImageStatus.VALID);
-					AuthStatusText.text = $"Logged in as {MojangAuthentication.Username}";
-					SetLoginLogoutButtons(true);
-					break;
-				case MojangAuthentication.AccountStatus.LOGGED_OUT:
-				case MojangAuthentication.AccountStatus.INVALID_CREDENTIALS:
-					SetAuthImage(AuthImageStatus.INVALID);
-					AuthStatusText.text = "Not Logged In";
-					SetLoginLogoutButtons(false);
-					break;
-				case MojangAuthentication.AccountStatus.NOT_PREMIUM:
-					SetAuthImage(AuthImageStatus.INVALID);
-					AuthStatusText.text = $"Logged in as {MojangAuthentication.Username}\nAccount not premium.";
-					SetLoginLogoutButtons(false);
-					break;
-			}
-		}));
+
+		SetAuthImage(AuthImageStatus.LOADING);
+		StartCoroutine(MojangAuthentication.GetLoginStatus(HandleLoginResponse));
 	}
 
+	private void HandleLoginResponse(MojangAuthentication.AccountStatus status)
+	{
+		switch (status)
+		{
+			case MojangAuthentication.AccountStatus.LOGGED_IN:
+				SetAuthImage(AuthImageStatus.VALID);
+				AuthStatusText.text = $"Logged in as {MojangAuthentication.Username}";
+				SetLoginLogoutButtons(true);
+				GameManager.Username = MojangAuthentication.Username;
+				break;
+			case MojangAuthentication.AccountStatus.LOGGED_OUT:
+			case MojangAuthentication.AccountStatus.INVALID_CREDENTIALS:
+				SetAuthImage(AuthImageStatus.INVALID);
+				AuthStatusText.text = "Not Logged In";
+				SetLoginLogoutButtons(false);
+				break;
+			case MojangAuthentication.AccountStatus.NOT_PREMIUM:
+				SetAuthImage(AuthImageStatus.INVALID);
+				AuthStatusText.text = $"Logged in as {MojangAuthentication.Username}\nAccount not premium.";
+				SetLoginLogoutButtons(false);
+				break;
+		}
+	}
+
+	/// <summary>
+	/// Sets the state of the login/logout buttons in the auth widget depending on whether the user is logged in
+	/// </summary>
+	/// <param name="loggedIn"></param>
 	private void SetLoginLogoutButtons(bool loggedIn)
 	{
-		LoginButton.interactable = !loggedIn;
+		WidgetLoginButton.interactable = !loggedIn;
 		LogoutButton.interactable = loggedIn;
 	}
 
+	/// <summary>
+	/// Sets the image displayed on the auth widget
+	/// </summary>
+	/// <param name="status"></param>
 	private void SetAuthImage(AuthImageStatus status)
 	{
 		switch (status)
@@ -125,6 +218,9 @@ public class MainMenuController : MonoBehaviour
 		StartCoroutine(QueryServerCoroutine(hostname, port));
 	}
 
+	/// <summary>
+	/// Connects to the server specified in the connect box
+	/// </summary>
 	public void ConnectToServer()
 	{
 		string hostname = AddressInput.text;
@@ -234,7 +330,7 @@ public class MainMenuController : MonoBehaviour
 		public int PingTime;
 	}
 
-	enum AuthImageStatus
+	private enum AuthImageStatus
 	{
 		VALID,
 		INVALID,

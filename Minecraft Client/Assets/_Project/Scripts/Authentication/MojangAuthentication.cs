@@ -60,13 +60,13 @@ public static class MojangAuthentication
 	public static IEnumerator Login(string username, string password, Action<AccountStatus> callback)
 	{
 		// send login request to server
-		var responseData = new ResponseData();
-		MakeRequest<RefreshResponse>("authenticate", JsonUtility.ToJson(new AuthenticatePayload(username, password)), responseData);
+		var task = MakeRequest<RefreshResponse>("authenticate", JsonUtility.ToJson(new AuthenticatePayload(username, password)), (responseData) =>
+		{
+			callback(HandleRefreshResponse(responseData));
+		});
 
-		while (!responseData.IsCompleted)
+		while (task.MoveNext())
 			yield return null;
-
-		callback(HandleRefreshResponse(responseData));
 	}
 
 	/// <summary>
@@ -81,14 +81,14 @@ public static class MojangAuthentication
 		}
 
 		// refresh access token
-		var responseData = new ResponseData();
-		MakeRequest<RefreshResponse>("refresh", JsonUtility.ToJson(new RefreshPayload(AccessToken)), responseData);
+		var task = MakeRequest<RefreshResponse>("refresh", JsonUtility.ToJson(new RefreshPayload(AccessToken)), responseData =>
+		{
+			callback(HandleRefreshResponse(responseData));
+		});
 
 		// wait for web request to complete
-		while (!responseData.IsCompleted)
+		while (task.MoveNext())
 			yield return null;
-
-		callback(HandleRefreshResponse(responseData));
 	}
 
 	/// <summary>
@@ -97,10 +97,11 @@ public static class MojangAuthentication
 	/// <param name="token"></param>
 	public static IEnumerator InvalidateAccessToken(string token = null)
 	{
-		var responseData = new ResponseData(); 
-		MakeRequest<object>("invalidate", JsonUtility.ToJson(new InvalidatePayload(token ?? AccessToken)), responseData);
-
-		while (!responseData.IsCompleted)
+		var task = MakeRequest<object>("invalidate", JsonUtility.ToJson(new InvalidatePayload(token ?? AccessToken)), responseData =>
+		{
+			// we don't need to do anything here
+		});
+		while (task.MoveNext())
 			yield return null;
 	}
 
@@ -156,7 +157,7 @@ public static class MojangAuthentication
 	/// <param name="jsonData"></param>
 	/// <typeparam name="T">The type to deserialze the response into</typeparam>
 	/// <returns></returns>
-	private static IEnumerator MakeRequest<T>(string endpoint, string jsonData, ResponseData response)
+	private static IEnumerator MakeRequest<T>(string endpoint, string jsonData, Action<ResponseData> callback)
 	{
 		var request = new UnityWebRequest($"{RequestServer}/{endpoint}", "POST")
 		{
@@ -166,8 +167,8 @@ public static class MojangAuthentication
 		request.SetRequestHeader("content-type", "application/json");
 		request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(jsonData));
 		request.downloadHandler = new DownloadHandlerBuffer();
-		request.SendWebRequest();
-		while (!request.isDone)
+		var operation = request.SendWebRequest();
+		while (!operation.isDone)
 			yield return null;
 
 		// check if request failed
@@ -185,7 +186,7 @@ public static class MojangAuthentication
 				error = new ServerErrorResponse(ex);
 			}
 
-			response.ErrorData = error;
+			callback(new ResponseData() { ErrorData = error });
 		}
 		else
 		{
@@ -193,18 +194,15 @@ public static class MojangAuthentication
 			try
 			{
 				T responseObject = JsonUtility.FromJson<T>(request.downloadHandler.text);
-				response.ResponseObject = responseObject;
+				callback(new ResponseData(responseObject));
 			}
 			catch (Exception ex)
 			{
 				// error parsing response
 				Debug.LogWarning($"Exception deserializing server response:\n{ex}\nBody:\n{request.downloadHandler.text}");
-				response.ErrorData = new ServerErrorResponse(ex);
+				callback(new ResponseData() { ErrorData = new ServerErrorResponse(ex) });
 			}
 		}
-
-		// mark the response as completed
-		response.IsCompleted = true;
 	}
 
 	/// <summary>
@@ -228,11 +226,6 @@ class ResponseData
 	{
 		ResponseObject = boxedResponse;
 	}
-
-	/// <summary>
-	/// Whether this response has all it's data. For use with <see cref="MojangAuthentication.MakeRequest{T}(string, string, ResponseData)"/>
-	/// </summary>
-	public bool IsCompleted { get; set; }
 
 	/// <summary>
 	/// The error this response contains

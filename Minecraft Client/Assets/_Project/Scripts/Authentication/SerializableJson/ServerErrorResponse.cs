@@ -26,7 +26,7 @@ public class ServerErrorResponse
 	public string ErrorMessage;
 	public string Cause;
 
-	new public string ToString()
+	public override string ToString()
 	{
 		// this mess returns the error + message and the cause, if it exists
 		return $"{Error}: {ErrorMessage}" + ((Cause != null) ? $"({Cause})" : "");
