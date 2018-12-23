@@ -15,12 +15,6 @@ public class InvalidatePayload
 		AccessToken = accessToken;
 	}
 
-	public string AccessToken { get; set; }
-	public string ClientToken
-	{
-		get
-		{
-			return MojangAuthentication.GetClientToken();
-		}
-	}
+	public string AccessToken;
+	public string ClientToken = MojangAuthentication.GetClientToken();
 }

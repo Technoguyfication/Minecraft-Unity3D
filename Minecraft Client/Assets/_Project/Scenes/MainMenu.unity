@@ -122,6 +122,7 @@ GameObject:
   m_Component:
   - component: {fileID: 13402249}
   - component: {fileID: 13402248}
+  - component: {fileID: 13402250}
   m_Layer: 0
   m_Name: Game Manager
   m_TagString: GameController
@@ -160,6 +161,31 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &13402250
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 13402247}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3cc5367566779d7428aa8411c09d840e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AddressInput: {fileID: 575226042}
+  PortInput: {fileID: 1403237455}
+  AuthStatusImage: {fileID: 1609835235}
+  AuthStatusImageGood: {fileID: 21300000, guid: f4a784deb3748ce4b943312f67e024de,
+    type: 3}
+  AuthStatusImageColorGood: {r: 0, g: 1, b: 0, a: 1}
+  AuthStatusImageBad: {fileID: 21300000, guid: 25df84cd581d8d540bb81ab965ab491f, type: 3}
+  AuthStatusImageColorBad: {r: 1, g: 0, b: 0, a: 1}
+  AuthStatusImageLoading: {fileID: 21300000, guid: bbb8917080bca704a868b5c1eef4aa59,
+    type: 3}
+  AuthStatusText: {fileID: 1687664430}
+  LoginButton: {fileID: 1049782416}
+  LogoutButton: {fileID: 1852489137}
+  GameManager: {fileID: 13402248}
 --- !u!1 &21165361
 GameObject:
   m_ObjectHideFlags: 0
@@ -421,7 +447,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 13402250}
         m_MethodName: QueryServer
         m_Mode: 1
         m_Arguments:
@@ -2016,7 +2042,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 13402250}
         m_MethodName: ConnectToServer
         m_Mode: 1
         m_Arguments:
@@ -2145,7 +2171,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: s
+  m_Text: Login Status
 --- !u!222 &1687664431
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2525,7 +2551,6 @@ GameObject:
   - component: {fileID: 2029211483}
   - component: {fileID: 2029211482}
   - component: {fileID: 2029211481}
-  - component: {fileID: 2029211485}
   m_Layer: 5
   m_Name: Main Menu
   m_TagString: Untagged
@@ -2610,28 +2635,3 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!114 &2029211485
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 2029211480}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3cc5367566779d7428aa8411c09d840e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  AddressInput: {fileID: 575226042}
-  PortInput: {fileID: 1403237455}
-  AuthStatusImage: {fileID: 1609835235}
-  AuthStatusImageGood: {fileID: 21300000, guid: f4a784deb3748ce4b943312f67e024de,
-    type: 3}
-  AuthStatusImageColorGood: {r: 0, g: 1, b: 0, a: 1}
-  AuthStatusImageBad: {fileID: 21300000, guid: 25df84cd581d8d540bb81ab965ab491f, type: 3}
-  AuthStatusImageColorBad: {r: 1, g: 0, b: 0, a: 1}
-  AuthStatusImageLoading: {fileID: 21300000, guid: bbb8917080bca704a868b5c1eef4aa59,
-    type: 3}
-  AuthStatusText: {fileID: 1687664430}
-  LoginButton: {fileID: 1049782416}
-  LogoutButton: {fileID: 1852489137}
-  GameManager: {fileID: 13402248}

@@ -15,13 +15,7 @@ public class RefreshPayload
 		AccessToken = accessToken;
 	}
 
-	public string AccessToken { get; set; }
-	public string ClientToken
-	{
-		get
-		{
-			return MojangAuthentication.GetClientToken();
-		}
-	}
-	public bool RequestUser { get; set; } = false;
+	public string AccessToken;
+	public string ClientToken = MojangAuthentication.GetClientToken();
+	public bool RequestUser = false;
 }

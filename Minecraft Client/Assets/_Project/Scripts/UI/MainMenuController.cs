@@ -37,7 +37,7 @@ public class MainMenuController : MonoBehaviour
 
 	private void Awake()
 	{
-		StartCoroutine(RefreshLoginStatus());
+		RefreshLoginStatus();
 	}
 
 	// Update is called once per frame
@@ -52,44 +52,30 @@ public class MainMenuController : MonoBehaviour
 	/// <summary>
 	/// Refreshes the client's login status
 	/// </summary>
-	public IEnumerator RefreshLoginStatus()
+	public void RefreshLoginStatus()
 	{
-		MojangAuthentication.AccountStatus status = MojangAuthentication.AccountStatus.LOGGED_OUT;
 		Debug.Log("Checking user login..");
-		Task loginStatusTask = new Task(() =>
+		Debug.Log($"Client auth server token: {MojangAuthentication.GetClientToken()}");
+		StartCoroutine(MojangAuthentication.GetLoginStatus((status) =>
 		{
-			try
+			// change ui based on status
+			switch (status)
 			{
-				status = MojangAuthentication.GetLoginStatus();
+				case MojangAuthentication.AccountStatus.LOGGED_IN:
+					SetAuthImage(AuthImageStatus.VALID);
+					AuthStatusText.text = $"Logged in as {MojangAuthentication.Username}";
+					break;
+				case MojangAuthentication.AccountStatus.LOGGED_OUT:
+				case MojangAuthentication.AccountStatus.INVALID_CREDENTIALS:
+					SetAuthImage(AuthImageStatus.INVALID);
+					AuthStatusText.text = "Not Logged In";
+					break;
+				case MojangAuthentication.AccountStatus.NOT_PREMIUM:
+					SetAuthImage(AuthImageStatus.INVALID);
+					AuthStatusText.text = $"Logged in as {MojangAuthentication.Username}\nAccount not premium.";
+					break;
 			}
-			catch (Exception ex)
-			{
-				Debug.LogWarning($"Failed to check access token: {ex}");
-				status = MojangAuthentication.AccountStatus.LOGGED_OUT;
-			}
-		});
-		loginStatusTask.Start();
-
-		// wait for status to complete
-		while (!loginStatusTask.IsCompleted)
-			yield return null;
-
-		switch (status)
-		{
-			case MojangAuthentication.AccountStatus.LOGGED_IN:
-				SetAuthImage(AuthImageStatus.VALID);
-				AuthStatusText.text = $"Logged in as {MojangAuthentication.Username}";
-				break;
-			case MojangAuthentication.AccountStatus.LOGGED_OUT:
-			case MojangAuthentication.AccountStatus.INVALID_CREDENTIALS:
-				SetAuthImage(AuthImageStatus.INVALID);
-				AuthStatusText.text = "Not Logged In";
-				break;
-			case MojangAuthentication.AccountStatus.NOT_PREMIUM:
-				SetAuthImage(AuthImageStatus.INVALID);
-				AuthStatusText.text = $"Logged in as {MojangAuthentication.Username}\nAccount not premium.";
-				break;
-		}
+		}));
 	}
 
 	private void SetAuthImage(AuthImageStatus status)

@@ -40,7 +40,7 @@ public static class MojangAuthentication
 	public static string GetClientToken()
 	{
 		// generate new client token if we need
-		if (PlayerPrefs.HasKey(clientTokenPrefKey))
+		if (!PlayerPrefs.HasKey(clientTokenPrefKey))
 		{
 			string newToken = Guid.NewGuid().ToString();
 			PlayerPrefs.SetString(clientTokenPrefKey, newToken);
@@ -57,37 +57,51 @@ public static class MojangAuthentication
 	/// <param name="username"></param>
 	/// <param name="password"></param>
 	/// <returns></returns>
-	public static AccountStatus Login(string username, string password)
+	public static IEnumerator Login(string username, string password, Action<AccountStatus> callback)
 	{
 		// send login request to server
-		var responseData = MakeRequest<RefreshResponse>("authenticate", JsonUtility.ToJson(new AuthenticatePayload(username, password)));
-		return HandleRefreshResponse(responseData);
+		var responseData = new ResponseData();
+		MakeRequest<RefreshResponse>("authenticate", JsonUtility.ToJson(new AuthenticatePayload(username, password)), responseData);
+
+		while (!responseData.IsCompleted)
+			yield return null;
+
+		callback(HandleRefreshResponse(responseData));
 	}
 
 	/// <summary>
 	/// Gets the stored login status of the user
 	/// </summary>
 	/// <returns></returns>
-	public static AccountStatus GetLoginStatus()
+	public static IEnumerator GetLoginStatus(Action<AccountStatus> callback)
 	{
 		if (AccessToken == null)
 		{
-			return AccountStatus.LOGGED_OUT;
+			callback(AccountStatus.LOGGED_OUT);
 		}
 
 		// refresh access token
-		var responseData = MakeRequest<RefreshResponse>("refresh", JsonUtility.ToJson(new RefreshPayload(AccessToken)));
-		return HandleRefreshResponse(responseData);
+		var responseData = new ResponseData();
+		MakeRequest<RefreshResponse>("refresh", JsonUtility.ToJson(new RefreshPayload(AccessToken)), responseData);
+
+		// wait for web request to complete
+		while (!responseData.IsCompleted)
+			yield return null;
+
+		callback(HandleRefreshResponse(responseData));
 	}
 
 	/// <summary>
 	/// Invalidates a specified access token, or the stored one if no token is specified
 	/// </summary>
 	/// <param name="token"></param>
-	public static void InvalidateAccessToken(string token = null)
+	public static IEnumerator InvalidateAccessToken(string token = null)
 	{
-		// object is used as a placeholder because we aren't getting a response from this request
-		var responseData = MakeRequest<object>("invalidate", JsonUtility.ToJson(new InvalidatePayload(token ?? AccessToken)), false);
+		var responseData = new ResponseData(); 
+		MakeRequest<object>("invalidate", JsonUtility.ToJson(new InvalidatePayload(token ?? AccessToken)), responseData);
+
+		while (!responseData.IsCompleted)
+			yield return null;
 	}
 
 	/// <summary>
@@ -142,7 +156,7 @@ public static class MojangAuthentication
 	/// <param name="jsonData"></param>
 	/// <typeparam name="T">The type to deserialze the response into</typeparam>
 	/// <returns></returns>
-	private static ResponseData MakeRequest<T>(string endpoint, string jsonData, bool needResponse = true)
+	private static IEnumerator MakeRequest<T>(string endpoint, string jsonData, ResponseData response)
 	{
 		var request = new UnityWebRequest($"{RequestServer}/{endpoint}", "POST")
 		{
@@ -153,7 +167,8 @@ public static class MojangAuthentication
 		request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(jsonData));
 		request.downloadHandler = new DownloadHandlerBuffer();
 		request.SendWebRequest();
-		while (!request.isDone) { } // block until request is done
+		while (!request.isDone)
+			yield return null;
 
 		// check if request failed
 		if (request.responseCode != 200)
@@ -164,38 +179,32 @@ public static class MojangAuthentication
 			{
 				error = JsonUtility.FromJson<ServerErrorResponse>(request.downloadHandler.text);
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
-				Debug.LogWarning($"Authentication server gave an error:\n{request.downloadHandler.text}");
-				throw new Exception("Request failed; invalid error body. See log for details.");
+				Debug.LogWarning($"Exception deserializing auth server error:\n{ex}\nBody:\n{request.downloadHandler.text}");
+				error = new ServerErrorResponse(ex);
 			}
 
-			// return error object
-			return new ResponseData()
-			{
-				ErrorData = error
-			};
+			response.ErrorData = error;
 		}
-
-		// attempt to parse response
-		try
+		else
 		{
-			if (needResponse)
+			// attempt to parse response
+			try
 			{
 				T responseObject = JsonUtility.FromJson<T>(request.downloadHandler.text);
-				return new ResponseData(responseObject);
+				response.ResponseObject = responseObject;
 			}
-			else
+			catch (Exception ex)
 			{
-				return new ResponseData();
+				// error parsing response
+				Debug.LogWarning($"Exception deserializing server response:\n{ex}\nBody:\n{request.downloadHandler.text}");
+				response.ErrorData = new ServerErrorResponse(ex);
 			}
 		}
-		catch (Exception ex)
-		{
-			// error parsing response
-			Debug.LogWarning($"Malformed auth server response: {request.downloadHandler.text}");
-			throw new Exception("Unable to parse server response. See log for details.", ex);
-		}
+
+		// mark the response as completed
+		response.IsCompleted = true;
 	}
 
 	/// <summary>
@@ -220,6 +229,14 @@ class ResponseData
 		ResponseObject = boxedResponse;
 	}
 
+	/// <summary>
+	/// Whether this response has all it's data. For use with <see cref="MojangAuthentication.MakeRequest{T}(string, string, ResponseData)"/>
+	/// </summary>
+	public bool IsCompleted { get; set; }
+
+	/// <summary>
+	/// The error this response contains
+	/// </summary>
 	public ServerErrorResponse ErrorData { get; set; } = null;
 
 	/// <summary>
