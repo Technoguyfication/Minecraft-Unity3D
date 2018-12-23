@@ -83,13 +83,13 @@ public class GameManager : MonoBehaviour
 	private void OnDestroy()
 	{
 		Disconnect("Game stopped");
-		_client.Dispose();
+		_client?.Dispose();
 	}
 
 	public void Disconnect(string reason)
 	{
 		_cancellationTokenSource.Cancel();
-		_client.Disconnect();
+		_client?.Disconnect();
 		_initialized = false;
 
 		Debug.Log($"Disconnected: {reason}");

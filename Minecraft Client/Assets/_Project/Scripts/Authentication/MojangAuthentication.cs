@@ -11,6 +11,7 @@ using UnityEngine.Networking;
 /// </summary>
 public static class MojangAuthentication
 {
+	public static string Username { get; private set; }
 
 	private const string RequestServer = @"https://authserver.mojang.com";
 	private const string clientTokenPrefKey = "authClientToken";
@@ -112,6 +113,7 @@ public static class MojangAuthentication
 
 		// get body from response data
 		var responseBody = (RefreshResponse)responseData.ResponseObject;
+		Username = responseBody.SelectedProfile.Name;
 		AccountStatus status;
 
 		// check if user is premium
