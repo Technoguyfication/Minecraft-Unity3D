@@ -78,6 +78,7 @@ public static class MojangAuthentication
 		if (string.IsNullOrEmpty(AccessToken))
 		{
 			callback(AccountStatus.LOGGED_OUT);
+			yield break;
 		}
 
 		// refresh access token
@@ -116,7 +117,7 @@ public static class MojangAuthentication
 		if (responseData.ErrorData != null)
 		{
 			// check if token invalid
-			if (responseData.ErrorData.Error == "ForbiddenOperationException")
+			if (responseData.ErrorData.error == "ForbiddenOperationException")
 			{
 				AccessToken = null; // clear access token because the one we have is invalid
 				return AccountStatus.INVALID_CREDENTIALS;
@@ -128,23 +129,18 @@ public static class MojangAuthentication
 
 		// get body from response data
 		var responseBody = (RefreshResponse)responseData.ResponseObject;
-		Username = responseBody.SelectedProfile.Name;
+		Username = responseBody.selectedProfile.name;
 		AccountStatus status;
 
 		// check if user is premium
-		if (responseBody.SelectedProfile == null)
+		if (responseBody.selectedProfile == null)
 		{
 			status = AccountStatus.NOT_PREMIUM;
 		}
 		else
 		{
 			status = AccountStatus.LOGGED_IN;
-		}
-
-		// store client token if login valid
-		if (status == AccountStatus.LOGGED_IN)
-		{
-			AccessToken = responseBody.AccessToken;
+			AccessToken = responseBody.accessToken;	// store access token
 		}
 
 		return status;

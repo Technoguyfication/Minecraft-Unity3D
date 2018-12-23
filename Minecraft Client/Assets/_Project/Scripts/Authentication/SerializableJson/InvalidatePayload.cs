@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+#pragma warning disable IDE1006
+
 [Serializable]
 public class InvalidatePayload
 {
@@ -12,9 +14,9 @@ public class InvalidatePayload
 
 	public InvalidatePayload(string accessToken)
 	{
-		AccessToken = accessToken;
+		this.accessToken = accessToken;
 	}
 
-	public string AccessToken;
-	public string ClientToken = MojangAuthentication.GetClientToken();
+	public string accessToken;
+	public string clientToken = MojangAuthentication.GetClientToken();
 }

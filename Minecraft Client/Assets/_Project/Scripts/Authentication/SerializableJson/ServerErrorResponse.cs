@@ -12,23 +12,23 @@ public class ServerErrorResponse
 
 	public ServerErrorResponse(Exception ex)
 	{
-		Error = ex.GetType().Name;
-		ErrorMessage = ex.Message;
+		error = ex.GetType().Name;
+		errorMessage = ex.Message;
 	}
 
 	public ServerErrorResponse(string message)
 	{
-		Error = "Unhandled Exception";
-		ErrorMessage = message;
+		error = "Unhandled Exception";
+		errorMessage = message;
 	}
 
-	public string Error;
-	public string ErrorMessage;
-	public string Cause;
+	public string error;
+	public string errorMessage;
+	public string cause;
 
 	public override string ToString()
 	{
 		// this mess returns the error + message and the cause, if it exists
-		return $"{Error}: {ErrorMessage}" + ((Cause != null) ? $"({Cause})" : "");
+		return $"{error}: {errorMessage}" + ((cause != null) ? $"({cause})" : "");
 	}
 }

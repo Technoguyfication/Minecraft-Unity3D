@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+#pragma warning disable IDE1006
+
 [Serializable]
 public class RefreshPayload
 {
@@ -12,10 +14,10 @@ public class RefreshPayload
 
 	public RefreshPayload(string accessToken)
 	{
-		AccessToken = accessToken;
+		this.accessToken = accessToken;
 	}
 
-	public string AccessToken;
-	public string ClientToken = MojangAuthentication.GetClientToken();
-	public bool RequestUser = false;
+	public string accessToken;
+	public string clientToken = MojangAuthentication.GetClientToken();
+	public bool requestUser = false;
 }
