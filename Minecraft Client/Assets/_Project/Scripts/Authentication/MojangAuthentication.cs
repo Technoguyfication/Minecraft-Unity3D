@@ -12,6 +12,7 @@ using UnityEngine.Networking;
 public static class MojangAuthentication
 {
 	public static string Username { get; private set; }
+	public static Guid UUID { get; private set; }
 
 	private const string LoginServer = @"https://authserver.mojang.com";
 	private const string SessionServer = @"https://sessionserver.mojang.com/session/minecraft/join";
@@ -108,6 +109,28 @@ public static class MojangAuthentication
 	}
 
 	/// <summary>
+	/// Sends a request to the joinserver 
+	/// </summary>
+	/// <param name="hash"></param>
+	public static void JoinServer(string hash)
+	{
+		var payload = new JoinServerPayload(AccessToken, UUID.ToString(), hash);
+
+		var task = MakeRequest<object>("", JsonUtility.ToJson(payload), (data) =>
+		{
+			// expecting an error because server sends non-200 response
+			if (data.ErrorData == null || !string.IsNullOrEmpty(data.ErrorData.error))
+			{
+				// error!
+				Debug.LogError($"Invalid response from session server: {data.ErrorData}");
+			}
+		}, SessionServer);
+
+		while (task.MoveNext())
+		{ }
+	}
+
+	/// <summary>
 	/// Checks a refresh response and tells us the status of it
 	/// </summary>
 	/// <param name="responseData"></param>
@@ -131,6 +154,7 @@ public static class MojangAuthentication
 		// get body from response data
 		var responseBody = (RefreshResponse)responseData.ResponseObject;
 		Username = responseBody.selectedProfile.name;
+		UUID = Guid.Parse(responseBody.selectedProfile.id);
 		AccountStatus status;
 
 		// check if user is premium
@@ -154,9 +178,9 @@ public static class MojangAuthentication
 	/// <param name="jsonData"></param>
 	/// <typeparam name="T">The type to deserialze the response into</typeparam>
 	/// <returns></returns>
-	private static IEnumerator MakeRequest<T>(string endpoint, string jsonData, Action<ResponseData> callback)
+	private static IEnumerator MakeRequest<T>(string endpoint, string jsonData, Action<ResponseData> callback, string server = LoginServer)
 	{
-		var request = new UnityWebRequest($"{LoginServer}/{endpoint}", "POST")
+		var request = new UnityWebRequest($"{server}/{endpoint}", "POST")
 		{
 			timeout = 30
 		};

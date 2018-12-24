@@ -151,10 +151,9 @@ public class GameManager : MonoBehaviour
 		// TODO: put the rest of the login packets here
 		// player abilities, item slot change, etc.
 
-		Task loginTask = new Task(() =>
-		{
-			// send off packets
-			_client.WritePackets(new Packet[] {
+
+		// send off packets
+		_client.WritePackets(new Packet[] {
 				new HandshakePacket()
 				{
 					Address = hostname,
@@ -167,39 +166,30 @@ public class GameManager : MonoBehaviour
 				}
 			});
 
-			_client.State = NetworkClient.ProtocolState.LOGIN;
+		_client.State = NetworkClient.ProtocolState.LOGIN;
 
-			// get response
-			while (true)
+		// get response
+		while (true)
+		{
+			var packet = _client.ReadNextPacket();
+			switch ((ClientboundIDs)packet.ID)
 			{
-				var packet = _client.ReadNextPacket();
-				switch ((ClientboundIDs)packet.ID)
-				{
-					case ClientboundIDs.LOGIN_SUCCESS:
-						loginSuccess = new LoginSuccessPacket(packet);
-						break;
-					case ClientboundIDs.JOIN_GAME:
-						joinGame = new JoinGamePacket(packet);
-						break;
-					case ClientboundIDs.LOGIN_DISCONNECT:
-						throw new Exception($"Disconnected from server: {new DisconnectPacket(packet).JSONResponse}");
-				}
-
-				if (loginSuccess != null && joinGame != null)
-				{
-					_client.State = NetworkClient.ProtocolState.PLAY;
+				case ClientboundIDs.LOGIN_SUCCESS:
+					loginSuccess = new LoginSuccessPacket(packet);
 					break;
-				}
+				case ClientboundIDs.JOIN_GAME:
+					joinGame = new JoinGamePacket(packet);
+					break;
+				case ClientboundIDs.LOGIN_DISCONNECT:
+					throw new Exception($"Disconnected from server: {new DisconnectPacket(packet).JSONResponse}");
 			}
-		});
-		loginTask.Start();
 
-		// wait till completion
-		while (!loginTask.IsCompleted)
-			yield return null;
-
-		if (loginTask.IsFaulted)
-			throw loginTask.Exception;
+			if (loginSuccess != null && joinGame != null)
+			{
+				_client.State = NetworkClient.ProtocolState.PLAY;
+				break;
+			}
+		}
 
 		// set settings from server
 		_playerUuid = loginSuccess.UUID;

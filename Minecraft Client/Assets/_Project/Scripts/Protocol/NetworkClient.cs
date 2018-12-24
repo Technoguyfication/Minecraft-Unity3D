@@ -13,10 +13,11 @@ public class NetworkClient : IDisposable
 	/// See: https://wiki.vg/Protocol_version_numbers
 	/// </summary>
 	public const int PROTOCOL_VERSION = 404;
-
 	public ProtocolState State { get; set; } = ProtocolState.HANDSHAKING;
 
+	private readonly EncryptionUtility _encryptionUtility = new EncryptionUtility();
 	private int _compressionThreshold = -1;
+	private bool _encryptionEnabled = false;
 
 	/// <summary>
 	/// Gets whether the client is connected to a server or not
@@ -73,8 +74,6 @@ public class NetworkClient : IDisposable
 	/// <returns></returns>
 	private byte[] ReadBytes(int amount)
 	{
-		// todo support protocol encryption
-
 		if (!Client.Connected)
 			throw new UnityException("Client not connected!");
 
@@ -93,7 +92,15 @@ public class NetworkClient : IDisposable
 			}
 		}
 
-		return buffer;
+		// decrypt if needed
+		if (_encryptionEnabled)
+		{
+			return _encryptionUtility.DecryptAES(buffer);
+		}
+		else
+		{
+			return buffer;
+		}
 	}
 
 	/// <summary>
@@ -138,7 +145,15 @@ public class NetworkClient : IDisposable
 				buffer.AddRange(p.Payload);
 			}
 
-			Write(buffer.ToArray(), 0, buffer.Count);
+			// handle encryption
+			if (_encryptionEnabled)
+			{
+				Write(_encryptionUtility.EncryptAES(buffer.ToArray()), 0, buffer.Count);
+			}
+			else
+			{
+				Write(buffer.ToArray(), 0, buffer.Count);
+			}
 		}
 	}
 
@@ -206,11 +221,51 @@ public class NetworkClient : IDisposable
 			payload = buffer.ToArray();
 		}
 
-		// handle compression packet
-		if (State == ProtocolState.LOGIN && packetId == (int)ClientboundIDs.LOGIN_SET_COMPRESSION)
+		if (State == ProtocolState.LOGIN)
 		{
-			_compressionThreshold = VarInt.ReadNext(new List<byte>(payload));
-			return ReadNextPacket();
+			// handle compression packet
+			if (packetId == (int)ClientboundIDs.LOGIN_SET_COMPRESSION)
+			{
+				_compressionThreshold = VarInt.ReadNext(new List<byte>(payload));
+				return ReadNextPacket();
+			}
+
+			// handle protocol encryption
+			if (packetId == (int)ClientboundIDs.LOGIN_ENCRYPTION_REQUEST)
+			{
+				var encryptionRequestPacket = new EncryptionRequestPacket()
+				{
+					Payload = payload
+				};
+
+				// generate shared AES secret
+				byte[] sharedSecret = EncryptionUtility.GetSharedSecret();
+				_encryptionUtility.SetAESKey(sharedSecret);
+				
+				// generate hash
+				List<byte> hashBuilder = new List<byte>(sharedSecret);
+				hashBuilder.AddRange(encryptionRequestPacket.PublicKey);
+				string hash = EncryptionUtility.SHAHash(hashBuilder.ToArray());
+
+				// send hash to mojang's servers
+				MojangAuthentication.JoinServer(hash);
+
+				// load RSA public key from server
+				_encryptionUtility.SetRSAKey(encryptionRequestPacket.PublicKey);
+				string rsaKeyPem = _encryptionUtility.GetPKCSPaddedRSAPublicKey();
+
+				// send encryption response
+				var response = new EncryptionResponsePacket()
+				{
+					SharedSecret = _encryptionUtility.EncryptRSA(sharedSecret),
+					VerifyToken = _encryptionUtility.EncryptRSA(encryptionRequestPacket.VerifyToken)
+				};
+				WritePacket(response);
+
+				_encryptionEnabled = true;
+
+				return ReadNextPacket();
+			}
 		}
 
 		return new PacketData

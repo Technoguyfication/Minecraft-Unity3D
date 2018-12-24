@@ -15,6 +15,7 @@ public class EncryptionUtility
 {
 	private const int SHARED_SECRET_SIZE = 16;
 	private Aes _aesProvider;
+	private RSACryptoServiceProvider _rsa;
 	private ICryptoTransform _aesEncryptTransform;
 	private ICryptoTransform _aesDecryptTransform;
 
@@ -23,12 +24,28 @@ public class EncryptionUtility
 	/// </summary>
 	/// <param name="data"></param>
 	/// <returns></returns>
-	public byte[] EncryptRSA(byte[] data, string publicKey)
+	public byte[] EncryptRSA(byte[] data)
 	{
-		using (var rsa = Crypto.DecodeX509PublicKey(publicKey))
-		{
-			return rsa.Encrypt(data, true);
-		}
+		return _rsa.Encrypt(data, true);
+	}
+
+	/// <summary>
+	/// Gets the PKCS#1 v1.5 padded version of the loaded public key
+	/// </summary>
+	/// <returns></returns>
+	public string GetPKCSPaddedRSAPublicKey()
+	{
+		return Crypto.ExportPublicKeyToRSAPEM(_rsa);
+	}
+
+	/// <summary>
+	/// Sets the RSA public key for encryption
+	/// </summary>
+	/// <param name="publicKey"></param>
+	public void SetRSAKey(byte[] publicKey)
+	{
+		string rsaPem = "-----BEGIN PUBLIC KEY-----" + Convert.ToBase64String(publicKey) + "-----END PUBLIC KEY-----";
+		_rsa = Crypto.DecodeX509PublicKey(rsaPem);
 	}
 
 	/// <summary>
@@ -99,11 +116,11 @@ public class EncryptionUtility
 	/// </summary>
 	/// <param name="input"></param>
 	/// <returns></returns>
-	public static string Hash(string input)
+	public static string SHAHash(byte[] input)
 	{
 		using (var sha = SHA1.Create())
 		{
-			byte[] digest = sha.ComputeHash(Encoding.UTF8.GetBytes(input));
+			byte[] digest = sha.ComputeHash(input);
 			var bigint = new System.Numerics.BigInteger(digest.Reverse());
 
 			// if the digest is "negative", flip it using BigInteger. otherwise, supply original digest

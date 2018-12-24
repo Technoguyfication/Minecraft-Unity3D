@@ -14,7 +14,8 @@ public class EncryptionRequestPacket : Packet
 		set
 		{
 			List<byte> buffer = new List<byte>(value);
-			buffer.Read(20);    // server id
+			int serverIdLen = VarInt.ReadNext(buffer);
+			buffer.Read(serverIdLen);
 			int pubKeyLen = VarInt.ReadNext(buffer);
 			PublicKey = buffer.Read(pubKeyLen).ToArray();
 			int verifyTokenLen = VarInt.ReadNext(buffer);
