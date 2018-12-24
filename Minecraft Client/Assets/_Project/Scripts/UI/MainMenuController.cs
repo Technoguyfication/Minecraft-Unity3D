@@ -39,7 +39,7 @@ public class MainMenuController : MonoBehaviour
 	// Use this for initialization
 	void Start()
 	{
-
+		
 	}
 
 	private void Awake()
@@ -172,7 +172,7 @@ public class MainMenuController : MonoBehaviour
 	/// <summary>
 	/// Sets the state of the login/logout buttons in the auth widget depending on whether the user is logged in
 	/// </summary>
-	/// <param name="loggedIn"></param>
+	/// <param name="loggedIn">Whether the user is logged in</param>
 	private void SetLoginLogoutButtons(bool loggedIn)
 	{
 		WidgetLoginButton.interactable = !loggedIn;

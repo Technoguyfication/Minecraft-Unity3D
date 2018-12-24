@@ -73,6 +73,8 @@ public class NetworkClient : IDisposable
 	/// <returns></returns>
 	private byte[] ReadBytes(int amount)
 	{
+		// todo support protocol encryption
+
 		if (!Client.Connected)
 			throw new UnityException("Client not connected!");
 
@@ -204,7 +206,8 @@ public class NetworkClient : IDisposable
 			payload = buffer.ToArray();
 		}
 
-		if (State == ProtocolState.LOGIN && packetId == 0x03)   // set compression packet
+		// handle compression packet
+		if (State == ProtocolState.LOGIN && packetId == (int)ClientboundIDs.LOGIN_SET_COMPRESSION)
 		{
 			_compressionThreshold = VarInt.ReadNext(new List<byte>(payload));
 			return ReadNextPacket();
