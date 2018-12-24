@@ -43,6 +43,12 @@ public static class Utility {
 		return array;
 	}
 
+	public static T[] Reverse<T>(this T[] array)
+	{
+		Array.Reverse(array);
+		return array;
+	}
+
 	public static List<T> ReverseIfLittleEndian<T>(this List<T> list)
 	{
 		if (BitConverter.IsLittleEndian)
