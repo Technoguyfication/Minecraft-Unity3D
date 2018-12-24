@@ -16,12 +16,22 @@ public class EncryptionUtility
 	private readonly RSACryptoServiceProvider _rsaProvider;
 
 	/// <summary>
-	/// Creates a new encryption utility class with the defined public key
+	/// Creates a new encryption class
 	/// </summary>
 	/// <param name="publicKey">An X509</param>
 	public EncryptionUtility(string publicKey)
 	{
 		_rsaProvider = Crypto.DecodeX509PublicKey(publicKey);
+	}
+
+	/// <summary>
+	/// Encrypts data using the server's public key
+	/// </summary>
+	/// <param name="data"></param>
+	/// <returns></returns>
+	public byte[] EncryptRSA(byte[] data)
+	{
+		return _rsaProvider.Encrypt(data, true);
 	}
 
 	/// <summary>
