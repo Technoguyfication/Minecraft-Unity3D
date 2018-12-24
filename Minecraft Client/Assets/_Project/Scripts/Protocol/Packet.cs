@@ -68,10 +68,10 @@ public enum ServerboundIDs : int
 
 	// login
 	LOGIN_START = 0x00,
-	ENCRYPTION_RESPONSE = 0x01,
-	KEEP_ALIVE = 0x0E,
+	LOGIN_ENCRYPTION_RESPONSE = 0x01,
 
 	// play
+	KEEP_ALIVE = 0x0E,
 	PLAYER = 0x0F,
 	PLAYER_POSITION_AND_LOOK = 0x11,
 
