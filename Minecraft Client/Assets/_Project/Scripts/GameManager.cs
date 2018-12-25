@@ -32,6 +32,7 @@ public class GameManager : MonoBehaviour
 	private string _playerUuid;
 	private LoadingScreenController _loadingScreen;
 	private float _lastTick = 0f;
+	private bool _disconnecting = false;
 
 	// Use this for initialization
 	void Start()
@@ -88,8 +89,12 @@ public class GameManager : MonoBehaviour
 
 	public void Disconnect(string reason)
 	{
+		if (_disconnecting)
+			return;
+
+		_disconnecting = true;
 		_cancellationTokenSource.Cancel();
-		_client?.Disconnect();
+		_client?.Disconnect(reason);
 		_initialized = false;
 
 		Debug.Log($"Disconnected: {reason}");
@@ -130,7 +135,9 @@ public class GameManager : MonoBehaviour
 		_loadingScreen.UpdateSubtitleText($"Attempting to connect to {hostname}:{port}");
 
 		// set up network client
+		_disconnecting = false;
 		_client = new NetworkClient();
+		_client.Disconnected += ClientDisconnectedEventHandler;
 		Task connectTask = new Task(() =>
 		{
 			_client.Connect(hostname, port);
@@ -150,7 +157,6 @@ public class GameManager : MonoBehaviour
 		JoinGamePacket joinGame = null;
 		// TODO: put the rest of the login packets here
 		// player abilities, item slot change, etc.
-
 
 		// send off packets
 		_client.WritePackets(new Packet[] {
@@ -228,6 +234,11 @@ public class GameManager : MonoBehaviour
 
 		// start tick loop
 		StartCoroutine(ClientTickLoopCoroutine(_cancellationTokenSource.Token));
+	}
+
+	private void ClientDisconnectedEventHandler(object sender, DisconnectedEventArgs e)
+	{
+		Disconnect(e.Reason);
 	}
 
 	/// <summary>

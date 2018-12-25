@@ -16,8 +16,8 @@ public class EncryptionUtility
 	private const int SHARED_SECRET_SIZE = 16;
 	private Aes _aesProvider;
 	private RSACryptoServiceProvider _rsa;
-	private ICryptoTransform _aesEncryptTransform;
-	private ICryptoTransform _aesDecryptTransform;
+	public ICryptoTransform AESEncryptTransform { get; private set; }
+	public ICryptoTransform AESDecryptTransform { get; private set; }
 
 	/// <summary>
 	/// Encrypts data using the server's public key
@@ -26,7 +26,7 @@ public class EncryptionUtility
 	/// <returns></returns>
 	public byte[] EncryptRSA(byte[] data)
 	{
-		return _rsa.Encrypt(data, true);
+		return _rsa.Encrypt(data, false);
 	}
 
 	/// <summary>
@@ -44,44 +44,8 @@ public class EncryptionUtility
 	/// <param name="publicKey"></param>
 	public void SetRSAKey(byte[] publicKey)
 	{
-		string rsaPem = "-----BEGIN PUBLIC KEY-----" + Convert.ToBase64String(publicKey) + "-----END PUBLIC KEY-----";
+		string rsaPem = "-----BEGIN PUBLIC KEY-----\n" + Convert.ToBase64String(publicKey) + "\n-----END PUBLIC KEY-----";
 		_rsa = Crypto.DecodeX509PublicKey(rsaPem);
-	}
-
-	/// <summary>
-	/// Encrypts data using the shared AES key
-	/// </summary>
-	/// <param name="data"></param>
-	/// <returns></returns>
-	public byte[] EncryptAES(byte[] data)
-	{
-		using (var ms = new MemoryStream())
-		{
-			using (var cs = new CryptoStream(ms, _aesEncryptTransform, CryptoStreamMode.Write))
-			{
-				cs.Write(data, 0, data.Length);
-				cs.Close();
-				return ms.ToArray();
-			}
-		}
-	}
-
-	/// <summary>
-	/// Decrypts data using AES
-	/// </summary>
-	/// <param name="data"></param>
-	/// <returns></returns>
-	public byte[] DecryptAES(byte[] data)
-	{
-		using (var ms = new MemoryStream())
-		{
-			using (var cs = new CryptoStream(ms, _aesDecryptTransform, CryptoStreamMode.Write))
-			{
-				cs.Write(data, 0, data.Length);
-				cs.Close();
-				return ms.ToArray();
-			}
-		}
 	}
 
 	/// <summary>
@@ -93,8 +57,8 @@ public class EncryptionUtility
 		_aesProvider.Key = sharedKey;
 		_aesProvider.IV = sharedKey;
 
-		_aesEncryptTransform = _aesProvider.CreateEncryptor();
-		_aesDecryptTransform = _aesProvider.CreateDecryptor();
+		AESEncryptTransform = _aesProvider.CreateEncryptor();
+		AESDecryptTransform = _aesProvider.CreateDecryptor();
 	}
 
 	/// <summary>

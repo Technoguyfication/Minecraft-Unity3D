@@ -2,10 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Net.Sockets;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Threading;
 using UnityEngine;
 using Ionic.Zlib;
+using System.IO;
 
 public class NetworkClient : IDisposable
 {
@@ -15,18 +17,24 @@ public class NetworkClient : IDisposable
 	public const int PROTOCOL_VERSION = 404;
 	public ProtocolState State { get; set; } = ProtocolState.HANDSHAKING;
 
-	private readonly EncryptionUtility _encryptionUtility = new EncryptionUtility();
-	private int _compressionThreshold = -1;
-	private bool _encryptionEnabled = false;
-
 	/// <summary>
 	/// Gets whether the client is connected to a server or not
 	/// </summary>
 	public bool Connected { get { return Client?.Connected ?? false; } }
 
+	public delegate void DisconnectedEventHandler(object sender, DisconnectedEventArgs e);
+	public event DisconnectedEventHandler Disconnected;
+
+	private bool _disconnecting = false;
+	private readonly EncryptionUtility _encryptionUtility = new EncryptionUtility();
+	private int _compressionThreshold = -1;
 	private TcpClient Client;
-	private readonly object StreamReadLock = new object();
-	private readonly object StreamWriteLock = new object();
+	private readonly object _streamWriteLock = new object();
+	private readonly object _streamReadLock = new object();
+
+	// we need seperate streams for reading and writing to support AES encryption
+	private Stream _clientWriteStream;
+	private Stream _clientReadStream;
 
 	public NetworkClient()
 	{
@@ -40,7 +48,7 @@ public class NetworkClient : IDisposable
 
 	public void Dispose()
 	{
-		Disconnect();
+		Disconnect("Client disposing");
 		Client?.Dispose();
 	}
 
@@ -54,17 +62,26 @@ public class NetworkClient : IDisposable
 		if (Client?.Connected ?? false)
 			throw new UnityException("Need to disconnect first!");
 
+		_disconnecting = false;
 		Client = new TcpClient();
 		Client.Connect(hostname, port);
+		_clientReadStream = _clientWriteStream = Client.GetStream();
 	}
 
 	/// <summary>
 	/// Disconnect from a server
 	/// </summary>
-	public void Disconnect()
+	public void Disconnect(string reason)
 	{
-		if (!Client?.Connected ?? false)
+		_disconnecting = true;
+
+		if (!Client?.Connected ?? false || _disconnecting)
 			return;
+
+		Client?.Close();
+		_clientReadStream?.Dispose();
+		_clientWriteStream?.Dispose();
+		Disconnected?.Invoke(this, new DisconnectedEventArgs(reason ?? "Connection closed"));
 	}
 
 	/// <summary>
@@ -80,27 +97,47 @@ public class NetworkClient : IDisposable
 		byte[] buffer = new byte[amount];
 		int bytesRead = 0;
 
-		lock (StreamReadLock)
+		lock (_streamReadLock)
 		{
 			while (bytesRead < amount)
 			{
-				int i = Client.GetStream().Read(buffer, bytesRead, amount - bytesRead);
+				int i = 0; ;
+				try
+				{
+					i = _clientReadStream.Read(buffer, bytesRead, amount - bytesRead);
+				}
+				catch (IOException ex)
+				{
+					Disconnect($"Connection closed: {ex.Message}");
+				}
+				catch (Exception ex)
+				{
+					Disconnect($"Error reading from socket: {ex.Message}");
+				}
 				if (i == 0)
-					throw new UnityException("Network disconnected");
+					Disconnect("Connection closed");
 
 				bytesRead += i;
 			}
 		}
 
-		// decrypt if needed
-		if (_encryptionEnabled)
-		{
-			return _encryptionUtility.DecryptAES(buffer);
-		}
-		else
-		{
-			return buffer;
-		}
+		return buffer;
+	}
+
+	/// <summary>
+	/// Sends bytes to the server
+	/// </summary>
+	/// <param name="buffer"></param>
+	/// <param name="offset"></param>
+	/// <param name="size"></param>
+	public void WriteBytes(byte[] buffer, int offset, int size)
+	{
+		if (!Client.Connected)
+			throw new UnityException("Client not connected!");
+
+		_clientWriteStream.Write(buffer, offset, size);
+		if (_clientWriteStream.GetType() == typeof(CryptoStream))
+			((CryptoStream)_clientWriteStream).FlushFinalBlock();
 	}
 
 	/// <summary>
@@ -109,7 +146,7 @@ public class NetworkClient : IDisposable
 	/// <param name="p"></param>
 	public void WritePacket(Packet p)
 	{
-		lock (StreamWriteLock)
+		lock (_streamWriteLock)
 		{
 			List<byte> buffer = new List<byte>();
 
@@ -132,7 +169,7 @@ public class NetworkClient : IDisposable
 				else
 				{
 					// data length below compression threshold
-					buffer.AddRange(VarInt.GetBytes(uncompressedBody.Count + 1));	// add one for length of data length
+					buffer.AddRange(VarInt.GetBytes(uncompressedBody.Count + 1));   // add one for length of data length
 					buffer.Add(0);  // 0 data length for uncompressed payload
 					buffer.AddRange(uncompressedBody);
 				}
@@ -145,15 +182,7 @@ public class NetworkClient : IDisposable
 				buffer.AddRange(p.Payload);
 			}
 
-			// handle encryption
-			if (_encryptionEnabled)
-			{
-				Write(_encryptionUtility.EncryptAES(buffer.ToArray()), 0, buffer.Count);
-			}
-			else
-			{
-				Write(buffer.ToArray(), 0, buffer.Count);
-			}
+			WriteBytes(buffer.ToArray(), 0, buffer.Count);
 		}
 	}
 
@@ -170,20 +199,6 @@ public class NetworkClient : IDisposable
 	}
 
 	/// <summary>
-	/// Sends bytes to the server
-	/// </summary>
-	/// <param name="buffer"></param>
-	/// <param name="offset"></param>
-	/// <param name="size"></param>
-	public void Write(byte[] buffer, int offset, int size)
-	{
-		if (!Client.Connected)
-			throw new UnityException("Client not connected!");
-
-		Client.GetStream().Write(buffer, offset, size);
-	}
-
-	/// <summary>
 	/// Gets the next packet from the server
 	/// </summary>
 	/// <returns></returns>
@@ -192,7 +207,7 @@ public class NetworkClient : IDisposable
 		int packetId;
 		byte[] payload;
 
-		lock (StreamReadLock)
+		lock (_streamReadLock)
 		{
 			int length = VarInt.ReadNext(ReadBytes);
 			List<byte> buffer = new List<byte>();
@@ -201,7 +216,7 @@ public class NetworkClient : IDisposable
 			if (_compressionThreshold >= 0)
 			{
 				int dataLength = VarInt.ReadNext(ReadBytes);
-				length -= VarInt.GetBytes(dataLength).Length;	// remove size of data length from rest of packet length
+				length -= VarInt.GetBytes(dataLength).Length;   // remove size of data length from rest of packet length
 				if (dataLength != 0)
 				{
 					byte[] compressedBuffer = ReadBytes(length);
@@ -233,38 +248,46 @@ public class NetworkClient : IDisposable
 			// handle protocol encryption
 			if (packetId == (int)ClientboundIDs.LOGIN_ENCRYPTION_REQUEST)
 			{
-				var encryptionRequestPacket = new EncryptionRequestPacket()
+				// lock write stream as we are reassigning the variable
+				lock (_streamWriteLock)
 				{
-					Payload = payload
-				};
+					var encryptionRequestPacket = new EncryptionRequestPacket()
+					{
+						Payload = payload
+					};
 
-				// generate shared AES secret
-				byte[] sharedSecret = EncryptionUtility.GetSharedSecret();
-				_encryptionUtility.SetAESKey(sharedSecret);
-				
-				// generate hash
-				List<byte> hashBuilder = new List<byte>(sharedSecret);
-				hashBuilder.AddRange(encryptionRequestPacket.PublicKey);
-				string hash = EncryptionUtility.SHAHash(hashBuilder.ToArray());
+					// generate shared AES secret
+					byte[] sharedSecret = EncryptionUtility.GetSharedSecret();
+					_encryptionUtility.SetAESKey(sharedSecret);
 
-				// send hash to mojang's servers
-				MojangAuthentication.JoinServer(hash);
+					// generate hash
+					List<byte> hashBuilder = new List<byte>(sharedSecret);
+					hashBuilder.AddRange(encryptionRequestPacket.PublicKey);
+					string hash = EncryptionUtility.SHAHash(hashBuilder.ToArray());
 
-				// load RSA public key from server
-				_encryptionUtility.SetRSAKey(encryptionRequestPacket.PublicKey);
-				string rsaKeyPem = _encryptionUtility.GetPKCSPaddedRSAPublicKey();
+					// send hash to mojang's servers
+					MojangAuthentication.JoinServer(hash);
 
-				// send encryption response
-				var response = new EncryptionResponsePacket()
-				{
-					SharedSecret = _encryptionUtility.EncryptRSA(sharedSecret),
-					VerifyToken = _encryptionUtility.EncryptRSA(encryptionRequestPacket.VerifyToken)
-				};
-				WritePacket(response);
+					// load RSA public key from server
+					_encryptionUtility.SetRSAKey(encryptionRequestPacket.PublicKey);
+					string rsaKeyPem = _encryptionUtility.GetPKCSPaddedRSAPublicKey();
+					Debug.Log(rsaKeyPem);
 
-				_encryptionEnabled = true;
+					// send encryption response
+					var response = new EncryptionResponsePacket()
+					{
+						SharedSecret = _encryptionUtility.EncryptRSA(sharedSecret),
+						VerifyToken = _encryptionUtility.EncryptRSA(encryptionRequestPacket.VerifyToken)
+					};
+					WritePacket(response);
 
-				return ReadNextPacket();
+					// enable encryption by reassigning IO streams to crypto ones
+					_clientWriteStream = new CryptoStream(Client.GetStream(), _encryptionUtility.AESEncryptTransform, CryptoStreamMode.Write);
+					_clientReadStream = new CryptoStream(Client.GetStream(), _encryptionUtility.AESDecryptTransform, CryptoStreamMode.Read);
+
+					// the next packet (and all following) should be encrypted
+					return ReadNextPacket();
+				}
 			}
 		}
 
@@ -282,4 +305,16 @@ public class NetworkClient : IDisposable
 		LOGIN = 2,
 		PLAY
 	}
+}
+
+public class DisconnectedEventArgs
+{
+	public DisconnectedEventArgs()
+	{}
+
+	public DisconnectedEventArgs(string reason)
+	{
+		Reason = reason;
+	}
+	public string Reason { get; set; }
 }
