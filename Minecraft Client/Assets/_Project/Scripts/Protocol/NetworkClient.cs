@@ -8,6 +8,7 @@ using System.Threading;
 using UnityEngine;
 using Ionic.Zlib;
 using System.IO;
+using System.Text;
 
 public class NetworkClient : IDisposable
 {
@@ -26,15 +27,13 @@ public class NetworkClient : IDisposable
 	public event DisconnectedEventHandler Disconnected;
 
 	private bool _disconnecting = false;
-	private readonly EncryptionUtility _encryptionUtility = new EncryptionUtility();
+	private readonly CryptoHandler _encryptionUtility = new CryptoHandler();
 	private int _compressionThreshold = -1;
 	private TcpClient Client;
 	private readonly object _streamWriteLock = new object();
 	private readonly object _streamReadLock = new object();
-
-	// we need seperate streams for reading and writing to support AES encryption
-	private Stream _clientWriteStream;
-	private Stream _clientReadStream;
+	private AesStream _aesStream;
+	private bool _encrypted = false;
 
 	public NetworkClient()
 	{
@@ -65,7 +64,6 @@ public class NetworkClient : IDisposable
 		_disconnecting = false;
 		Client = new TcpClient();
 		Client.Connect(hostname, port);
-		_clientReadStream = _clientWriteStream = Client.GetStream();
 	}
 
 	/// <summary>
@@ -79,8 +77,6 @@ public class NetworkClient : IDisposable
 			return;
 
 		Client?.Close();
-		_clientReadStream?.Dispose();
-		_clientWriteStream?.Dispose();
 		Disconnected?.Invoke(this, new DisconnectedEventArgs(reason ?? "Connection closed"));
 	}
 
@@ -104,18 +100,26 @@ public class NetworkClient : IDisposable
 				int i = 0; ;
 				try
 				{
-					i = _clientReadStream.Read(buffer, bytesRead, amount - bytesRead);
+					if (_encrypted)
+						i = _aesStream.Read(buffer, bytesRead, amount - bytesRead);
+					else
+						i = Client.GetStream().Read(buffer, bytesRead, amount - bytesRead);
 				}
 				catch (IOException ex)
 				{
 					Disconnect($"Connection closed: {ex.Message}");
+					break;
 				}
 				catch (Exception ex)
 				{
 					Disconnect($"Error reading from socket: {ex.Message}");
+					break;
 				}
 				if (i == 0)
+				{
 					Disconnect("Connection closed");
+					break;
+				}
 
 				bytesRead += i;
 			}
@@ -135,9 +139,10 @@ public class NetworkClient : IDisposable
 		if (!Client.Connected)
 			throw new UnityException("Client not connected!");
 
-		_clientWriteStream.Write(buffer, offset, size);
-		if (_clientWriteStream.GetType() == typeof(CryptoStream))
-			((CryptoStream)_clientWriteStream).FlushFinalBlock();
+		if (_encrypted)
+			_aesStream.Write(buffer, offset, size);
+		else
+			Client.GetStream().Write(buffer, offset, size);
 	}
 
 	/// <summary>
@@ -183,6 +188,10 @@ public class NetworkClient : IDisposable
 			}
 
 			WriteBytes(buffer.ToArray(), 0, buffer.Count);
+			if (_encrypted)
+				_aesStream.Flush();
+			else
+				Client.GetStream().Flush();
 		}
 	}
 
@@ -236,6 +245,7 @@ public class NetworkClient : IDisposable
 			payload = buffer.ToArray();
 		}
 
+		// handles some stuff during login phase
 		if (State == ProtocolState.LOGIN)
 		{
 			// handle compression packet
@@ -245,49 +255,42 @@ public class NetworkClient : IDisposable
 				return ReadNextPacket();
 			}
 
-			// handle protocol encryption
+			// handle protocol encryption packet
 			if (packetId == (int)ClientboundIDs.LOGIN_ENCRYPTION_REQUEST)
 			{
-				// lock write stream as we are reassigning the variable
-				lock (_streamWriteLock)
+				var encRequestPkt = new EncryptionRequestPacket()
 				{
-					var encryptionRequestPacket = new EncryptionRequestPacket()
-					{
-						Payload = payload
-					};
+					Payload = payload
+				};
 
-					// generate shared AES secret
-					byte[] sharedSecret = EncryptionUtility.GetSharedSecret();
-					_encryptionUtility.SetAESKey(sharedSecret);
+				var aesSecret = CryptoHandler.GenerateSharedSecret();
+				var authHash = CryptoHandler.SHAHash(Encoding.ASCII.GetBytes(encRequestPkt.ServerID).Concat(aesSecret, encRequestPkt.PublicKey));
 
-					// generate hash
-					List<byte> hashBuilder = new List<byte>(sharedSecret);
-					hashBuilder.AddRange(encryptionRequestPacket.PublicKey);
-					string hash = EncryptionUtility.SHAHash(hashBuilder.ToArray());
+				Debug.Log($"Sending hash to Mojang servers: {authHash}");
 
-					// send hash to mojang's servers
-					MojangAuthentication.JoinServer(hash);
+				// check session with mojang
+				if (!MojangAuthentication.JoinServer(authHash))
+					throw new UnityException("Invalid session. (Try restarting game or relogging into Minecraft account)");
 
-					// load RSA public key from server
-					_encryptionUtility.SetRSAKey(encryptionRequestPacket.PublicKey);
-					string rsaKeyPem = _encryptionUtility.GetPKCSPaddedRSAPublicKey();
-					Debug.Log(rsaKeyPem);
+				// use pub key to encrypt shared secret
+				var rsaProvider = CryptoHandler.DecodeRSAPublicKey(encRequestPkt.PublicKey);
+				byte[] encSecret = rsaProvider.Encrypt(aesSecret, false);
+				byte[] encToken = rsaProvider.Encrypt(encRequestPkt.VerifyToken, false);
 
-					// send encryption response
-					var response = new EncryptionResponsePacket()
-					{
-						SharedSecret = _encryptionUtility.EncryptRSA(sharedSecret),
-						VerifyToken = _encryptionUtility.EncryptRSA(encryptionRequestPacket.VerifyToken)
-					};
-					WritePacket(response);
+				// respond to server with private key
+				var responsePkt = new EncryptionResponsePacket()
+				{
+					SharedSecret = encSecret,
+					VerifyToken = encToken
+				};
+				WritePacket(responsePkt);
 
-					// enable encryption by reassigning IO streams to crypto ones
-					_clientWriteStream = new CryptoStream(Client.GetStream(), _encryptionUtility.AESEncryptTransform, CryptoStreamMode.Write);
-					_clientReadStream = new CryptoStream(Client.GetStream(), _encryptionUtility.AESDecryptTransform, CryptoStreamMode.Read);
+				// enable aes encryption
+				_aesStream = new AesStream(Client.GetStream(), aesSecret);
+				_encrypted = true;
 
-					// the next packet (and all following) should be encrypted
-					return ReadNextPacket();
-				}
+				// read the next packet
+				return ReadNextPacket();
 			}
 		}
 
@@ -310,7 +313,7 @@ public class NetworkClient : IDisposable
 public class DisconnectedEventArgs
 {
 	public DisconnectedEventArgs()
-	{}
+	{ }
 
 	public DisconnectedEventArgs(string reason)
 	{

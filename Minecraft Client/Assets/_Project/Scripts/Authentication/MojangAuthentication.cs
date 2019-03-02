@@ -15,7 +15,6 @@ public static class MojangAuthentication
 	public static Guid UUID { get; private set; }
 
 	private const string LoginServer = @"https://authserver.mojang.com";
-	private const string SessionServer = @"https://sessionserver.mojang.com/session/minecraft/join";
 	private const string clientTokenPrefKey = "authClientToken";
 	private const string accessTokenPrefKey = "authAccessToken";
 
@@ -62,7 +61,7 @@ public static class MojangAuthentication
 	public static IEnumerator Login(string username, string password, Action<AccountStatus> callback)
 	{
 		// send login request to server
-		var task = MakeRequest<RefreshResponse>("authenticate", JsonUtility.ToJson(new AuthenticatePayload(username, password)), (responseData) =>
+		var task = MakeRequest<RefreshResponse>(LoginServer + "/authenticate", JsonUtility.ToJson(new AuthenticatePayload(username, password)), (responseData) =>
 		{
 			callback(HandleRefreshResponse(responseData));
 		});
@@ -84,7 +83,7 @@ public static class MojangAuthentication
 		}
 
 		// refresh access token
-		var task = MakeRequest<RefreshResponse>("refresh", JsonUtility.ToJson(new RefreshPayload(AccessToken)), responseData =>
+		var task = MakeRequest<RefreshResponse>(LoginServer + "/refresh", JsonUtility.ToJson(new RefreshPayload(AccessToken)), responseData =>
 		{
 			callback(HandleRefreshResponse(responseData));
 		});
@@ -100,7 +99,7 @@ public static class MojangAuthentication
 	/// <param name="token"></param>
 	public static IEnumerator InvalidateAccessToken(string token = null)
 	{
-		var task = MakeRequest<object>("invalidate", JsonUtility.ToJson(new InvalidatePayload(token ?? AccessToken)), responseData =>
+		var task = MakeRequest<object>(LoginServer + "/invalidate", JsonUtility.ToJson(new InvalidatePayload(token ?? AccessToken)), responseData =>
 		{
 			// we don't need to do anything here
 		});
@@ -109,25 +108,33 @@ public static class MojangAuthentication
 	}
 
 	/// <summary>
-	/// Sends a request to the joinserver 
+	/// Sends a request to the joinserver and gets the response
 	/// </summary>
 	/// <param name="hash"></param>
-	public static void JoinServer(string hash)
+	public static bool JoinServer(string hash)
 	{
-		var payload = new JoinServerPayload(AccessToken, UUID.ToString(), hash);
+		var payload = new JoinServerPayload(AccessToken, UUID.ToString("N"), hash);
+		bool success = false;
 
-		var task = MakeRequest<object>("", JsonUtility.ToJson(payload), (data) =>
+		var task = MakeRequest<object>("https://sessionserver.mojang.com/session/minecraft/join", JsonUtility.ToJson(payload), (data) =>
 		{
-			// expecting an error because server sends non-200 response
-			if (data.ErrorData == null || !string.IsNullOrEmpty(data.ErrorData.error))
+			// expecting an error because server sends a 204 response
+			if (data.ResponseCode != 204)
 			{
-				// error!
+				// an actual error occured
 				Debug.LogError($"Invalid response from session server: {data.ErrorData}");
+				success = false;
 			}
-		}, SessionServer);
+			else
+			{
+				success = true;
+			}
+		});
 
 		while (task.MoveNext())
 		{ }
+
+		return success;
 	}
 
 	/// <summary>
@@ -178,9 +185,9 @@ public static class MojangAuthentication
 	/// <param name="jsonData"></param>
 	/// <typeparam name="T">The type to deserialze the response into</typeparam>
 	/// <returns></returns>
-	private static IEnumerator MakeRequest<T>(string endpoint, string jsonData, Action<ResponseData> callback, string server = LoginServer)
+	private static IEnumerator MakeRequest<T>(string endpoint, string jsonData, Action<ResponseData> callback)
 	{
-		var request = new UnityWebRequest($"{server}/{endpoint}", "POST")
+		var request = new UnityWebRequest($"{endpoint}", "POST")
 		{
 			timeout = 30
 		};
@@ -207,7 +214,7 @@ public static class MojangAuthentication
 				error = new ServerErrorResponse(ex);
 			}
 
-			callback(new ResponseData() { ErrorData = error });
+			callback(new ResponseData() { ErrorData = error, ResponseCode = request.responseCode });
 		}
 		else
 		{
@@ -257,4 +264,9 @@ class ResponseData
 	/// A boxed version of the response object
 	/// </summary>
 	public object ResponseObject { get; set; }
+
+	/// <summary>
+	/// The response code sent by the server
+	/// </summary>
+	public long ResponseCode { get; set; }
 }

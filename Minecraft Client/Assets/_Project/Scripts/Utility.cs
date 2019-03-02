@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public static class Utility {
@@ -11,6 +12,26 @@ public static class Utility {
 	/// <param name="amount"></param>
 	/// <returns></returns>
 	public delegate byte[] ReadBytes(int amount);
+
+	/// <summary>
+	/// Concatentates two or more byte arrays
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
+	/// <param name="a1"></param>
+	/// <param name="a2"></param>
+	/// <returns></returns>
+	public static byte[] Concat(this byte[] a1, params byte[][] a2)
+	{
+		byte[] dst = new byte[a1.Length + a2.Sum(a => a.Length)];
+		Buffer.BlockCopy(a1, 0, dst, 0, a1.Length);
+		int offset = a1.Length;
+		foreach (var arr in a2)
+		{
+			Buffer.BlockCopy(arr, 0, dst, offset, arr.Length);
+			offset += arr.Length;
+		}
+		return dst;
+	}
 
 	/// <summary>
 	/// returns <see cref="amount"/> entries from the source list in a new list, removing them from the original

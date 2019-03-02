@@ -8,14 +8,14 @@ public class EncryptionRequestPacket : Packet
 {
 	public byte[] PublicKey { get; set; }
 	public byte[] VerifyToken { get; set; }
+	public string ServerID { get; set; }
 
 	public override byte[] Payload
 	{
 		set
 		{
 			List<byte> buffer = new List<byte>(value);
-			int serverIdLen = VarInt.ReadNext(buffer);
-			buffer.Read(serverIdLen);
+			ServerID = PacketStructureUtility.GetString(buffer);
 			int pubKeyLen = VarInt.ReadNext(buffer);
 			PublicKey = buffer.Read(pubKeyLen).ToArray();
 			int verifyTokenLen = VarInt.ReadNext(buffer);

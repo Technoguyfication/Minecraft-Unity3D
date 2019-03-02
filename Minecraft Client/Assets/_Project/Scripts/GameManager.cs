@@ -150,7 +150,7 @@ public class GameManager : MonoBehaviour
 		if (connectTask.IsFaulted || !_client.Connected)
 			throw (Exception)connectTask.Exception ?? new UnityException("Connection failed: Unknown");
 
-		_loadingScreen.UpdateSubtitleText("Connection established. Asking server nicely to let us play.");
+		_loadingScreen.UpdateSubtitleText("Connection established. Logging in...");
 
 		// perform handshake/login
 		LoginSuccessPacket loginSuccess = null;
@@ -174,20 +174,29 @@ public class GameManager : MonoBehaviour
 
 		_client.State = NetworkClient.ProtocolState.LOGIN;
 
-		// get response
+		// get login response
 		while (true)
 		{
-			var packet = _client.ReadNextPacket();
-			switch ((ClientboundIDs)packet.ID)
+			try
 			{
-				case ClientboundIDs.LOGIN_SUCCESS:
-					loginSuccess = new LoginSuccessPacket(packet);
-					break;
-				case ClientboundIDs.JOIN_GAME:
-					joinGame = new JoinGamePacket(packet);
-					break;
-				case ClientboundIDs.LOGIN_DISCONNECT:
-					throw new Exception($"Disconnected from server: {new DisconnectPacket(packet).JSONResponse}");
+				var packet = _client.ReadNextPacket();
+				switch ((ClientboundIDs)packet.ID)
+				{
+					case ClientboundIDs.LOGIN_SUCCESS:
+						loginSuccess = new LoginSuccessPacket(packet);
+						break;
+					case ClientboundIDs.JOIN_GAME:
+						joinGame = new JoinGamePacket(packet);
+						break;
+					case ClientboundIDs.LOGIN_DISCONNECT:
+						Disconnect($"Disconnected from server: {new DisconnectPacket(packet).JSONResponse}");
+						yield break;
+				}
+			}
+			catch (Exception e)
+			{
+				Disconnect($"Failed to login: {e.Message}");
+				yield break;
 			}
 
 			if (loginSuccess != null && joinGame != null)
@@ -196,6 +205,8 @@ public class GameManager : MonoBehaviour
 				break;
 			}
 		}
+
+		_loadingScreen.UpdateSubtitleText("Downloading world...");
 
 		// set settings from server
 		_playerUuid = loginSuccess.UUID;
@@ -214,8 +225,6 @@ public class GameManager : MonoBehaviour
 		// set up references in game scene
 		_currentWorld.ChunkRenderer = Instantiate(ChunkRendererPrefab, Vector3.zero, Quaternion.identity).GetComponent<ChunkRenderer>();
 		_currentWorld.ChunkRenderer.DebugCanvas = DebugCanvas;
-
-		_loadingScreen.UpdateSubtitleText("Downloading terrain...");
 
 		// start network worker tasks
 		_netReadTask = new Task(() =>
