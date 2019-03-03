@@ -25,8 +25,8 @@ public class UnloadChunkPacket : Packet
 		set
 		{
 			List<byte> buffer = new List<byte>(value);
-			X = PacketStructureUtility.GetInt32(buffer);
-			Z = PacketStructureUtility.GetInt32(buffer);
+			X = PacketHelper.GetInt32(buffer);
+			Z = PacketHelper.GetInt32(buffer);
 		}
 	}
 

@@ -19,13 +19,13 @@ public class JoinGamePacket : Packet
 		set
 		{
 			List<byte> buffer = new List<byte>(value);
-			PlayerEntityId = PacketStructureUtility.GetInt32(buffer);
+			PlayerEntityId = PacketHelper.GetInt32(buffer);
 			GameMode = (GameMode)buffer.Read(1)[0];
-			Dimension = (World.DimensionType)PacketStructureUtility.GetInt32(buffer);
+			Dimension = (World.DimensionType)PacketHelper.GetInt32(buffer);
 			Difficulty = (Difficulty)buffer.Read(1)[0];
 			MaxPlayers = buffer.Read(1)[0];
 
-			string levelTypeString = PacketStructureUtility.GetString(buffer);
+			string levelTypeString = PacketHelper.GetString(buffer);
 			switch (levelTypeString.ToLower())
 			{
 				case "default":
@@ -48,7 +48,7 @@ public class JoinGamePacket : Packet
 
 			}
 
-			ReducedDebug = PacketStructureUtility.GetBoolean(buffer);
+			ReducedDebug = PacketHelper.GetBoolean(buffer);
 		}
 		get
 		{

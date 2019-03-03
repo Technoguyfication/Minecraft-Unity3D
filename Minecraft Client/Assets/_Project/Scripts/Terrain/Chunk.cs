@@ -190,7 +190,7 @@ public class Chunk
 				ulong[] dataArray = new ulong[dataArrayLength];
 				for (int i = 0; i < dataArrayLength; i++)
 				{
-					dataArray[i] = PacketStructureUtility.GetUInt64(data);
+					dataArray[i] = PacketHelper.GetUInt64(data);
 				}
 
 				// parse block data

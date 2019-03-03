@@ -12,7 +12,7 @@ public class ClientKeepAlivePacket : Packet
 	{
 		set
 		{
-			KeepAliveID = PacketStructureUtility.GetInt64(new List<byte>(value));
+			KeepAliveID = PacketHelper.GetInt64(new List<byte>(value));
 		}
 		get
 		{

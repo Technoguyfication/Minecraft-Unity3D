@@ -12,7 +12,7 @@ public class LoginStartPacket : Packet
 	{
 		get
 		{
-			return PacketStructureUtility.GetBytes(Username);
+			return PacketHelper.GetBytes(Username);
 		}
 		set
 		{

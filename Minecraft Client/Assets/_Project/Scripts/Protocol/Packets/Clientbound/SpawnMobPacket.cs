@@ -35,16 +35,16 @@ public class SpawnMobPacket : Packet
 		{
 			List<byte> buffer = new List<byte>(value);
 			EntityID = VarInt.ReadNext(buffer);
-			UUID = PacketStructureUtility.GetGUID(buffer);
-			X = PacketStructureUtility.GetDouble(buffer);
-			Y = PacketStructureUtility.GetDouble(buffer);
-			Z = PacketStructureUtility.GetDouble(buffer);
+			UUID = PacketHelper.GetGUID(buffer);
+			X = PacketHelper.GetDouble(buffer);
+			Y = PacketHelper.GetDouble(buffer);
+			Z = PacketHelper.GetDouble(buffer);
 			Yaw = buffer.Read(1)[0];
 			Pitch = buffer.Read(1)[0];
 			HeadPitch = buffer.Read(1)[0];
-			VelocityX = PacketStructureUtility.GetInt16(buffer);
-			VelocityY = PacketStructureUtility.GetInt16(buffer);
-			VelocityZ = PacketStructureUtility.GetInt16(buffer);
+			VelocityX = PacketHelper.GetInt16(buffer);
+			VelocityY = PacketHelper.GetInt16(buffer);
+			VelocityZ = PacketHelper.GetInt16(buffer);
 		}
 		get
 		{

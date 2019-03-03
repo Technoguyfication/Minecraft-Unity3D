@@ -20,11 +20,11 @@ public class ClientPlayerPositionAndLookPacket : Packet
 		set
 		{
 			List<byte> buffer = new List<byte>(value);
-			X = PacketStructureUtility.GetDouble(buffer);
-			Y = PacketStructureUtility.GetDouble(buffer);
-			Z = PacketStructureUtility.GetDouble(buffer);
-			Yaw = PacketStructureUtility.GetSingle(buffer);
-			Pitch = PacketStructureUtility.GetSingle(buffer);
+			X = PacketHelper.GetDouble(buffer);
+			Y = PacketHelper.GetDouble(buffer);
+			Z = PacketHelper.GetDouble(buffer);
+			Yaw = PacketHelper.GetSingle(buffer);
+			Pitch = PacketHelper.GetSingle(buffer);
 			Flags = buffer.Read(1)[0];
 			TeleportID = VarInt.ReadNext(buffer);
 		}

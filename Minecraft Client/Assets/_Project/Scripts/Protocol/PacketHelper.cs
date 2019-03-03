@@ -7,7 +7,7 @@ using UnityEngine;
 /// <summary>
 /// Used for reading and writing data in packet format. DOES perform endianness fixing
 /// </summary>
-public static class PacketStructureUtility
+public static class PacketHelper
 {
 	/// <summary>
 	/// Reads the next string

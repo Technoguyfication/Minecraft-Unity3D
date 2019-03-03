@@ -14,8 +14,8 @@ public class LoginSuccessPacket : Packet
 		set
 		{
 			List<byte> buffer = new List<byte>(value);
-			UUID = PacketStructureUtility.GetString(buffer);
-			Username = PacketStructureUtility.GetString(buffer);
+			UUID = PacketHelper.GetString(buffer);
+			Username = PacketHelper.GetString(buffer);
 		}
 		get
 		{

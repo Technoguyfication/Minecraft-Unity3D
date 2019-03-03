@@ -13,7 +13,7 @@ public class DisconnectPacket : Packet
 		set
 		{
 			List<byte> buffer = new List<byte>(value);
-			JSONResponse = PacketStructureUtility.GetString(buffer);
+			JSONResponse = PacketHelper.GetString(buffer);
 		}
 		get
 		{

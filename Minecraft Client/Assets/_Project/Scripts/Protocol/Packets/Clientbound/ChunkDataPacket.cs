@@ -40,9 +40,9 @@ public class ChunkDataPacket : Packet
 		set
 		{
 			List<byte> buffer = new List<byte>(value);
-			ChunkX = PacketStructureUtility.GetInt32(buffer);
-			ChunkZ = PacketStructureUtility.GetInt32(buffer);
-			GroundUpContinuous = PacketStructureUtility.GetBoolean(buffer);
+			ChunkX = PacketHelper.GetInt32(buffer);
+			ChunkZ = PacketHelper.GetInt32(buffer);
+			GroundUpContinuous = PacketHelper.GetBoolean(buffer);
 			PrimaryBitmask = VarInt.ReadNext(buffer);
 			int dataSize = VarInt.ReadNext(buffer);
 			Data = buffer.Read(dataSize).ToArray();

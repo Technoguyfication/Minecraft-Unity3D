@@ -20,12 +20,12 @@ public class ResponsePacket : Packet
 	{
 		get
 		{
-			return PacketStructureUtility.GetBytes(JSONResponse);
+			return PacketHelper.GetBytes(JSONResponse);
 		}
 		set
 		{
 			List<byte> buffer = new List<byte>(value);
-			JSONResponse = PacketStructureUtility.GetString(buffer);
+			JSONResponse = PacketHelper.GetString(buffer);
 		}
 	}
 
