@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4144365261745750}
   - component: {fileID: 33949150224971236}
   - component: {fileID: 23962490005750854}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -89,7 +89,7 @@ GameObject:
   - component: {fileID: 4364227221157724}
   - component: {fileID: 20332317576367998}
   - component: {fileID: 81150563005019136}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Main Camera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
@@ -172,7 +172,7 @@ GameObject:
   - component: {fileID: 33281194973348602}
   - component: {fileID: 23775712746326346}
   - component: {fileID: 65106360418884022}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: physical
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -262,7 +262,7 @@ GameObject:
   - component: {fileID: 4261384238173106}
   - component: {fileID: 54848853000200578}
   - component: {fileID: 114727922089166652}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -313,11 +313,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d02e270cc3969d241adaead885b7a820, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Physical: {fileID: 1729968927608002}
+  ID: 0
   MouseSensitivity: 15
   SneakSpeed: 1.31
   WalkSpeed: 4.317
   SprintSpeed: 5.612
   JumpHeight: 1.25
   Camera: {fileID: 1484566796131458}
-  Physical: {fileID: 1729968927608002}
   UseGravity: 1

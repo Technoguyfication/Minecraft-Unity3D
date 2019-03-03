@@ -8,6 +8,7 @@ using UnityEngine;
 public abstract class Entity : MonoBehaviour
 {
 	public GameObject Physical;
+	public int ID;
 
 	protected readonly float CameraMinX = -89.9f;
 	protected readonly float CameraMaxX = 89.9f;
