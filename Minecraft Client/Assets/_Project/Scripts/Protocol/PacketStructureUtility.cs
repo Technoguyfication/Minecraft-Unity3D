@@ -21,6 +21,18 @@ public static class PacketStructureUtility
 		return Encoding.UTF8.GetString(strRaw.ToArray());
 	}
 
+	public static short GetInt16(List<byte> bytes)
+	{
+		byte[] shortRaw = bytes.Read(2).ToArray();
+		return BitConverter.ToInt16(shortRaw.ReverseIfLittleEndian(), 0);
+	}
+
+	public static ushort GetUInt16(List<byte> bytes)
+	{
+		byte[] ushortRaw = bytes.Read(2).ToArray();
+		return BitConverter.ToUInt16(ushortRaw.ReverseIfLittleEndian(), 0);
+	}
+
 	public static int GetInt32(List<byte> bytes)
 	{
 		byte[] intRaw = bytes.Read(4).ToArray();
@@ -55,6 +67,12 @@ public static class PacketStructureUtility
 	{
 		byte[] boolRaw = bytes.Read(1, 0).ToArray();
 		return BitConverter.ToBoolean(boolRaw, 0);
+	}
+
+	public static Guid GetGUID(List<byte> bytes)
+	{
+		byte[] guidRaw = bytes.Read(16).ToArray();
+		return new Guid(guidRaw);
 	}
 
 	public static byte[] GetBytes(string data)

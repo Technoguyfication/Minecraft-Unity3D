@@ -58,6 +58,7 @@ public enum ClientboundIDs : int
 	JOIN_GAME = 0x25,
 	DISCONNECT = 0x1b,
 	PLAYER_POSITION_AND_LOOK = 0x32,
+	ENTITY = 0x27,
 }
 
 public enum ServerboundIDs : int

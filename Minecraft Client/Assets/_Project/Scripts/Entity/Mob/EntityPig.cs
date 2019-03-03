@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TestEntity : Entity
+public class EntityPig : MonoBehaviour
 {
-	public override int ID { get; set; }
-
     // Start is called before the first frame update
     void Start()
     {

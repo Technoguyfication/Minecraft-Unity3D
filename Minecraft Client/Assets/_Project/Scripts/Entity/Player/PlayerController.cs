@@ -18,6 +18,8 @@ public class PlayerController : Entity
 	public event OnGroundEventHandler OnGroundChanged;
 	private bool _wasOnGround = true;
 
+	public override int ID { get; set; }
+
 	// Update is called once per frame
 	void Update()
 	{

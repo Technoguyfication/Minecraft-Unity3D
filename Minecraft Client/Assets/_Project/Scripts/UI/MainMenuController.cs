@@ -289,7 +289,7 @@ public class MainMenuController : MonoBehaviour
 				// send ping
 				var sw = new Stopwatch();
 				sw.Start();
-				client.WritePacket(new PingPongPacket());
+				client.WritePacket(new EntityPacket());
 
 				// wait for pong packet
 				while (true)

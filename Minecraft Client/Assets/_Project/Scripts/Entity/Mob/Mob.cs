@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TestEntity : Entity
+public class Mob : Entity
 {
 	public override int ID { get; set; }
 

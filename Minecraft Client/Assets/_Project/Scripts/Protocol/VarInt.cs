@@ -29,6 +29,16 @@ public static class VarInt
 		}
 		return result;
 	}
+	
+	/// <summary>
+	/// Reads the next varint from an array of bytes (does not "seek", use <see cref="ReadNext(List{byte})"/> for that)
+	/// </summary>
+	/// <param name="bytes"></param>
+	/// <returns></returns>
+	public static int ReadNext(byte[] bytes)
+	{
+		return ReadNext(new List<byte>(bytes));
+	}
 
 	/// <summary>
 	/// Reads the next VarInt from a stream
