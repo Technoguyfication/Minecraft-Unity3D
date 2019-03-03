@@ -1,6 +1,7 @@
 # Minecraft-Unity3D
 
-I literally want to make a functional Minecraft client in Unity, and maybe add support for client side plugins (read: cheats). It's not going to look pretty and realistically I'll probably abandon it before it's done but at the bare minimum I want to make it _work_.
+I want to recreate the vanilla Minecraft client in Unity to a degree that the game is mostly playable. The idea is you can connect to a server and play with your friends like normal, and have a very close to vanilla experience. I might also add in some client-side modifications in the future ;)
+
 
 Adding some screenshots to better explain where the project is at right now:
 
