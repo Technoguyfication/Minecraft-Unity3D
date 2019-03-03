@@ -106,7 +106,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Physical: {fileID: 3159809025659396188}
-  ID: 0
 --- !u!54 &3159809025659396262
 Rigidbody:
   m_ObjectHideFlags: 0
