@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 public class LoginSuccessPacket : Packet
 {
-	public string UUID { get; set; }
+	public Guid UUID { get; set; }
 	public string Username { get; set; }
 
 	public override byte[] Payload
@@ -14,7 +14,7 @@ public class LoginSuccessPacket : Packet
 		set
 		{
 			List<byte> buffer = new List<byte>(value);
-			UUID = PacketHelper.GetString(buffer);
+			UUID = Guid.Parse(PacketHelper.GetString(buffer));
 			Username = PacketHelper.GetString(buffer);
 		}
 		get

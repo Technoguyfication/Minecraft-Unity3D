@@ -27,12 +27,16 @@ public class EntityManager : MonoBehaviour
 	/// <param name="pkt"></param>
 	public void SpawnMob(SpawnMobPacket pkt)
 	{
-		var mob = Instantiate(TestEntity).GetComponent<Mob>();
+		var mob = Instantiate(TestEntity, transform).GetComponent<Mob>();
+		mob.Type = pkt.Type;
 		mob.World = World;
+		mob.UUID = pkt.UUID;
+		mob.ID = pkt.EntityID;
 		Vector3 pos = new Vector3((float)pkt.X, (float)pkt.Y, (float)pkt.Z); ;
 		mob.MinecraftPosition = pos;
 		mob.SetRotation(Quaternion.Euler(pkt.Pitch, pkt.Yaw, 0));
 		mob.HeadPitch = pkt.HeadPitch;
+		mob.name = $"{mob.Type.ToString()} ID:{mob.ID} UUID:{mob.UUID.ToString()}";
 
 		Debug.Log($"Spawned entity at {pos}");
 	}

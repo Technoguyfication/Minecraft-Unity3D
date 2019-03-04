@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,8 +10,9 @@ public abstract class Entity : MonoBehaviour
 {
 	public GameObject Physical;
 	public int ID { get; set; }
+	public Guid UUID { get; set; }
 	public EntityType Type { get; set; }
-	public World World;
+	public World World { get; set; }
 
 	protected readonly float CameraMinX = -89.9f;
 	protected readonly float CameraMaxX = 89.9f;

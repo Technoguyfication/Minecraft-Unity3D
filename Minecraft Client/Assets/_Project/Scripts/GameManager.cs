@@ -42,7 +42,7 @@ public class GameManager : MonoBehaviour
 		}
 	}
 	private World _currentWorldVar;
-	private string _playerUuid;
+	private Guid _playerUuid;
 	private LoadingScreenController _loadingScreen;
 	private float _lastTick = 0f;
 	private bool _disconnecting = false;
@@ -308,6 +308,7 @@ public class GameManager : MonoBehaviour
 		{
 			_player = Instantiate(PlayerPrefab).GetComponent<PlayerController>();
 			_player.World = _currentWorld;
+			_player.UUID = _playerUuid;
 			_player.OnGroundChanged += PlayerOnGroundChanged;
 			_loadingScreen.HideLoadingScreen();
 			DebugCanvas.Player = _player;
