@@ -59,6 +59,7 @@ public enum ClientboundIDs : int
 	DISCONNECT = 0x1b,
 	PLAYER_POSITION_AND_LOOK = 0x32,
 	ENTITY = 0x27,
+	SPAWN_MOB = 0x03,
 }
 
 public enum ServerboundIDs : int

@@ -10,6 +10,7 @@ public abstract class Entity : MonoBehaviour
 	public GameObject Physical;
 	public int ID { get; set; }
 	public EntityType Type { get; set; }
+	public World World;
 
 	protected readonly float CameraMinX = -89.9f;
 	protected readonly float CameraMaxX = 89.9f;
@@ -108,10 +109,15 @@ public abstract class Entity : MonoBehaviour
 		Rigidbody = GetComponent<Rigidbody>();
 	}
 
-	// Update is called once per frame
+	// called once per frame
 	protected virtual void Update()
-    {
+	{ }
 
+	protected virtual void FixedUpdate()
+    {
+		// don't simulate gravity on the rigidbody unless the chunk it's in is loaded
+		// keeps entities from falling through world while generating chunks
+		Rigidbody.useGravity = World.ChunkRenderer.IsChunkGenerated(BlockPos.GetChunk());
 	}
 
 	/// <summary>

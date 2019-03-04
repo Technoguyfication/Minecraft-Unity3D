@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class EntityManager : MonoBehaviour
 {
+	public GameObject TestEntity;
+	public World World;
+
 	private readonly List<Entity> _entities = new List<Entity>();
 
     // Start is called before the first frame update
@@ -24,7 +27,14 @@ public class EntityManager : MonoBehaviour
 	/// <param name="pkt"></param>
 	public void SpawnMob(SpawnMobPacket pkt)
 	{
-		
+		var mob = Instantiate(TestEntity).GetComponent<Mob>();
+		mob.World = World;
+		Vector3 pos = new Vector3((float)pkt.X, (float)pkt.Y, (float)pkt.Z); ;
+		mob.MinecraftPosition = pos;
+		mob.SetRotation(Quaternion.Euler(pkt.Pitch, pkt.Yaw, 0));
+		mob.HeadPitch = pkt.HeadPitch;
+
+		Debug.Log($"Spawned entity at {pos}");
 	}
 
 	public void DestroyAllEntities()

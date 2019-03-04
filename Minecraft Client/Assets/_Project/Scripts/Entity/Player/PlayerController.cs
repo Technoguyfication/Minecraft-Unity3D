@@ -16,7 +16,6 @@ public class PlayerController : Player
 	public float WalkSpeed = 4.17f;
 	public float SprintSpeed = 5.612f;
 	public float JumpHeight = DEFAULT_JUMP_HEIGHT;    // sometimes changes (potions, etc.)
-	public bool UseGravity = true;
 
 	public delegate void OnGroundEventHandler(object sender, OnGroundEventArgs e);
 	public event OnGroundEventHandler OnGroundChanged;
@@ -39,8 +38,11 @@ public class PlayerController : Player
 		base.Update();
 	}
 
-	private void FixedUpdate()
+	protected override void FixedUpdate()
 	{
+		// base has to be called first because it determines whether gravity is set
+		base.FixedUpdate();
+
 		Vector3 inputVelocity = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;    // get raw input from user
 
 		// adjust velocity based on walking or sprinting
@@ -65,7 +67,6 @@ public class PlayerController : Player
 			OnGroundChanged?.Invoke(this, new OnGroundEventArgs() { OnGround = OnGround });
 		}
 
-		Rigidbody.useGravity = UseGravity;
 		Rigidbody.velocity = rotatedVelocity;
 	}
 }

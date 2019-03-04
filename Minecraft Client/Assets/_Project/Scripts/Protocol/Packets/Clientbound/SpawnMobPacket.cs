@@ -29,6 +29,8 @@ public class SpawnMobPacket : Packet
 		PacketID = 0x03;
 	}
 
+	public SpawnMobPacket(PacketData data) : base(data) { }
+
 	public override byte[] Payload
 	{
 		set
@@ -36,6 +38,7 @@ public class SpawnMobPacket : Packet
 			List<byte> buffer = new List<byte>(value);
 			EntityID = VarInt.ReadNext(buffer);
 			UUID = PacketHelper.GetGUID(buffer);
+			Type = (Entity.EntityType)VarInt.ReadNext(buffer);
 			X = PacketHelper.GetDouble(buffer);
 			Y = PacketHelper.GetDouble(buffer);
 			Z = PacketHelper.GetDouble(buffer);

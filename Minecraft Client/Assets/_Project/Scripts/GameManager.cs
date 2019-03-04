@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour
 
 	public string Username = "mcplayer";
 	public DebugCanvas DebugCanvas;
+	public EntityManager EntityManager;
 
 	private PlayerController _player = null;
 	private NetworkClient _client;
@@ -28,7 +29,19 @@ public class GameManager : MonoBehaviour
 	private Task _netWriteTask;
 	private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 	private bool _initialized = false;
-	private World _currentWorld;
+	private World _currentWorld
+	{
+		get
+		{
+			return _currentWorldVar;
+		}
+		set
+		{
+			_currentWorldVar = value;
+			EntityManager.World = _currentWorld;
+		}
+	}
+	private World _currentWorldVar;
 	private string _playerUuid;
 	private LoadingScreenController _loadingScreen;
 	private float _lastTick = 0f;
@@ -71,12 +84,6 @@ public class GameManager : MonoBehaviour
 					HandlePacket(packet);
 				}
 				_packetReceiveQueue.Clear();
-			}
-
-			// freeze player gravity if we're not in a loaded chunk
-			if (_player != null)
-			{
-				_player.UseGravity = _currentWorld.ChunkRenderer.IsChunkGenerated(_player.BlockPos.GetChunk());
 			}
 		}
 	}
@@ -273,6 +280,9 @@ public class GameManager : MonoBehaviour
 			case ClientboundIDs.UNLOAD_CHUNK:
 				_currentWorld.UnloadChunk(new UnloadChunkPacket(data).Position);
 				break;
+			case ClientboundIDs.SPAWN_MOB:
+				EntityManager.SpawnMob(new SpawnMobPacket(data));
+				break;
 			default:
 				break;
 		}
@@ -297,6 +307,7 @@ public class GameManager : MonoBehaviour
 		if (_player == null)
 		{
 			_player = Instantiate(PlayerPrefab).GetComponent<PlayerController>();
+			_player.World = _currentWorld;
 			_player.OnGroundChanged += PlayerOnGroundChanged;
 			_loadingScreen.HideLoadingScreen();
 			DebugCanvas.Player = _player;

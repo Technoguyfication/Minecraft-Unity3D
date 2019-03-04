@@ -5,10 +5,9 @@ using UnityEngine;
 /// <summary>
 /// A player in game
 /// </summary>
-public class Player : Entity
+public class Player : LivingEntity
 {
 	public Texture Skin { get; set; }
-	public GameObject Head;
 	
 	public Player()
 	{
@@ -17,9 +16,6 @@ public class Player : Entity
 
 	protected override void Update()
 	{
-		// set angle of player head
-		Head.transform.localEulerAngles = new Vector3(Pitch, Yaw, 0);
-
 		// simplify pitch degrees
 		if (Pitch > 90f)
 		{
