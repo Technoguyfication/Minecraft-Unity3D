@@ -261,9 +261,9 @@ GameObject:
   m_Component:
   - component: {fileID: 4261384238173106}
   - component: {fileID: 54848853000200578}
-  - component: {fileID: 114727922089166652}
+  - component: {fileID: 2074139628}
   m_Layer: 9
-  m_Name: Player
+  m_Name: PlayerController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -301,7 +301,7 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 112
   m_CollisionDetection: 2
---- !u!114 &114727922089166652
+--- !u!114 &2074139628
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -310,15 +310,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 1818212769120596}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d02e270cc3969d241adaead885b7a820, type: 3}
+  m_Script: {fileID: 11500000, guid: cdac97a4ad2c3bd47904f88962089395, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Physical: {fileID: 1729968927608002}
-  ID: 0
-  MouseSensitivity: 15
-  SneakSpeed: 1.31
-  WalkSpeed: 4.317
-  SprintSpeed: 5.612
-  JumpHeight: 1.25
-  Camera: {fileID: 1484566796131458}
-  UseGravity: 1
+  Head: {fileID: 1484566796131458}

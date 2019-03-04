@@ -16,18 +16,11 @@ public class PlayerController : Player
 	public float WalkSpeed = 4.17f;
 	public float SprintSpeed = 5.612f;
 	public float JumpHeight = DEFAULT_JUMP_HEIGHT;    // sometimes changes (potions, etc.)
-	public GameObject Camera;
 	public bool UseGravity = true;
 
 	public delegate void OnGroundEventHandler(object sender, OnGroundEventArgs e);
 	public event OnGroundEventHandler OnGroundChanged;
 	private bool _wasOnGround = true;
-
-	// called on entity start
-	protected override void Start()
-	{
-		base.Start();
-	}
 
 	// Update is called once per frame
 	protected override void Update()
@@ -37,40 +30,13 @@ public class PlayerController : Player
 
 		Yaw += Input.GetAxis("Mouse X") * MouseSensitivity;
 
-		Camera.transform.localEulerAngles = new Vector3(Pitch, Yaw, 0);
-
 		// jumping
 		if (Input.GetKey(KeyCode.Space) && OnGround)
 		{
 			Rigidbody.velocity = new Vector3(Rigidbody.velocity.x, Mathf.Sqrt(2 * Mathf.Abs(Physics.gravity.y) * JumpHeight), Rigidbody.velocity.y);
 		}
 
-		// simplify pitch
-		if (Pitch > 90f)
-		{
-			Pitch %= 90f;
-			Pitch -= 90f;
-		}
-		else
-		{
-			Pitch %= 90f;
-		}
-
-		// simplify yaw
-		if (Yaw > 180f)
-		{
-			Yaw %= 360f;
-			Yaw -= 360f;
-		}
-		else if (Yaw < -180f)
-		{
-			Yaw %= 360f;
-			Yaw += 360f;
-		}
-		else
-		{
-			Yaw %= 360f;
-		}
+		base.Update();
 	}
 
 	private void FixedUpdate()
@@ -90,7 +56,7 @@ public class PlayerController : Player
 
 		// since the camera is the only part of the player that turns, we need to rotate the velocity vectors to the camera's looking position
 		// so the user moves in the direction they are looking
-		Vector3 rotatedVelocity = Quaternion.Euler(0, Camera.transform.rotation.eulerAngles.y, 0) * inputVelocity;
+		Vector3 rotatedVelocity = Quaternion.Euler(0, Head.transform.rotation.eulerAngles.y, 0) * inputVelocity;
 
 		// check if player ground status changed
 		if (OnGround != _wasOnGround)

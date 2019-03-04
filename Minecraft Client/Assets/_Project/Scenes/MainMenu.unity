@@ -216,7 +216,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5c2cee27529eb744ac03b3ce7eb0ce3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerPrefab: {fileID: 1818212769120596, guid: 9491017758607d74c814f7b89d3a3829,
+  PlayerPrefab: {fileID: 2119609523043025278, guid: ffb5e1644d8734445a6a2cb825bde442,
     type: 3}
   ChunkRendererPrefab: {fileID: 1373419148536406, guid: 3ed795cc8aaa4484da1c4aa8a115fc40,
     type: 3}
