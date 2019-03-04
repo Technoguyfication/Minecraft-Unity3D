@@ -8,7 +8,8 @@ using UnityEngine;
 public abstract class Entity : MonoBehaviour
 {
 	public GameObject Physical;
-	public abstract int ID { get; set; }
+	public int ID { get; set; }
+	public EntityType Type { get; set; }
 
 	protected readonly float CameraMinX = -89.9f;
 	protected readonly float CameraMaxX = 89.9f;
@@ -52,7 +53,7 @@ public abstract class Entity : MonoBehaviour
 	{
 		get
 		{
-			return new Vector3((float)Z, (float)FeetY, (float)X);
+			return new Vector3((float)Z, (float)Y, (float)X);
 		}
 		set
 		{
@@ -76,10 +77,13 @@ public abstract class Entity : MonoBehaviour
 	}
 
 	public double X { get { return transform.position.z; } }
-	public double FeetY { get { return transform.position.y; } }
+	public double Y { get { return transform.position.y; } }
 	public double Z { get { return transform.position.x; } }
 	public float Pitch { get; set; } = 0f;
 	public float Yaw { get; set; } = 0f;
+	public short VelocityX { get; set; }
+	public short VelocityY { get; set; }
+	public short VelocityZ { get; set; }
 
 	/// <summary>
 	/// The block this player is in
@@ -91,48 +95,23 @@ public abstract class Entity : MonoBehaviour
 			return new BlockPos()
 			{
 				X = (int)X - ((X < 0) ? 1 : 0),
-				Y = (int)FeetY,
+				Y = (int)Y,
 				Z = (int)Z - ((Z < 0) ? 1 : 0)
 			};
 		}
 	}
 
 	// Use this for initialization
-	void Start()
+	protected virtual void Start()
 	{
 		Collider = Physical.GetComponent<BoxCollider>();
 		Rigidbody = GetComponent<Rigidbody>();
 	}
 
 	// Update is called once per frame
-	void Update()
+	protected virtual void Update()
     {
-		// simplify pitch
-		if (Pitch > 90f)
-		{
-			Pitch %= 90f;
-			Pitch -= 90f;
-		}
-		else
-		{
-			Pitch %= 90f;
-		}
 
-		// simplify yaw
-		if (Yaw > 180f)
-		{
-			Yaw %= 360f;
-			Yaw -= 360f;
-		}
-		else if (Yaw < -180f)
-		{
-			Yaw %= 360f;
-			Yaw += 360f;
-		}
-		else
-		{
-			Yaw %= 360f;
-		}
 	}
 
 	/// <summary>
@@ -164,7 +143,7 @@ public abstract class Entity : MonoBehaviour
 			return _other.GetHashCode().Equals(GetHashCode());
 	}
 
-	public enum Type
+	public enum EntityType
 	{
 		// the following are spawned using spawn mob packet
 		BAT = 3,

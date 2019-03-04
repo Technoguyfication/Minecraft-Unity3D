@@ -19,15 +19,13 @@ public class EntityManager : MonoBehaviour
     }
 
 	/// <summary>
-	/// Initializes an entity with an ID
+	/// Spawns a mob in the server
 	/// </summary>
 	/// <param name="pkt"></param>
-	public void InitializeEntity(EntityPacket pkt)
+	public void SpawnMob(SpawnMobPacket pkt)
 	{
-
+		
 	}
-
-
 
 	public void DestroyAllEntities()
 	{

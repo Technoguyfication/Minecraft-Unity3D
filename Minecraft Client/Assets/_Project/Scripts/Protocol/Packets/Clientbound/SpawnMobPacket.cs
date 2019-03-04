@@ -11,7 +11,7 @@ public class SpawnMobPacket : Packet
 {
 	public int EntityID { get; set; }
 	public Guid UUID { get; set; }
-	public Entity.Type Type { get; set; }
+	public Entity.EntityType Type { get; set; }
 	public double X { get; set; }
 	public double Y { get; set; }
 	public double Z { get; set; }

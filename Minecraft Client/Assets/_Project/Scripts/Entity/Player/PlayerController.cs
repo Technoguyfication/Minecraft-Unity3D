@@ -3,14 +3,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : Entity
+/// <summary>
+/// The local player
+/// </summary>
+public class PlayerController : Player
 {
+	public const float DEFAULT_JUMP_HEIGHT = 1.25f;
+
 	[Range(0, 100f)]
 	public float MouseSensitivity = 15f;
 	public float SneakSpeed = 1.31f;
 	public float WalkSpeed = 4.17f;
 	public float SprintSpeed = 5.612f;
-	public float JumpHeight = 1.25f;    // sometimes changes (potions, etc.)
+	public float JumpHeight = DEFAULT_JUMP_HEIGHT;    // sometimes changes (potions, etc.)
 	public GameObject Camera;
 	public bool UseGravity = true;
 
@@ -18,10 +23,14 @@ public class PlayerController : Entity
 	public event OnGroundEventHandler OnGroundChanged;
 	private bool _wasOnGround = true;
 
-	public override int ID { get; set; }
+	// called on entity start
+	protected override void Start()
+	{
+		base.Start();
+	}
 
 	// Update is called once per frame
-	void Update()
+	protected override void Update()
 	{
 		Pitch -= Input.GetAxis("Mouse Y") * MouseSensitivity;
 		Pitch = Mathf.Clamp(Pitch, CameraMinX, CameraMaxX);
@@ -34,6 +43,33 @@ public class PlayerController : Entity
 		if (Input.GetKey(KeyCode.Space) && OnGround)
 		{
 			Rigidbody.velocity = new Vector3(Rigidbody.velocity.x, Mathf.Sqrt(2 * Mathf.Abs(Physics.gravity.y) * JumpHeight), Rigidbody.velocity.y);
+		}
+
+		// simplify pitch
+		if (Pitch > 90f)
+		{
+			Pitch %= 90f;
+			Pitch -= 90f;
+		}
+		else
+		{
+			Pitch %= 90f;
+		}
+
+		// simplify yaw
+		if (Yaw > 180f)
+		{
+			Yaw %= 360f;
+			Yaw -= 360f;
+		}
+		else if (Yaw < -180f)
+		{
+			Yaw %= 360f;
+			Yaw += 360f;
+		}
+		else
+		{
+			Yaw %= 360f;
 		}
 	}
 

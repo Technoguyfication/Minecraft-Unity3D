@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Mob : Entity
+/// <summary>
+/// Base class for mobs
+/// </summary>
+public abstract class Mob : Entity
 {
-	public override int ID { get; set; }
+	public float HeadPitch { get; set; }
 
-    // Start is called before the first frame update
-    void Start()
+	// Start is called before the first frame update
+	void Start()
     {
         
     }

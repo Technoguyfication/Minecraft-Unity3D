@@ -41,7 +41,7 @@ public class ServerPlayerPositionAndLookPacket : Packet
 		return new ServerPlayerPositionAndLookPacket()
 		{
 			X = player.X,
-			FeetY = player.FeetY,
+			FeetY = player.Y,
 			Z = player.Z,
 			Yaw = player.Yaw - 90,
 			Pitch = player.Pitch,

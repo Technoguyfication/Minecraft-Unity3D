@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class TestEntity : Entity
 {
-	public override int ID { get; set; }
-
     // Start is called before the first frame update
     void Start()
     {
