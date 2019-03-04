@@ -281,7 +281,13 @@ public class GameManager : MonoBehaviour
 				_currentWorld.UnloadChunk(new UnloadChunkPacket(data).Position);
 				break;
 			case ClientboundIDs.SPAWN_MOB:
-				EntityManager.SpawnMob(new SpawnMobPacket(data));
+				EntityManager.HandleSpawnMobPacket(new SpawnMobPacket(data));
+				break;
+			case ClientboundIDs.DESTROY_ENTITIES:
+				EntityManager.DestroyEntities(new DestroyEntitiesPacket(data).EntityIDs);
+				break;
+			case ClientboundIDs.ENTITY_RELATIVE_MOVE:
+				EntityManager.HandleEntityRelativeMovePacket(new EntityRelativeMovePacket(data));
 				break;
 			default:
 				break;
@@ -298,11 +304,6 @@ public class GameManager : MonoBehaviour
 			(float)packet.Y + (((packet.Flags & 0x02) != 0) ? _player.MinecraftPosition.y : 0f),
 			(float)packet.Z + (((packet.Flags & 0x04) != 0) ? _player.MinecraftPosition.z : 0f));
 
-		Quaternion rot = Quaternion.Euler(
-			packet.Pitch + (((packet.Flags & 0x10) != 0) ? _player.Pitch : 0),
-			packet.Yaw + (((packet.Flags & 0x08) != 0) ? _player.Yaw : 0) + 90,
-			0);
-
 		// check if we need to spawn the player for the first time
 		if (_player == null)
 		{
@@ -316,9 +317,9 @@ public class GameManager : MonoBehaviour
 
 		// update player position
 		_player.MinecraftPosition = pos;
-		_player.SetRotation(rot);
+		_player.SetRotation(packet.Pitch + (((packet.Flags & 0x10) != 0) ? _player.Pitch : 0), packet.Yaw + (((packet.Flags & 0x08) != 0) ? _player.Yaw : 0) + 90);
 
-		Debug.Log($"Moved player to {pos}, {rot.eulerAngles}");
+		Debug.Log($"Moved player to {pos}, {_player.transform.rotation.eulerAngles}");
 
 		DispatchWritePacket(new TeleportConfirmPacket()
 		{

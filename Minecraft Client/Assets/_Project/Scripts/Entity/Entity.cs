@@ -9,13 +9,13 @@ using UnityEngine;
 public abstract class Entity : MonoBehaviour
 {
 	public GameObject Physical;
-	public int ID { get; set; }
+	public int EntityID { get; set; }
 	public Guid UUID { get; set; }
 	public EntityType Type { get; set; }
 	public World World { get; set; }
 
-	protected readonly float CameraMinX = -89.9f;
-	protected readonly float CameraMaxX = 89.9f;
+	protected readonly float HeadMinX = -89.9f;
+	protected readonly float HeadMaxX = 89.9f;
 
 	protected BoxCollider Collider;
 	protected Rigidbody Rigidbody;
@@ -26,7 +26,7 @@ public abstract class Entity : MonoBehaviour
 	public virtual bool OnGround { get; protected set; }
 
 	/// <summary>
-	/// Gets a Vector3 representing the minecraft position of the player.
+	/// Gets a Vector3 representing the minecraft position of the entity.
 	/// </summary>
 	public Vector3 MinecraftPosition
 	{
@@ -41,7 +41,7 @@ public abstract class Entity : MonoBehaviour
 	}
 
 	/// <summary>
-	/// The Unity-style position of the player
+	/// The Unity-style position of the entity
 	/// </summary>
 	public Vector3 UnityPosition
 	{
@@ -60,6 +60,21 @@ public abstract class Entity : MonoBehaviour
 	public double Z { get { return transform.position.x; } }
 	public float Pitch { get; set; } = 0f;
 	public float Yaw { get; set; } = 0f;
+	/// <summary>
+	/// The rotation of the entity. (Usually the head rotation)
+	/// </summary>
+	public Quaternion EntityRotation
+	{
+		get
+		{
+			return Quaternion.Euler(Pitch, Yaw, 0);
+		}
+		set
+		{
+			Pitch = value.eulerAngles.x;
+			Yaw = value.eulerAngles.y;
+		}
+	}
 	public short VelocityX { get; set; }
 	public short VelocityY { get; set; }
 	public short VelocityZ { get; set; }
@@ -98,24 +113,15 @@ public abstract class Entity : MonoBehaviour
 		Rigidbody.useGravity = World.ChunkRenderer.IsChunkGenerated(BlockPos.GetChunk());
 	}
 
-	/// <summary>
-	/// Sets the Unity position of the object
-	/// </summary>
-	/// <param name="position"></param>
-	private void SetPosition(Vector3 position)
+	public void SetRotation(float pitch, float yaw)
 	{
-		transform.position = position;
-	}
-
-	public void SetRotation(Quaternion rotation)
-	{
-		Pitch = rotation.eulerAngles.x;
-		Yaw = rotation.eulerAngles.y;
+		Pitch = pitch;
+		Yaw = yaw;
 	}
 
 	public override int GetHashCode()
 	{
-		return ID;
+		return EntityID;
 	}
 
 	public override bool Equals(object other)
@@ -126,6 +132,12 @@ public abstract class Entity : MonoBehaviour
 		else
 			return _other.GetHashCode().Equals(GetHashCode());
 	}
+
+	private void SetPosition(Vector3 position)
+	{
+		transform.position = position;
+	}
+
 
 	public enum EntityType
 	{

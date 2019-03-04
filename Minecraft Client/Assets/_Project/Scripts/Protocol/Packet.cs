@@ -60,6 +60,11 @@ public enum ClientboundIDs : int
 	PLAYER_POSITION_AND_LOOK = 0x32,
 	ENTITY = 0x27,
 	SPAWN_MOB = 0x03,
+	DESTROY_ENTITIES = 0x35,
+	ENTITY_RELATIVE_MOVE = 0x28,
+	ENTITY_LOOK_AND_RELATIVE_MOVE = 0x29,
+	ENTITY_LOOK = 0x2A,
+
 }
 
 public enum ServerboundIDs : int
