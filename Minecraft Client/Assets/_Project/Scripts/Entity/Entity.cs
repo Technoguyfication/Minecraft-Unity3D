@@ -21,33 +21,9 @@ public abstract class Entity : MonoBehaviour
 	protected Rigidbody Rigidbody;
 
 	/// <summary>
-	/// Whether the player is touching the ground or not
+	/// Whether the entity is touching the ground or not.
 	/// </summary>
-	public bool OnGround
-	{
-		get
-		{
-			// raycast from all four corners of hitbox to determine if player on on ground
-			// it's assumed the Physical object has the same X and Z scale
-			float physicalWidth = Physical.transform.localScale.x / 2;
-			Vector3[] castPoints = new Vector3[]
-				{
-					new Vector3(physicalWidth, 0, physicalWidth),
-					new Vector3(physicalWidth, 0, -physicalWidth),
-					new Vector3(-physicalWidth, 0, -physicalWidth),
-					new Vector3(-physicalWidth, 0, physicalWidth),
-				};
-
-			// if any rays hit, we're on the ground
-			foreach (var castPoint in castPoints)
-			{
-				if (Physics.Raycast(Physical.transform.position + castPoint, -Vector3.up, Collider.bounds.extents.y + 0.00001f))
-					return true;
-			}
-
-			return false;
-		}
-	}
+	public virtual bool OnGround { get; protected set; }
 
 	/// <summary>
 	/// Gets a Vector3 representing the minecraft position of the player.

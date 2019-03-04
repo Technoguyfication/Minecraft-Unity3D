@@ -21,11 +21,37 @@ public class PlayerController : Player
 	public event OnGroundEventHandler OnGroundChanged;
 	private bool _wasOnGround = true;
 
+	public override bool OnGround
+	{
+		get
+		{
+			// raycast from all four corners of hitbox to determine if player is on ground
+			// it's assumed the Physical object has the same X and Z scale
+			float physicalWidth = Physical.transform.localScale.x / 2;
+			Vector3[] castPoints = new Vector3[]
+				{
+					new Vector3(physicalWidth, 0, physicalWidth),
+					new Vector3(physicalWidth, 0, -physicalWidth),
+					new Vector3(-physicalWidth, 0, -physicalWidth),
+					new Vector3(-physicalWidth, 0, physicalWidth),
+				};
+
+			// if any rays hit, we're on the ground
+			foreach (var castPoint in castPoints)
+			{
+				if (Physics.Raycast(Physical.transform.position + castPoint, -Vector3.up, Collider.bounds.extents.y + 0.00001f))
+					return true;
+			}
+
+			return false;
+		}
+	}
+
 	// Update is called once per frame
 	protected override void Update()
 	{
 		Pitch -= Input.GetAxis("Mouse Y") * MouseSensitivity;
-		Pitch = Mathf.Clamp(Pitch, CameraMinX, CameraMaxX);
+		Pitch = Mathf.Clamp(Pitch, HeadMinX, HeadMaxX);
 
 		Yaw += Input.GetAxis("Mouse X") * MouseSensitivity;
 
