@@ -186,7 +186,7 @@ public abstract class Entity : MonoBehaviour
 		PIG_ZOMBIE = 53,
 		POLAR_BEAR = 54,
 		RABBIT = 56,
-		SALMON = 58,
+		SALMON = 57,
 		SHEEP = 58,
 		SHULKER = 59,
 		SILVERFISH = 61,
