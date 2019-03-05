@@ -117,9 +117,12 @@ public abstract class Entity : MonoBehaviour
 
 	protected virtual void FixedUpdate()
     {
-		// don't simulate gravity on the rigidbody unless the chunk it's in is loaded
-		// keeps entities from falling through world while generating chunks
-		Rigidbody.useGravity = World.ChunkRenderer.IsChunkGenerated(BlockPos.GetChunk());
+		if (World != null)
+		{
+			// don't simulate gravity on the rigidbody unless the chunk it's in is loaded
+			// keeps entities from falling through world while generating chunks
+			Rigidbody.useGravity = World.ChunkRenderer.IsChunkGenerated(BlockPos.GetChunk());
+		}
 	}
 
 	public void SetRotation(float pitch, float yaw)

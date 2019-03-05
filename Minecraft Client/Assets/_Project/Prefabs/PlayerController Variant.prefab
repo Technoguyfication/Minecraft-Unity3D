@@ -14,12 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Physical: {fileID: 2119521297424583912}
   Head: {fileID: 2119346262984514728}
+  Body: {fileID: 6920921992992541528}
   MouseSensitivity: 15
   SneakSpeed: 1.31
   WalkSpeed: 4.17
   SprintSpeed: 5.612
   JumpHeight: 1.25
-  UseGravity: 1
 --- !u!1001 &2120113531586674730
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -29,7 +29,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1818212769120596, guid: 9491017758607d74c814f7b89d3a3829, type: 3}
       propertyPath: m_Name
-      value: PlayerController
+      value: PlayerController Variant
       objectReference: {fileID: 0}
     - target: {fileID: 4261384238173106, guid: 9491017758607d74c814f7b89d3a3829, type: 3}
       propertyPath: m_LocalPosition.x
@@ -87,6 +87,12 @@ GameObject:
 --- !u!1 &2119521297424583912 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1729968927608002, guid: 9491017758607d74c814f7b89d3a3829,
+    type: 3}
+  m_PrefabInstance: {fileID: 2120113531586674730}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &6920921992992541528 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 9034262515352816498, guid: 9491017758607d74c814f7b89d3a3829,
     type: 3}
   m_PrefabInstance: {fileID: 2120113531586674730}
   m_PrefabAsset: {fileID: 0}
