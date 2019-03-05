@@ -64,6 +64,7 @@ public enum ClientboundIDs : int
 	ENTITY_RELATIVE_MOVE = 0x28,
 	ENTITY_LOOK_AND_RELATIVE_MOVE = 0x29,
 	ENTITY_LOOK = 0x2A,
+	ENTITY_TELEPORT = 0x50,
 
 }
 

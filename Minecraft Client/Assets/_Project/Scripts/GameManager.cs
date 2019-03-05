@@ -295,6 +295,9 @@ public class GameManager : MonoBehaviour
 			case ClientboundIDs.ENTITY_LOOK_AND_RELATIVE_MOVE:
 				EntityManager.HandleEntityLookAndRelativeMovePacket(new EntityLookAndRelativeMovePacket(data));
 				break;
+			case ClientboundIDs.ENTITY_TELEPORT:
+				EntityManager.HandleEntityTeleport(new EntityTeleportPacket(data));
+				break;
 			default:
 				break;
 		}

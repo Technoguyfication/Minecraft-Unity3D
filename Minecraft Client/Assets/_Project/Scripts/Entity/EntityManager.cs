@@ -40,9 +40,11 @@ public class EntityManager : MonoBehaviour
 	/// </summary>
 	/// <param name="entityId"></param>
 	/// <param name="absolutePos"></param>
-	public void EntityAbsoluteMove(int entityId, Vector3 absolutePos)
+	public void EntityAbsoluteMove(int entityId, Vector3 absolutePos, bool onGround)
 	{
-		GetEntityByID(entityId).MinecraftPosition = absolutePos;
+		var entity = GetEntityByID(entityId);
+		entity.MinecraftPosition = absolutePos;
+		entity.OnGround = onGround;
 	}
 
 	/// <summary>
@@ -126,6 +128,7 @@ public class EntityManager : MonoBehaviour
 		catch (NullReferenceException)
 		{
 			Debug.LogWarning($"Server tried to send look packet for unloaded entity ID {pkt.EntityID}");
+			return;
 		}
 	}
 
@@ -133,6 +136,20 @@ public class EntityManager : MonoBehaviour
 	{
 		Vector3 delta = new Vector3(deltaX, deltaY, deltaZ) / 4096;
 		return delta;
+	}
+
+	public void HandleEntityTeleport(EntityTeleportPacket pkt)
+	{
+		try
+		{
+			EntityLook(pkt.EntityID, pkt.Pitch / 256f, pkt.Yaw / 256f);
+			EntityAbsoluteMove(pkt.EntityID, new Vector3((float)pkt.X, (float)pkt.Y, (float)pkt.Z), pkt.OnGround);
+		}
+		catch (NullReferenceException)
+		{
+			Debug.LogWarning($"Server tried to send teleport packet for unloaded entity ID {pkt.EntityID}");
+			return;
+		}
 	}
 
 	/// <summary>
