@@ -23,7 +23,7 @@ public abstract class Entity : MonoBehaviour
 	/// <summary>
 	/// Whether the entity is touching the ground or not.
 	/// </summary>
-	public virtual bool OnGround { get; protected set; }
+	public virtual bool OnGround { get; set; }
 
 	/// <summary>
 	/// Gets a Vector3 representing the minecraft position of the entity.
@@ -32,11 +32,11 @@ public abstract class Entity : MonoBehaviour
 	{
 		get
 		{
-			return new Vector3((float)Z, (float)Y, (float)X);
+			return new Vector3((float)X, (float)Y, (float)Z);
 		}
 		set
 		{
-			SetPosition(new Vector3(value.z, value.y, value.x));
+			transform.position = new Vector3(value.z, value.y, value.x);
 		}
 	}
 
@@ -51,12 +51,21 @@ public abstract class Entity : MonoBehaviour
 		}
 		set
 		{
-			SetPosition(value);
+			transform.position = value;
 		}
 	}
 
+	/// <summary>
+	/// X coordinate in Minecraft space
+	/// </summary>
 	public double X { get { return transform.position.z; } }
+	/// <summary>
+	/// Y coordinate in Minecraft space
+	/// </summary>
 	public double Y { get { return transform.position.y; } }
+	/// <summary>
+	/// Z coordinate in Minecraft space
+	/// </summary>
 	public double Z { get { return transform.position.x; } }
 	public float Pitch { get; set; } = 0f;
 	public float Yaw { get; set; } = 0f;
@@ -133,9 +142,9 @@ public abstract class Entity : MonoBehaviour
 			return _other.GetHashCode().Equals(GetHashCode());
 	}
 
-	private void SetPosition(Vector3 position)
+	public override string ToString()
 	{
-		transform.position = position;
+		return $"{Type.ToString()}:{EntityID}";
 	}
 
 
