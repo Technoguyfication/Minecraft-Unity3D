@@ -11,8 +11,8 @@ public class EntityLookAndRelativeMovePacket : Packet
 	public short DeltaX { get; set; }
 	public short DeltaY { get; set; }
 	public short DeltaZ { get; set; }
-	public byte Yaw { get; set; }
-	public byte Pitch { get; set; }
+	public sbyte Yaw { get; set; }
+	public sbyte Pitch { get; set; }
 	public bool OnGround { get; set; }
 
 	public override byte[] Payload
@@ -24,8 +24,8 @@ public class EntityLookAndRelativeMovePacket : Packet
 			DeltaX = PacketHelper.GetInt16(buffer);
 			DeltaY = PacketHelper.GetInt16(buffer);
 			DeltaZ = PacketHelper.GetInt16(buffer);
-			Yaw = buffer.Read(1)[0];
-			Pitch = buffer.Read(1)[0];
+			Yaw = (sbyte)buffer.Read(1)[0];
+			Pitch = (sbyte)buffer.Read(1)[0];
 			OnGround = PacketHelper.GetBoolean(buffer);
 		}
 		get

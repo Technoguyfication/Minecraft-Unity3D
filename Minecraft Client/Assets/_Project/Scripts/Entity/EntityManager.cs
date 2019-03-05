@@ -9,6 +9,7 @@ public class EntityManager : MonoBehaviour
 	public World World;
 
 	private readonly List<Entity> _entities = new List<Entity>();
+	private const float ENTITY_ANGLE_MULTIPLE = 360 / 256f;
 
 	// Start is called before the first frame update
 	void Start()
@@ -105,12 +106,12 @@ public class EntityManager : MonoBehaviour
 
 	public void HandleEntityLookAndRelativeMovePacket(EntityLookAndRelativeMovePacket pkt)
 	{
-		var deltaPos = ConvertRelativeMoveToVector(pkt.DeltaZ, pkt.DeltaY, pkt.DeltaX);
+		var deltaPos = ConvertRelativeMoveToVector(pkt.DeltaX, pkt.DeltaY, pkt.DeltaZ);
 
 		try
 		{
 			EntityRelativeMove(pkt.EntityID, deltaPos, pkt.OnGround);
-			EntityLook(pkt.EntityID, pkt.Pitch / 256f, pkt.Yaw / 256f);
+			EntityLook(pkt.EntityID, pkt.Pitch * ENTITY_ANGLE_MULTIPLE, pkt.Yaw * ENTITY_ANGLE_MULTIPLE);
 		}
 		catch (NullReferenceException)
 		{
@@ -123,7 +124,7 @@ public class EntityManager : MonoBehaviour
 	{
 		try
 		{
-			EntityLook(pkt.EntityID, pkt.Pitch / 256f, pkt.Yaw / 256f);
+			EntityLook(pkt.EntityID, pkt.Pitch * ENTITY_ANGLE_MULTIPLE, pkt.Yaw * ENTITY_ANGLE_MULTIPLE);
 		}
 		catch (NullReferenceException)
 		{
@@ -142,7 +143,7 @@ public class EntityManager : MonoBehaviour
 	{
 		try
 		{
-			EntityLook(pkt.EntityID, pkt.Pitch / 256f, pkt.Yaw / 256f);
+			EntityLook(pkt.EntityID, pkt.Pitch * ENTITY_ANGLE_MULTIPLE, pkt.Yaw * ENTITY_ANGLE_MULTIPLE);
 			EntityAbsoluteMove(pkt.EntityID, new Vector3((float)pkt.X, (float)pkt.Y, (float)pkt.Z), pkt.OnGround);
 		}
 		catch (NullReferenceException)

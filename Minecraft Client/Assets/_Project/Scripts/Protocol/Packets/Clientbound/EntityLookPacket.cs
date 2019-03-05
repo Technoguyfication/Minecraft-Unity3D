@@ -8,8 +8,8 @@ using UnityEngine;
 public class EntityLookPacket : Packet
 {
 	public int EntityID { get; set; }
-	public byte Yaw { get; set; }
-	public byte Pitch { get; set; }
+	public sbyte Yaw { get; set; }
+	public sbyte Pitch { get; set; }
 	public bool OnGround { get; set; }
 
 	public override byte[] Payload
@@ -18,8 +18,8 @@ public class EntityLookPacket : Packet
 		{
 			List<byte> buffer = new List<byte>(value);
 			EntityID = VarInt.ReadNext(buffer);
-			Yaw = buffer.Read(1)[0];
-			Pitch = buffer.Read(1)[0];
+			Yaw = (sbyte)buffer.Read(1)[0];
+			Pitch = (sbyte)buffer.Read(1)[0];
 			OnGround = PacketHelper.GetBoolean(buffer);
 		}
 		get
