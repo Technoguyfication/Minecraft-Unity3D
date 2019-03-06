@@ -197,7 +197,6 @@ GameObject:
   - component: {fileID: 13402249}
   - component: {fileID: 13402248}
   - component: {fileID: 13402250}
-  - component: {fileID: 13402251}
   m_Layer: 0
   m_Name: Game Manager
   m_TagString: GameController
@@ -223,7 +222,7 @@ MonoBehaviour:
     type: 3}
   Username: mcplayer
   DebugCanvas: {fileID: 1103229369}
-  EntityManager: {fileID: 13402251}
+  EntityManager: {fileID: 85674382}
 --- !u!4 &13402249
 Transform:
   m_ObjectHideFlags: 0
@@ -271,20 +270,6 @@ MonoBehaviour:
   LogoutButton: {fileID: 1852489137}
   GameManager: {fileID: 13402248}
   ModalDimmer: {fileID: 11063737}
---- !u!114 &13402251
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 13402247}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 52be607520f229d4f89ce35fdca134d8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  TestEntity: {fileID: 984875785676933378, guid: ccbceba490bb3184989291ebeca02c4c,
-    type: 3}
 --- !u!1 &21165361
 GameObject:
   m_ObjectHideFlags: 0
@@ -559,7 +544,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52be607520f229d4f89ce35fdca134d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TestEntity: {fileID: 0}
+  TestEntity: {fileID: 984875785676933378, guid: ccbceba490bb3184989291ebeca02c4c,
+    type: 3}
 --- !u!1 &127268863
 GameObject:
   m_ObjectHideFlags: 0

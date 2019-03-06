@@ -10,6 +10,7 @@ public class EntityManager : MonoBehaviour
 
 	private readonly List<Entity> _entities = new List<Entity>();
 	private const float ENTITY_ANGLE_MULTIPLE = 360 / 256f;
+	private const float ENTITY_ANGLE_OFFSET = 90f;
 
 	// Start is called before the first frame update
 	void Start()
@@ -79,7 +80,7 @@ public class EntityManager : MonoBehaviour
 		mob.EntityID = pkt.EntityID;
 		Vector3 pos = new Vector3((float)pkt.X, (float)pkt.Y, (float)pkt.Z); ;
 		mob.MinecraftPosition = pos;
-		mob.SetRotation(pkt.Pitch, pkt.Yaw);
+		mob.SetRotation(pkt.Pitch, pkt.Yaw + ENTITY_ANGLE_OFFSET);
 		mob.HeadPitch = pkt.HeadPitch;
 		mob.name = $"{mob.Type.ToString()} ID:{mob.EntityID} UUID:{mob.UUID.ToString()}";
 
@@ -111,7 +112,7 @@ public class EntityManager : MonoBehaviour
 		try
 		{
 			EntityRelativeMove(pkt.EntityID, deltaPos, pkt.OnGround);
-			EntityLook(pkt.EntityID, pkt.Pitch * ENTITY_ANGLE_MULTIPLE, pkt.Yaw * ENTITY_ANGLE_MULTIPLE);
+			EntityLook(pkt.EntityID, pkt.Pitch * ENTITY_ANGLE_MULTIPLE, pkt.Yaw * ENTITY_ANGLE_MULTIPLE + ENTITY_ANGLE_OFFSET);
 		}
 		catch (NullReferenceException)
 		{
@@ -124,7 +125,7 @@ public class EntityManager : MonoBehaviour
 	{
 		try
 		{
-			EntityLook(pkt.EntityID, pkt.Pitch * ENTITY_ANGLE_MULTIPLE, pkt.Yaw * ENTITY_ANGLE_MULTIPLE);
+			EntityLook(pkt.EntityID, pkt.Pitch * ENTITY_ANGLE_MULTIPLE, pkt.Yaw * ENTITY_ANGLE_MULTIPLE + ENTITY_ANGLE_OFFSET);
 		}
 		catch (NullReferenceException)
 		{
@@ -143,7 +144,7 @@ public class EntityManager : MonoBehaviour
 	{
 		try
 		{
-			EntityLook(pkt.EntityID, pkt.Pitch * ENTITY_ANGLE_MULTIPLE, pkt.Yaw * ENTITY_ANGLE_MULTIPLE);
+			EntityLook(pkt.EntityID, pkt.Pitch * ENTITY_ANGLE_MULTIPLE, pkt.Yaw * ENTITY_ANGLE_MULTIPLE + ENTITY_ANGLE_OFFSET);
 			EntityAbsoluteMove(pkt.EntityID, new Vector3((float)pkt.X, (float)pkt.Y, (float)pkt.Z), pkt.OnGround);
 		}
 		catch (NullReferenceException)
