@@ -57,7 +57,7 @@ public class PlayerController : Player
 		Pitch -= Input.GetAxis("Mouse Y") * MouseSensitivity;
 		Pitch = Mathf.Clamp(Pitch, HeadMinX, HeadMaxX);
 
-		Yaw += Input.GetAxis("Mouse X") * MouseSensitivity;
+		HeadYaw = Yaw += Input.GetAxis("Mouse X") * MouseSensitivity;
 
 		// jumping
 		if (Input.GetKey(KeyCode.Space) && OnGround)

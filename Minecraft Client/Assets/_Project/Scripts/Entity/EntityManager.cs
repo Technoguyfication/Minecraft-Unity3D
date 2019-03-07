@@ -9,7 +9,7 @@ public class EntityManager : MonoBehaviour
 	public World World;
 
 	private readonly List<Entity> _entities = new List<Entity>();
-	private const float ENTITY_ANGLE_MULTIPLE = 360 / 256f;
+	private const float ENTITY_ANGLE_COEFFICIENT = 360 / 256f;
 	private const float ENTITY_ANGLE_OFFSET = 90f;
 
 	// Start is called before the first frame update
@@ -50,7 +50,7 @@ public class EntityManager : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Sets an entity's look angles
+	/// Sets an entity's look angles for the body and head pitch only. For head yaw, use <see cref="EntityHeadYaw(int, float)"/>
 	/// </summary>
 	/// <param name="entityId"></param>
 	/// <param name="yaw"></param>
@@ -59,6 +59,17 @@ public class EntityManager : MonoBehaviour
 	{
 		var entity = GetEntityByID(entityId);
 		entity.SetRotation(pitch, yaw);
+	}
+
+	/// <summary>
+	/// Sets the head yaw angle of the entity
+	/// </summary>
+	/// <param name="entityId"></param>
+	/// <param name="headYaw"></param>
+	public void EntityHeadYaw(int entityId, float headYaw)
+	{
+		LivingEntity entity = GetEntityByID(entityId) as LivingEntity;
+		entity.HeadYaw = headYaw;
 	}
 
 	/// <summary>
@@ -80,8 +91,8 @@ public class EntityManager : MonoBehaviour
 		mob.EntityID = pkt.EntityID;
 		Vector3 pos = new Vector3((float)pkt.X, (float)pkt.Y, (float)pkt.Z); ;
 		mob.MinecraftPosition = pos;
-		mob.SetRotation(pkt.Pitch, pkt.Yaw + ENTITY_ANGLE_OFFSET);
-		mob.HeadPitch = pkt.HeadPitch;
+		mob.SetRotation(pkt.Pitch * ENTITY_ANGLE_COEFFICIENT, pkt.Yaw * ENTITY_ANGLE_COEFFICIENT + ENTITY_ANGLE_OFFSET);
+		//mob.HeadPitch = pkt.HeadPitch * ENTITY_ANGLE_COEFFICIENT;
 		mob.name = $"{mob.Type.ToString()} ID:{mob.EntityID} UUID:{mob.UUID.ToString()}";
 
 		_entities.Add(mob);
@@ -112,7 +123,7 @@ public class EntityManager : MonoBehaviour
 		try
 		{
 			EntityRelativeMove(pkt.EntityID, deltaPos, pkt.OnGround);
-			EntityLook(pkt.EntityID, pkt.Pitch * ENTITY_ANGLE_MULTIPLE, pkt.Yaw * ENTITY_ANGLE_MULTIPLE + ENTITY_ANGLE_OFFSET);
+			EntityLook(pkt.EntityID, pkt.Pitch * ENTITY_ANGLE_COEFFICIENT, pkt.Yaw * ENTITY_ANGLE_COEFFICIENT + ENTITY_ANGLE_OFFSET);
 		}
 		catch (NullReferenceException)
 		{
@@ -125,11 +136,24 @@ public class EntityManager : MonoBehaviour
 	{
 		try
 		{
-			EntityLook(pkt.EntityID, pkt.Pitch * ENTITY_ANGLE_MULTIPLE, pkt.Yaw * ENTITY_ANGLE_MULTIPLE + ENTITY_ANGLE_OFFSET);
+			EntityLook(pkt.EntityID, pkt.Pitch * ENTITY_ANGLE_COEFFICIENT, pkt.Yaw * ENTITY_ANGLE_COEFFICIENT + ENTITY_ANGLE_OFFSET);
 		}
 		catch (NullReferenceException)
 		{
 			Debug.LogWarning($"Server tried to send look packet for unloaded entity ID {pkt.EntityID}");
+			return;
+		}
+	}
+
+	public void HandleEntityHeadLook(EntityHeadLookPacket pkt)
+	{
+		try
+		{
+			EntityHeadYaw(pkt.EntityID, pkt.HeadYaw * ENTITY_ANGLE_COEFFICIENT + ENTITY_ANGLE_OFFSET);
+		}
+		catch (NullReferenceException)
+		{
+			Debug.LogWarning($"Server tried to send head look packet for unloaded entity ID {pkt.EntityID}");
 			return;
 		}
 	}
@@ -144,7 +168,7 @@ public class EntityManager : MonoBehaviour
 	{
 		try
 		{
-			EntityLook(pkt.EntityID, pkt.Pitch * ENTITY_ANGLE_MULTIPLE, pkt.Yaw * ENTITY_ANGLE_MULTIPLE + ENTITY_ANGLE_OFFSET);
+			EntityLook(pkt.EntityID, pkt.Pitch * ENTITY_ANGLE_COEFFICIENT, pkt.Yaw * ENTITY_ANGLE_COEFFICIENT + ENTITY_ANGLE_OFFSET);
 			EntityAbsoluteMove(pkt.EntityID, new Vector3((float)pkt.X, (float)pkt.Y, (float)pkt.Z), pkt.OnGround);
 		}
 		catch (NullReferenceException)
