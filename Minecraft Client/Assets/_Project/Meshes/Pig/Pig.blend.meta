@@ -9,34 +9,75 @@ ModelImporter:
     100006: front_right_foot
     100008: head
     100010: //RootNode
+    100012: front_left_foot_001
+    100014: front_left_foot_002
+    100016: front_left_foot_003
+    100018: front_left_foot_004
+    100020: Foot
+    100022: Foot_001
+    100024: Foot_002
+    100026: Foot_003
     400000: back_left_foot
     400002: back_right_foot
     400004: front_left_foot
     400006: front_right_foot
     400008: head
     400010: //RootNode
+    400012: front_left_foot_001
+    400014: front_left_foot_002
+    400016: front_left_foot_003
+    400018: front_left_foot_004
+    400020: Foot
+    400022: Foot_001
+    400024: Foot_002
+    400026: Foot_003
     2100000: unnamed
     2100002: Material_001
     2100004: Material_001__pig_png
     2100006: Material_001__pig_png_001
+    2100008: Pig__pig_png_001
     2300000: back_left_foot
     2300002: back_right_foot
     2300004: front_left_foot
     2300006: front_right_foot
     2300008: head
     2300010: //RootNode
+    2300012: front_left_foot_001
+    2300014: front_left_foot_002
+    2300016: front_left_foot_003
+    2300018: front_left_foot_004
+    2300020: Foot
+    2300022: Foot_001
+    2300024: Foot_002
+    2300026: Foot_003
     3300000: back_left_foot
     3300002: back_right_foot
     3300004: front_left_foot
     3300006: front_right_foot
     3300008: head
     3300010: //RootNode
+    3300012: front_left_foot_001
+    3300014: front_left_foot_002
+    3300016: front_left_foot_003
+    3300018: front_left_foot_004
+    3300020: Foot
+    3300022: Foot_001
+    3300024: Foot_002
+    3300026: Foot_003
     4300000: body
     4300002: back_left_foot
     4300004: back_right_foot
     4300006: front_left_foot
     4300008: front_right_foot
     4300010: head
+    4300012: front_left_foot_004
+    4300014: front_left_foot_003
+    4300016: front_left_foot_002
+    4300018: front_left_foot_001
+    4300020: Foot
+    4300022: Foot_003
+    4300024: Foot_002
+    4300026: Foot_001
     7400000: Default Take
     9500000: //RootNode
   externalObjects:
@@ -45,8 +86,18 @@ ModelImporter:
       assembly: UnityEngine.CoreModule
       name: Material.001
     second: {fileID: 2100000, guid: cc8062a5e2c0804409c92b336c7f7807, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material_001__pig_png_001
+    second: {fileID: 2100000, guid: cc8062a5e2c0804409c92b336c7f7807, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Pig__pig_png_001
+    second: {fileID: 2100000, guid: cc8062a5e2c0804409c92b336c7f7807, type: 2}
   materials:
-    importMaterials: 0
+    importMaterials: 1
     materialName: 0
     materialSearch: 1
     materialLocation: 1

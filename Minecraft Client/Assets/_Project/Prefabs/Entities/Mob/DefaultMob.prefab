@@ -166,6 +166,7 @@ GameObject:
   - component: {fileID: 984875785676933625}
   - component: {fileID: 984875785676933624}
   - component: {fileID: 2542008215803868551}
+  - component: {fileID: 235395229}
   m_Layer: 9
   m_Name: DefaultMob
   m_TagString: Untagged
@@ -220,6 +221,20 @@ MonoBehaviour:
   Physical: {fileID: 7074988037215164881}
   Head: {fileID: 6874267521874002168}
   Body: {fileID: 671163216999108679}
+--- !u!114 &235395229
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 984875785676933378}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7bfdda7e4f8c8b40a6189aa316ef007, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TestMob: {fileID: 2542008215803868551}
+  CycleSpeed: 10
 --- !u!1 &2248086975951609041
 GameObject:
   m_ObjectHideFlags: 0
@@ -1059,15 +1074,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 0b46c5e2bffe18841ab1146d460d55d4, type: 3}
       propertyPath: m_LocalScale.x
-      value: 10
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 0b46c5e2bffe18841ab1146d460d55d4, type: 3}
       propertyPath: m_LocalScale.y
-      value: 10
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 0b46c5e2bffe18841ab1146d460d55d4, type: 3}
       propertyPath: m_LocalScale.z
-      value: 10
+      value: 20
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0b46c5e2bffe18841ab1146d460d55d4, type: 3}
