@@ -25,7 +25,8 @@ public class LivingEntity : Entity
     // Update is called once per frame
     protected override void Update()
     {
-		Head.transform.localEulerAngles = new Vector3(HeadPitch, HeadYaw, 0);
+		// subtract yaw from head yaw because head is parented to body
+		Head.transform.localEulerAngles = new Vector3(HeadPitch, HeadYaw - Yaw, 0);
 		Body.transform.localEulerAngles = new Vector3(0, Yaw, 0);
 
 		base.Update();
