@@ -1,0 +1,171 @@
+fileFormatVersion: 2
+guid: 261668ba9b1b1ee4e9cd8f5e8ab6e050
+ModelImporter:
+  serializedVersion: 23
+  fileIDToRecycleName:
+    100000: //RootNode
+    100002: Body
+    100004: Cube
+    100006: Cube_001
+    100008: Cube_002
+    100010: Cube_003
+    100012: Cube_004
+    100014: BL_Foot
+    100016: BR_Foot
+    100018: FL_foot
+    100020: fr_fOOT
+    100022: HEad
+    400000: //RootNode
+    400002: Body
+    400004: Cube
+    400006: Cube_001
+    400008: Cube_002
+    400010: Cube_003
+    400012: Cube_004
+    400014: BL_Foot
+    400016: BR_Foot
+    400018: FL_foot
+    400020: fr_fOOT
+    400022: HEad
+    2100000: unnamed
+    2100002: None__creeper_png
+    2100004: Material__creeper_png
+    2100006: Material__creeper_png_001
+    2100008: Creeper__creeper_png
+    2100010: Creeper__creeper_png_001
+    2300000: //RootNode
+    2300002: Body
+    2300004: Cube
+    2300006: Cube_001
+    2300008: Cube_002
+    2300010: Cube_003
+    2300012: Cube_004
+    2300014: BL_Foot
+    2300016: BR_Foot
+    2300018: FL_foot
+    2300020: fr_fOOT
+    2300022: HEad
+    3300000: //RootNode
+    3300002: Body
+    3300004: Cube
+    3300006: Cube_001
+    3300008: Cube_002
+    3300010: Cube_003
+    3300012: Cube_004
+    3300014: BL_Foot
+    3300016: BR_Foot
+    3300018: FL_foot
+    3300020: fr_fOOT
+    3300022: HEad
+    4300000: Body
+    4300002: Cube_003
+    4300004: Cube_002
+    4300006: Cube_001
+    4300008: Cube
+    4300010: Cube_004
+    4300012: fr_fOOT
+    4300014: FL_foot
+    4300016: HEad
+    4300018: BR_Foot
+    4300020: BL_Foot
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Creeper__creeper_png
+    second: {fileID: 2100000, guid: 8f180444015cadb4b8d8f018f0ea2fb5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Creeper__creeper_png_001
+    second: {fileID: 2100000, guid: 8f180444015cadb4b8d8f018f0ea2fb5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material.001
+    second: {fileID: 2100000, guid: cc8062a5e2c0804409c92b336c7f7807, type: 2}
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 0
+    importLights: 0
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    previousCalculatedGlobalScale: 1
+    hasPreviousCalculatedGlobalScale: 0
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  importAnimation: 0
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
