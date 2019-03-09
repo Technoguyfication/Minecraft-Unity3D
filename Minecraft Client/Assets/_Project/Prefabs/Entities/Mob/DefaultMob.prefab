@@ -134,7 +134,6 @@ GameObject:
   - component: {fileID: 984875785676933625}
   - component: {fileID: 984875785676933624}
   - component: {fileID: 2542008215803868551}
-  - component: {fileID: 235395229}
   m_Layer: 9
   m_Name: DefaultMob
   m_TagString: Untagged
@@ -189,20 +188,6 @@ MonoBehaviour:
   Physical: {fileID: 7074988037215164881}
   Head: {fileID: 6874267521874002168}
   Body: {fileID: 9197829341900174738}
---- !u!114 &235395229
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 984875785676933378}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a7bfdda7e4f8c8b40a6189aa316ef007, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  TestMob: {fileID: 2542008215803868551}
-  CycleSpeed: 10
 --- !u!1 &2248086975951609041
 GameObject:
   m_ObjectHideFlags: 0

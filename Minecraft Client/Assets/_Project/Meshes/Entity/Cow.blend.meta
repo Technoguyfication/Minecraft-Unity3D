@@ -10,6 +10,11 @@ ModelImporter:
     100008: Cube_002
     100010: Cube_003
     100012: Cube_004
+    100014: BL_Foot
+    100016: BR_Foot
+    100018: FL_Foot
+    100020: FR_Foot
+    100022: Head
     400000: //RootNode
     400002: Body
     400004: Cube
@@ -17,6 +22,11 @@ ModelImporter:
     400008: Cube_002
     400010: Cube_003
     400012: Cube_004
+    400014: BL_Foot
+    400016: BR_Foot
+    400018: FL_Foot
+    400020: FR_Foot
+    400022: Head
     2100000: Cow__cow_png
     2100002: unnamed
     2100004: None__cow_png
@@ -27,6 +37,11 @@ ModelImporter:
     2300008: Cube_002
     2300010: Cube_003
     2300012: Cube_004
+    2300014: BL_Foot
+    2300016: BR_Foot
+    2300018: FL_Foot
+    2300020: FR_Foot
+    2300022: Head
     3300000: //RootNode
     3300002: Body
     3300004: Cube
@@ -34,12 +49,22 @@ ModelImporter:
     3300008: Cube_002
     3300010: Cube_003
     3300012: Cube_004
+    3300014: BL_Foot
+    3300016: BR_Foot
+    3300018: FL_Foot
+    3300020: FR_Foot
+    3300022: Head
     4300000: Body
     4300002: Cube
     4300004: Cube_004
     4300006: Cube_003
     4300008: Cube_002
     4300010: Cube_001
+    4300012: Head
+    4300014: BL_Foot
+    4300016: BR_Foot
+    4300018: FR_Foot
+    4300020: FL_Foot
   externalObjects:
   - first:
       type: UnityEngine:Material
