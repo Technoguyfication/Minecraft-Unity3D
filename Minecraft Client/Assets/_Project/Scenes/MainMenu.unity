@@ -511,6 +511,7 @@ GameObject:
   m_Component:
   - component: {fileID: 85674381}
   - component: {fileID: 85674382}
+  - component: {fileID: 85674383}
   m_Layer: 0
   m_Name: Entity Manager
   m_TagString: Untagged
@@ -544,8 +545,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52be607520f229d4f89ce35fdca134d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TestEntity: {fileID: 984875785676933378, guid: ccbceba490bb3184989291ebeca02c4c,
+  EntityLibrary: {fileID: 85674383}
+--- !u!114 &85674383
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 85674380}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64fdf463445f02c4baf4586159bba055, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DefaultEntity: {fileID: 984875785676933378, guid: ccbceba490bb3184989291ebeca02c4c,
     type: 3}
+  Creeper: {fileID: 2635472375816120246, guid: ec4e6fd0fcf61ff4fbaa8fb9dbef4c08, type: 3}
+  Cow: {fileID: 7411706794983835076, guid: 39ad4773c32735d48bbd8bc2cc7cc2d8, type: 3}
+  Pig: {fileID: 3144754443554451387, guid: f39a986edda0959459ca0e7424d41190, type: 3}
 --- !u!1 &127268863
 GameObject:
   m_ObjectHideFlags: 0

@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class EntityManager : MonoBehaviour
 {
-	public GameObject TestEntity;
+	public EntityLibrary EntityLibrary;
 	public World World;
 
 	private readonly List<Entity> _entities = new List<Entity>();
@@ -84,7 +84,7 @@ public class EntityManager : MonoBehaviour
 			return;
 		}
 
-		var mob = Instantiate(TestEntity, transform).GetComponent<Mob>();
+		var mob = Instantiate(EntityLibrary.GetEntity(pkt.Type), transform).GetComponent<Mob>();
 		mob.Type = pkt.Type;
 		mob.World = World;
 		mob.UUID = pkt.UUID;
