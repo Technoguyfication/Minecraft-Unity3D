@@ -96,10 +96,6 @@ public class EntityManager : MonoBehaviour
 		mob.name = $"{mob.Type.ToString()} ID:{mob.EntityID} UUID:{mob.UUID.ToString()}";
 
 		_entities.Add(mob);
-
-#if DEBUG
-		Debug.Log($"Spawned entity at {pos}");
-#endif
 	}
 
 	public void HandleEntityRelativeMovePacket(EntityRelativeMovePacket pkt)
@@ -201,10 +197,6 @@ public class EntityManager : MonoBehaviour
 
 		_entities.Remove(entity);
 		Destroy(entity.gameObject);
-
-#if DEBUG
-		Debug.Log($"Destroyed entity ID {entityId}");
-#endif
 	}
 
 	/// <summary>

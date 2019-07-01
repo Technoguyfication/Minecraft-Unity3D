@@ -10,6 +10,9 @@ using UnityEngine.EventSystems;
 
 public class MainMenuController : MonoBehaviour
 {
+	private const string ADDRESS_PREF_KEY = "lastAddressInput";
+	private const string PORT_PREF_KEY = "lastPortInput";
+
 	[Header("Connect")]
 	public InputField AddressInput;
 	public InputField PortInput;
@@ -39,7 +42,10 @@ public class MainMenuController : MonoBehaviour
 	// Use this for initialization
 	void Start()
 	{
-		
+		// set hostname and port textbox to last used
+		// todo: server list page
+		AddressInput.text = PlayerPrefs.GetString(ADDRESS_PREF_KEY, AddressInput.text);
+		PortInput.text = PlayerPrefs.GetString(PORT_PREF_KEY, PortInput.text);
 	}
 
 	private void Awake()
@@ -225,6 +231,8 @@ public class MainMenuController : MonoBehaviour
 	{
 		string hostname = AddressInput.text;
 		int port = int.Parse(PortInput.text);
+		PlayerPrefs.SetString(ADDRESS_PREF_KEY, AddressInput.text);
+		PlayerPrefs.SetString(PORT_PREF_KEY, PortInput.text);
 		Debug.Log("Starting game load coroutine");
 		StartCoroutine(GameManager.ConnectToServerCoroutine(hostname, port));
 	}

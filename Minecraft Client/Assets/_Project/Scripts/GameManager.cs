@@ -62,12 +62,12 @@ public class GameManager : MonoBehaviour
 			// make sure we aren't disconnected
 			if (_netReadTask.IsFaulted)
 			{
-				Disconnect(_netReadTask.Exception.Message);
+				Disconnect(_netReadTask.Exception.InnerExceptions[0].Message);
 				return;
 			}
 			if (_netWriteTask.IsFaulted)
 			{
-				Disconnect(_netWriteTask.Exception.Message);
+				Disconnect(_netWriteTask.Exception.InnerExceptions[0].Message);
 				return;
 			}
 			if (!_client.Connected)
@@ -269,7 +269,7 @@ public class GameManager : MonoBehaviour
 				Disconnect(new DisconnectPacket(data).JSONResponse);
 				break;
 			case ClientboundIDs.KEEP_ALIVE:
-				DispatchWritePacket(new ServerKeepAlivePacket() { KeepAliveID = new ClientKeepAlivePacket(data).KeepAliveID });
+				HandleKeepAlive(new ClientKeepAlivePacket(data));
 				break;
 			case ClientboundIDs.CHUNK_DATA:
 				_currentWorld.AddChunkData(new ChunkDataPacket(data));
@@ -304,6 +304,17 @@ public class GameManager : MonoBehaviour
 			default:
 				break;
 		}
+	}
+
+	private void HandleKeepAlive(ClientKeepAlivePacket pkt)
+	{
+#if DEBUG
+		Debug.Log($"Keep-alive: {pkt.KeepAliveID}");
+#endif
+		DispatchWritePacket(new ServerKeepAlivePacket()
+		{
+			KeepAliveID = pkt.KeepAliveID
+		});
 	}
 
 	private void HandlePositionAndLook(ClientPlayerPositionAndLookPacket packet)

@@ -3,7 +3,25 @@ guid: 3cc5367566779d7428aa8411c09d840e
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - AddressInput: {instanceID: 0}
+  - PortInput: {instanceID: 0}
+  - LoginWindow: {instanceID: 0}
+  - EmailInput: {instanceID: 0}
+  - PasswordInput: {instanceID: 0}
+  - WindowLoginButton: {instanceID: 0}
+  - AuthStatusImage: {instanceID: 0}
+  - AuthStatusImageGood: {fileID: 21300000, guid: f4a784deb3748ce4b943312f67e024de,
+      type: 3}
+  - AuthStatusImageBad: {fileID: 21300000, guid: 25df84cd581d8d540bb81ab965ab491f,
+      type: 3}
+  - AuthStatusImageLoading: {fileID: 21300000, guid: bbb8917080bca704a868b5c1eef4aa59,
+      type: 3}
+  - AuthStatusText: {instanceID: 0}
+  - WidgetLoginButton: {instanceID: 0}
+  - LogoutButton: {instanceID: 0}
+  - GameManager: {instanceID: 0}
+  - ModalDimmer: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

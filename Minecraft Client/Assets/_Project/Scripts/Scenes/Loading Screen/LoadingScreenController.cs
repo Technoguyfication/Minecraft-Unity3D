@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class LoadingScreenController : MonoBehaviour {
 
 	public GameObject LoadingScreenCanvas;
+	public GameObject LoadingScreenCamera;
 	public Text SubtitleText;
 
 	// Use this for initialization
@@ -21,6 +22,7 @@ public class LoadingScreenController : MonoBehaviour {
 	public void HideLoadingScreen()
 	{
 		LoadingScreenCanvas.SetActive(false);
+		Destroy(LoadingScreenCamera);
 	}
 
 	public void UpdateSubtitleText(string text)
