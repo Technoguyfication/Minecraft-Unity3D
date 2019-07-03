@@ -12,4 +12,5 @@ public enum BlockType : uint
 	VOID_AIR = 8591,
 	CAVE_AIR = 8592,
 	STONE = 1,
+	WATER = 34,
 }

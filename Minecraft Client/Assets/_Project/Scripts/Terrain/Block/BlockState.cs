@@ -19,7 +19,7 @@ public struct BlockState
 	{
 		get
 		{
-			return State != BlockType.AIR && State != BlockType.CAVE_AIR && State != BlockType.VOID_AIR;
+			return State != BlockType.AIR && State != BlockType.CAVE_AIR && State != BlockType.VOID_AIR && State != BlockType.WATER;
 		}
 	}
 
