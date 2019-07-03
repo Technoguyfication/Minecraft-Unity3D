@@ -68,7 +68,7 @@ public class EntityManager : MonoBehaviour
 	/// <param name="headYaw"></param>
 	public void EntityHeadYaw(int entityId, float headYaw)
 	{
-		LivingEntity entity = GetEntityByID(entityId) as LivingEntity;
+		LivingEntity entity = (LivingEntity)GetEntityByID(entityId);
 		entity.HeadYaw = headYaw;
 	}
 
