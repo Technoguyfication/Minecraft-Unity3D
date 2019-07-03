@@ -1,12 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-using System.Threading.Tasks;
 using System.Diagnostics;
-using Debug = UnityEngine.Debug;
-using System;
+using System.Threading.Tasks;
+using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
+using Debug = UnityEngine.Debug;
 
 public class MainMenuController : MonoBehaviour
 {

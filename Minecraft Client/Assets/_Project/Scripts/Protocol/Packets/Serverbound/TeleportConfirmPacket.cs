@@ -6,17 +6,12 @@ using System.Threading.Tasks;
 
 public class TeleportConfirmPacket : Packet
 {
-	public int  TeleportID { get; set; }
+	public int TeleportID { get; set; }
 
-	public override byte[] Payload {
-		get
-		{
-			return VarInt.GetBytes(TeleportID);
-		}
-		set
-		{
-			throw new NotImplementedException();
-		}
+	public override byte[] Payload
+	{
+		get => VarInt.GetBytes(TeleportID);
+		set => throw new NotImplementedException();
 	}
 
 	public TeleportConfirmPacket()

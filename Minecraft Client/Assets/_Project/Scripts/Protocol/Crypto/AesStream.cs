@@ -13,8 +13,8 @@ public class AesStream : Stream
 {
 	Stream BaseStream { get; set; }
 
-	CryptoStream enc;
-	CryptoStream dec;
+	readonly CryptoStream enc;
+	readonly CryptoStream dec;
 	public AesStream(Stream underlyingStream, byte[] secret)
 	{
 		BaseStream = underlyingStream;
@@ -22,41 +22,23 @@ public class AesStream : Stream
 		dec = new CryptoStream(underlyingStream, GenerateAES(secret).CreateDecryptor(), CryptoStreamMode.Read);
 	}
 
-	public override bool CanRead
-	{
-		get { return true; }
-	}
+	public override bool CanRead => true;
 
-	public override bool CanSeek
-	{
-		get { return false; }
-	}
+	public override bool CanSeek => false;
 
-	public override bool CanWrite
-	{
-		get { return true; }
-	}
+	public override bool CanWrite => true;
 
 	public override void Flush()
 	{
 		BaseStream.Flush();
 	}
 
-	public override long Length
-	{
-		get { throw new NotSupportedException(); }
-	}
+	public override long Length => throw new NotSupportedException();
 
 	public override long Position
 	{
-		get
-		{
-			throw new NotSupportedException();
-		}
-		set
-		{
-			throw new NotSupportedException();
-		}
+		get => throw new NotSupportedException();
+		set => throw new NotSupportedException();
 	}
 
 	public override int ReadByte()

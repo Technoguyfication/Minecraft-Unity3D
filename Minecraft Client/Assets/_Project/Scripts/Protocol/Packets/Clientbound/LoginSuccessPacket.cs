@@ -17,10 +17,7 @@ public class LoginSuccessPacket : Packet
 			UUID = Guid.Parse(PacketHelper.GetString(buffer));
 			Username = PacketHelper.GetString(buffer);
 		}
-		get
-		{
-			throw new NotImplementedException();
-		}
+		get => throw new NotImplementedException();
 	}
 
 	public LoginSuccessPacket()

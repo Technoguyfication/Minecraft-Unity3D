@@ -8,17 +8,15 @@ public class ServerPlayerPacket : Packet
 {
 	public bool OnGround { get; set; }
 
-	public override byte[] Payload {
+	public override byte[] Payload
+	{
 		get
 		{
 			List<byte> builder = new List<byte>();
 			builder.AddRange(BitConverter.GetBytes(OnGround));
 			return builder.ToArray();
 		}
-		set
-		{
-			throw new NotImplementedException();
-		}
+		set => throw new NotImplementedException();
 	}
 
 	public ServerPlayerPacket()

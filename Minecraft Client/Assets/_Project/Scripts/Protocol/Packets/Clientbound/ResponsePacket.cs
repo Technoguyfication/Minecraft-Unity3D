@@ -18,10 +18,7 @@ public class ResponsePacket : Packet
 
 	public override byte[] Payload
 	{
-		get
-		{
-			return PacketHelper.GetBytes(JSONResponse);
-		}
+		get => PacketHelper.GetBytes(JSONResponse);
 		set
 		{
 			List<byte> buffer = new List<byte>(value);

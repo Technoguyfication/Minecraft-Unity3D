@@ -9,13 +9,7 @@ public class IndirectChunkPalette : IChunkPalette
 {
 	private readonly Dictionary<uint, uint> _blockStates = new Dictionary<uint, uint>();
 
-	public int Length
-	{
-		get
-		{
-			return _blockStates.Count;
-		}
-	}
+	public int Length => _blockStates.Count;
 
 	public void Read(List<byte> buffer)
 	{

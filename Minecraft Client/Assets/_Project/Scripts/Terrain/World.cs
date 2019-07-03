@@ -13,7 +13,7 @@ public class World
 	public DimensionType Dimension { get; set; }
 	public ChunkRenderer ChunkRenderer;
 
-	private List<Chunk> _chunks;
+	private readonly List<Chunk> _chunks;
 	private readonly DebugCanvas _debugCanvas;
 
 	/// <summary>

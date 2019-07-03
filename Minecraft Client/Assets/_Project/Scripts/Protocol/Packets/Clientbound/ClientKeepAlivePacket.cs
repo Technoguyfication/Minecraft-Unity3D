@@ -10,14 +10,8 @@ public class ClientKeepAlivePacket : Packet
 
 	public override byte[] Payload
 	{
-		set
-		{
-			KeepAliveID = PacketHelper.GetInt64(new List<byte>(value));
-		}
-		get
-		{
-			throw new NotImplementedException();
-		}
+		set => KeepAliveID = PacketHelper.GetInt64(new List<byte>(value));
+		get => throw new NotImplementedException();
 	}
 
 	public ClientKeepAlivePacket()

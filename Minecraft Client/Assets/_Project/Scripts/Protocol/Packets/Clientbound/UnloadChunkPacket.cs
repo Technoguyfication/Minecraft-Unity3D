@@ -18,10 +18,7 @@ public class UnloadChunkPacket : Packet
 
 	public override byte[] Payload
 	{
-		get
-		{
-			throw new NotImplementedException();
-		}
+		get => throw new NotImplementedException();
 		set
 		{
 			List<byte> buffer = new List<byte>(value);
@@ -33,15 +30,9 @@ public class UnloadChunkPacket : Packet
 	public int X { get; set; }
 	public int Z { get; set; }
 
-	public ChunkPos Position
+	public ChunkPos Position => new ChunkPos()
 	{
-		get
-		{
-			return new ChunkPos()
-			{
-				X = X,
-				Z = Z
-			};
-		}
-	}
+		X = X,
+		Z = Z
+	};
 }

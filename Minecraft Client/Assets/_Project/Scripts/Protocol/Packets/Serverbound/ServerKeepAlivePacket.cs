@@ -10,14 +10,8 @@ public class ServerKeepAlivePacket : Packet
 
 	public override byte[] Payload
 	{
-		set
-		{
-			throw new NotImplementedException();
-		}
-		get
-		{
-			return BitConverter.GetBytes(KeepAliveID).ReverseIfLittleEndian();
-		}
+		set => throw new NotImplementedException();
+		get => BitConverter.GetBytes(KeepAliveID).ReverseIfLittleEndian();
 	}
 
 	public ServerKeepAlivePacket()

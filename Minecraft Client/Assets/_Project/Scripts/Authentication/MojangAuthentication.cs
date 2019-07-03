@@ -23,10 +23,7 @@ public static class MojangAuthentication
 	/// </summary>
 	public static string AccessToken
 	{
-		get
-		{
-			return PlayerPrefs.GetString(accessTokenPrefKey, null);
-		}
+		get => PlayerPrefs.GetString(accessTokenPrefKey, null);
 		set
 		{
 			PlayerPrefs.SetString(accessTokenPrefKey, value);
@@ -172,7 +169,7 @@ public static class MojangAuthentication
 		else
 		{
 			status = AccountStatus.LOGGED_IN;
-			AccessToken = responseBody.accessToken;	// store access token
+			AccessToken = responseBody.accessToken; // store access token
 		}
 
 		return status;

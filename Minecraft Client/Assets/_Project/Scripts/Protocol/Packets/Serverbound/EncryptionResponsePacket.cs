@@ -26,9 +26,6 @@ public class EncryptionResponsePacket : Packet
 			builder.AddRange(VerifyToken);
 			return builder.ToArray();
 		}
-		set
-		{
-			throw new NotImplementedException();
-		}
+		set => throw new NotImplementedException();
 	}
 }

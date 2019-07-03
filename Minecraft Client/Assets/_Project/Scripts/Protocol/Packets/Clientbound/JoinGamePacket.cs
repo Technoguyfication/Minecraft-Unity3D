@@ -50,10 +50,7 @@ public class JoinGamePacket : Packet
 
 			ReducedDebug = PacketHelper.GetBoolean(buffer);
 		}
-		get
-		{
-			throw new NotImplementedException();
-		}
+		get => throw new NotImplementedException();
 	}
 
 	public JoinGamePacket()

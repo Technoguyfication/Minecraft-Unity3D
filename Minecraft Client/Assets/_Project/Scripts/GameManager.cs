@@ -1,11 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using System.Threading.Tasks;
-using UnityEngine.SceneManagement;
-using System;
-using System.Threading;
+﻿using System;
+using System.Collections;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Manages everything for a game, or connection to a server
@@ -23,18 +23,15 @@ public class GameManager : MonoBehaviour
 
 	private PlayerController _player = null;
 	private NetworkClient _client;
-	private BlockingCollection<Packet> _packetSendQueue = new BlockingCollection<Packet>();
-	private List<PacketData> _packetReceiveQueue = new List<PacketData>();
+	private readonly BlockingCollection<Packet> _packetSendQueue = new BlockingCollection<Packet>();
+	private readonly List<PacketData> _packetReceiveQueue = new List<PacketData>();
 	private Task _netReadTask;
 	private Task _netWriteTask;
-	private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+	private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 	private bool _initialized = false;
 	private World _currentWorld
 	{
-		get
-		{
-			return _currentWorldVar;
-		}
+		get => _currentWorldVar;
 		set
 		{
 			_currentWorldVar = value;

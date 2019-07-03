@@ -24,10 +24,7 @@ public class EntityRelativeMovePacket : Packet
 			DeltaZ = PacketHelper.GetInt16(buffer);
 			OnGround = PacketHelper.GetBoolean(buffer);
 		}
-		get
-		{
-			throw new NotImplementedException();
-		}
+		get => throw new NotImplementedException();
 	}
 
 	public EntityRelativeMovePacket()

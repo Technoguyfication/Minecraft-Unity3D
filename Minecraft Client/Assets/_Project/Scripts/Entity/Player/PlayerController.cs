@@ -45,10 +45,7 @@ public class PlayerController : Player
 
 			return false;
 		}
-		set
-		{
-			throw new InvalidOperationException("Cannot set OnGround for PlayerController!");
-		}
+		set => throw new InvalidOperationException("Cannot set OnGround for PlayerController!");
 	}
 
 	// Update is called once per frame

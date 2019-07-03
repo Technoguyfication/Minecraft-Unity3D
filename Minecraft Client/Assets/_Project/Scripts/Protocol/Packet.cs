@@ -5,13 +5,7 @@ using UnityEngine;
 
 public abstract class Packet
 {
-	public int Length
-	{
-		get
-		{
-			return (VarInt.GetBytes(PacketID).Length + Payload.Length);
-		}
-	}
+	public int Length => (VarInt.GetBytes(PacketID).Length + Payload.Length);
 	public int PacketID { get; set; }
 	public abstract byte[] Payload { get; set; }
 

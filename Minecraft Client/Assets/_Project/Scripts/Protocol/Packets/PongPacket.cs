@@ -16,14 +16,8 @@ public class PingPongPacket : Packet
 
 	public override byte[] Payload
 	{
-		set
-		{
-			Number = BitConverter.ToInt64(value.ReverseIfLittleEndian(), 0);
-		}
-		get
-		{
-			return BitConverter.GetBytes(Number).ReverseIfLittleEndian();
-		}
+		set => Number = BitConverter.ToInt64(value.ReverseIfLittleEndian(), 0);
+		get => BitConverter.GetBytes(Number).ReverseIfLittleEndian();
 	}
 
 	public long Number { get; set; }

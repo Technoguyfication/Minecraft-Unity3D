@@ -15,11 +15,11 @@ public class ChunkRenderer : MonoBehaviour
 	public GameObject ChunkMeshPrefab;
 	public DebugCanvas DebugCanvas;
 
-	private List<ChunkMesh> _chunkMeshes = new List<ChunkMesh>();
-	private BlockingCollection<ChunkMesh> _regenerationQueue = new BlockingCollection<ChunkMesh>();
-	private List<ChunkMeshData> _finishedMeshData = new List<ChunkMeshData>();
+	private readonly List<ChunkMesh> _chunkMeshes = new List<ChunkMesh>();
+	private readonly BlockingCollection<ChunkMesh> _regenerationQueue = new BlockingCollection<ChunkMesh>();
+	private readonly List<ChunkMeshData> _finishedMeshData = new List<ChunkMeshData>();
 	private Task _regenerationTask;
-	private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+	private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
 	private void Start()
 	{

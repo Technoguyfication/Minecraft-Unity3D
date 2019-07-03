@@ -22,10 +22,7 @@ public class EntityLookPacket : Packet
 			Pitch = (sbyte)buffer.Read(1)[0];
 			OnGround = PacketHelper.GetBoolean(buffer);
 		}
-		get
-		{
-			throw new NotImplementedException();
-		}
+		get => throw new NotImplementedException();
 	}
 
 	public EntityLookPacket()

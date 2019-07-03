@@ -18,10 +18,7 @@ public class EntityHeadLookPacket : Packet
 			EntityID = VarInt.ReadNext(buffer);
 			HeadYaw = (sbyte)buffer.Read(1)[0];
 		}
-		get
-		{
-			throw new NotImplementedException();
-		}
+		get => throw new NotImplementedException();
 	}
 
 	public EntityHeadLookPacket()

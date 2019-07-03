@@ -5,5 +5,5 @@ using UnityEngine;
 public struct PacketData
 {
 	public int ID;
-	public byte[] Payload; 
+	public byte[] Payload;
 }

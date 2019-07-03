@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 public class ServerErrorResponse
 {
 	public ServerErrorResponse()
-	{}
+	{ }
 
 	public ServerErrorResponse(Exception ex)
 	{

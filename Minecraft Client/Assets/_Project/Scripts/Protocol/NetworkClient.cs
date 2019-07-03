@@ -1,14 +1,14 @@
-﻿using System;
+﻿using Ionic.Zlib;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Sockets;
 using System.Security.Cryptography;
-using System.Threading.Tasks;
-using System.Threading;
-using UnityEngine;
-using Ionic.Zlib;
-using System.IO;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using UnityEngine;
 
 public class NetworkClient : IDisposable
 {
@@ -21,7 +21,7 @@ public class NetworkClient : IDisposable
 	/// <summary>
 	/// Gets whether the client is connected to a server or not
 	/// </summary>
-	public bool Connected { get { return Client?.Connected ?? false; } }
+	public bool Connected => Client?.Connected ?? false;
 
 	public delegate void DisconnectedEventHandler(object sender, DisconnectedEventArgs e);
 	public event DisconnectedEventHandler Disconnected;

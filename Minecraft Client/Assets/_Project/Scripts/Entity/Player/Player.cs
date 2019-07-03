@@ -8,7 +8,7 @@ using UnityEngine;
 public class Player : LivingEntity
 {
 	public Texture Skin { get; set; }
-	
+
 	public Player()
 	{
 		Type = EntityType.PLAYER;

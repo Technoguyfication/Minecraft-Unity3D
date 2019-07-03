@@ -13,7 +13,8 @@ public class ServerPlayerPositionAndLookPacket : Packet
 	public float Pitch { get; set; }
 	public bool OnGround { get; set; }
 
-	public override byte[] Payload {
+	public override byte[] Payload
+	{
 		get
 		{
 			List<byte> builder = new List<byte>();
@@ -25,10 +26,7 @@ public class ServerPlayerPositionAndLookPacket : Packet
 			builder.AddRange(BitConverter.GetBytes(OnGround));
 			return builder.ToArray();
 		}
-		set
-		{
-			throw new NotImplementedException();
-		}
+		set => throw new NotImplementedException();
 	}
 
 	public ServerPlayerPositionAndLookPacket()

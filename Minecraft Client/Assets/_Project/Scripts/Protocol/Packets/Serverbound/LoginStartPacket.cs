@@ -10,14 +10,8 @@ public class LoginStartPacket : Packet
 
 	public override byte[] Payload
 	{
-		get
-		{
-			return PacketHelper.GetBytes(Username);
-		}
-		set
-		{
-			throw new NotImplementedException();
-		}
+		get => PacketHelper.GetBytes(Username);
+		set => throw new NotImplementedException();
 	}
 
 	public LoginStartPacket()

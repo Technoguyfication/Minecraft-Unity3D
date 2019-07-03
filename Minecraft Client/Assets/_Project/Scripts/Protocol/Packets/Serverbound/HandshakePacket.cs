@@ -23,10 +23,7 @@ public class HandshakePacket : Packet
 			builder.AddRange(VarInt.GetBytes((int)NextState));
 			return builder.ToArray();
 		}
-		set
-		{
-			throw new NotImplementedException();
-		}
+		set => throw new NotImplementedException();
 	}
 
 	public int ProtocolVersion { get; set; } = NetworkClient.PROTOCOL_VERSION;

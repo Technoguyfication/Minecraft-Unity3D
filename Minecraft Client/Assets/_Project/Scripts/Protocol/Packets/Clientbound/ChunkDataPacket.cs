@@ -9,17 +9,11 @@ public class ChunkDataPacket : Packet
 {
 	public int ChunkX { get; set; }
 	public int ChunkZ { get; set; }
-	public ChunkPos Position
+	public ChunkPos Position => new ChunkPos()
 	{
-		get
-		{
-			return new ChunkPos()
-			{
-				X = ChunkX,
-				Z = ChunkZ
-			};
-		}
-	}
+		X = ChunkX,
+		Z = ChunkZ
+	};
 	public bool GroundUpContinuous { get; set; }
 	public int PrimaryBitmask { get; set; }
 	public byte[] Data { get; set; }
@@ -33,10 +27,7 @@ public class ChunkDataPacket : Packet
 
 	public override byte[] Payload
 	{
-		get
-		{
-			throw new NotImplementedException();
-		}
+		get => throw new NotImplementedException();
 		set
 		{
 			List<byte> buffer = new List<byte>(value);

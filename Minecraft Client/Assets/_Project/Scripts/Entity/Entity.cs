@@ -30,14 +30,8 @@ public abstract class Entity : MonoBehaviour
 	/// </summary>
 	public Vector3 MinecraftPosition
 	{
-		get
-		{
-			return new Vector3((float)X, (float)Y, (float)Z);
-		}
-		set
-		{
-			transform.position = new Vector3(value.z, value.y, value.x);
-		}
+		get => new Vector3((float)X, (float)Y, (float)Z);
+		set => transform.position = new Vector3(value.z, value.y, value.x);
 	}
 
 	/// <summary>
@@ -45,28 +39,22 @@ public abstract class Entity : MonoBehaviour
 	/// </summary>
 	public Vector3 UnityPosition
 	{
-		get
-		{
-			return transform.position;
-		}
-		set
-		{
-			transform.position = value;
-		}
+		get => transform.position;
+		set => transform.position = value;
 	}
 
 	/// <summary>
 	/// X coordinate in Minecraft space
 	/// </summary>
-	public double X { get { return transform.position.z; } }
+	public double X => transform.position.z;
 	/// <summary>
 	/// Y coordinate in Minecraft space
 	/// </summary>
-	public double Y { get { return transform.position.y; } }
+	public double Y => transform.position.y;
 	/// <summary>
 	/// Z coordinate in Minecraft space
 	/// </summary>
-	public double Z { get { return transform.position.x; } }
+	public double Z => transform.position.x;
 	public float Pitch { get; set; } = 0f;
 	public float Yaw { get; set; } = 0f;
 	/// <summary>
@@ -74,10 +62,7 @@ public abstract class Entity : MonoBehaviour
 	/// </summary>
 	public Quaternion EntityRotation
 	{
-		get
-		{
-			return Quaternion.Euler(Pitch, Yaw, 0);
-		}
+		get => Quaternion.Euler(Pitch, Yaw, 0);
 		set
 		{
 			Pitch = value.eulerAngles.x;
@@ -91,18 +76,12 @@ public abstract class Entity : MonoBehaviour
 	/// <summary>
 	/// The block this player is in
 	/// </summary>
-	public BlockPos BlockPos
+	public BlockPos BlockPos => new BlockPos()
 	{
-		get
-		{
-			return new BlockPos()
-			{
-				X = (int)X - ((X < 0) ? 1 : 0),
-				Y = (int)Y,
-				Z = (int)Z - ((Z < 0) ? 1 : 0)
-			};
-		}
-	}
+		X = (int)X - ((X < 0) ? 1 : 0),
+		Y = (int)Y,
+		Z = (int)Z - ((Z < 0) ? 1 : 0)
+	};
 
 	// Use this for initialization
 	protected virtual void Start()
@@ -116,7 +95,7 @@ public abstract class Entity : MonoBehaviour
 	{ }
 
 	protected virtual void FixedUpdate()
-    {
+	{
 		if (World != null)
 		{
 			// don't simulate gravity on the rigidbody unless the chunk it's in is loaded

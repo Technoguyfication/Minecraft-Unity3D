@@ -21,10 +21,7 @@ public class EncryptionRequestPacket : Packet
 			int verifyTokenLen = VarInt.ReadNext(buffer);
 			VerifyToken = buffer.Read(verifyTokenLen).ToArray();
 		}
-		get
-		{
-			throw new NotImplementedException();
-		}
+		get => throw new NotImplementedException();
 	}
 
 	public EncryptionRequestPacket()

@@ -28,10 +28,7 @@ public class ClientPlayerPositionAndLookPacket : Packet
 			Flags = buffer.Read(1)[0];
 			TeleportID = VarInt.ReadNext(buffer);
 		}
-		get
-		{
-			throw new NotImplementedException();
-		}
+		get => throw new NotImplementedException();
 	}
 
 	public ClientPlayerPositionAndLookPacket()

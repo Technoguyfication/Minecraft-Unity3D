@@ -49,9 +49,6 @@ public class SpawnMobPacket : Packet
 			VelocityY = PacketHelper.GetInt16(buffer);
 			VelocityZ = PacketHelper.GetInt16(buffer);
 		}
-		get
-		{
-			throw new NotImplementedException();
-		}
+		get => throw new NotImplementedException();
 	}
 }

@@ -15,10 +15,7 @@ public class DisconnectPacket : Packet
 			List<byte> buffer = new List<byte>(value);
 			JSONResponse = PacketHelper.GetString(buffer);
 		}
-		get
-		{
-			throw new NotImplementedException();
-		}
+		get => throw new NotImplementedException();
 	}
 
 	public DisconnectPacket()

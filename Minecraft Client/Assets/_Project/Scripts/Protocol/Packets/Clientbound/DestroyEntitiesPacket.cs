@@ -20,10 +20,7 @@ public class DestroyEntitiesPacket : Packet
 				EntityIDs[i] = VarInt.ReadNext(buffer);
 			}
 		}
-		get
-		{
-			throw new NotImplementedException();
-		}
+		get => throw new NotImplementedException();
 	}
 
 	public DestroyEntitiesPacket()
