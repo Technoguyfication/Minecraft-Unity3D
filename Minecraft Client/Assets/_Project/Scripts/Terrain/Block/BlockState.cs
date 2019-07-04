@@ -15,7 +15,7 @@ public struct BlockState
 	/// <summary>
 	/// Gets if the block is solid in all four corners, for use in rendering
 	/// </summary>
-	public bool IsSolid => State != BlockType.AIR && State != BlockType.CAVE_AIR && State != BlockType.VOID_AIR && State != BlockType.WATER;
+	public bool IsSolid => State != BlockType.AIR && State != BlockType.CAVE_AIR && State != BlockType.VOID_AIR /*&& State != BlockType.WATER*/;
 
 	/// <summary>
 	/// Whether this block can be rendered I.E. not air, etc.
