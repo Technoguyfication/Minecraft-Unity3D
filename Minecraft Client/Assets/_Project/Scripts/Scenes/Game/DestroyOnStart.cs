@@ -2,15 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TestBlocks : MonoBehaviour
+public class DestroyOnStart : MonoBehaviour
 {
-	public bool DestroyOnStart = true;
 
 	// Start is called before the first frame update
 	void Start()
 	{
-		if (DestroyOnStart)
-			Destroy(this);
+		Destroy(gameObject);
 	}
 
 	// Update is called once per frame
