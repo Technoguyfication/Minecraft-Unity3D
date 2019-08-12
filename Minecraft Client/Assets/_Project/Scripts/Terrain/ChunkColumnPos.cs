@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-public struct ChunkPos
+public struct ChunkColumnPos
 {
 	public int X { get; set; }
 	public int Z { get; set; }
@@ -21,16 +21,16 @@ public struct ChunkPos
 
 	public override bool Equals(object obj)
 	{
-		ChunkPos? pos = obj as ChunkPos?;
+		ChunkColumnPos? pos = obj as ChunkColumnPos?;
 		if (pos == null)
 			return false;
 		else
-			return (((ChunkPos)pos).X == X) && (((ChunkPos)pos).Z == Z);
+			return (((ChunkColumnPos)pos).X == X) && (((ChunkColumnPos)pos).Z == Z);
 	}
 
-	public static ChunkPos operator +(ChunkPos left, ChunkPos right)
+	public static ChunkColumnPos operator +(ChunkColumnPos left, ChunkColumnPos right)
 	{
-		return new ChunkPos()
+		return new ChunkColumnPos()
 		{
 			X = left.X + right.X,
 			Z = left.Z + right.Z

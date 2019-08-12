@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// The physical representation of a chunk in-game
+/// The physical representation of a chunk section in-game
 /// </summary>
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshCollider))]
@@ -12,7 +12,7 @@ using UnityEngine;
 public class ChunkMesh : MonoBehaviour
 {
 	public bool IsGenerated { get; set; } = false;
-	public Chunk Chunk { get; set; } = null;
+	public ChunkColumn Chunk { get; set; } = null;
 
 	private readonly BlockPos[] _neighborPositions = new BlockPos[]
 		{
@@ -24,12 +24,12 @@ public class ChunkMesh : MonoBehaviour
 			new BlockPos() { Z = -1 },
 		};
 
-	private readonly ChunkPos[] _neighborChunkPositions = new ChunkPos[]
+	private readonly ChunkColumnPos[] _neighborChunkPositions = new ChunkColumnPos[]
 		{
-			new ChunkPos() { X = 1 },
-			new ChunkPos() { X = -1 },
-			new ChunkPos() { Z = 1 },
-			new ChunkPos() { Z = -1 },
+			new ChunkColumnPos() { X = 1 },
+			new ChunkColumnPos() { X = -1 },
+			new ChunkColumnPos() { Z = 1 },
+			new ChunkColumnPos() { Z = -1 },
 		};
 
 	// Use this for initialization
@@ -52,7 +52,7 @@ public class ChunkMesh : MonoBehaviour
 		int triangleIndex = 0;
 
 		// store neighbor chunks so we don't have to look them up through the World
-		Chunk[] neighborChunks = new Chunk[4];
+		ChunkColumn[] neighborChunks = new ChunkColumn[4];
 		for (int i = 0; i < 4; i++)
 		{
 			neighborChunks[i] = Chunk.World.GetChunk(_neighborChunkPositions[i] + Chunk.Position) ?? Chunk.World.EmptyChunk;
@@ -65,7 +65,7 @@ public class ChunkMesh : MonoBehaviour
 			{
 				for (int x = 0; x < 16; x++)
 				{
-					int blockIndex = Chunk.GetBlockIndex(x, y, z);
+					int blockIndex = ChunkColumn.GetBlockIndex(x, y, z);
 
 					// check if we need to render this block
 					if (!Chunk.BlockArray[blockIndex].IsRendered)
@@ -80,13 +80,13 @@ public class ChunkMesh : MonoBehaviour
 						var neighborPos = _neighborPositions[i] + pos;
 
 						// check if we can use our "locally" cached chunk data to check this block
-						if (Chunk.ExistsInside(neighborPos))
+						if (ChunkColumn.ExistsInside(neighborPos))
 						{
-							neighbors[i] = Chunk.BlockArray[Chunk.GetBlockIndex(neighborPos)].IsSolid;
+							neighbors[i] = Chunk.BlockArray[ChunkColumn.GetBlockIndex(neighborPos)].IsSolid;
 						}
 						else
 						{
-							Chunk neighborChunk;
+							ChunkColumn neighborChunk;
 
 							// find which neighbor chunk the block is in
 							switch (i)

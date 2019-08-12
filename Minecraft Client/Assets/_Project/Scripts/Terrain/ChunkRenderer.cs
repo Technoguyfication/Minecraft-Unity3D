@@ -82,7 +82,7 @@ public class ChunkRenderer : MonoBehaviour
 	/// </summary>
 	/// <param name="pos"></param>
 	/// <returns></returns>
-	public bool IsChunkGenerated(ChunkPos pos)
+	public bool IsChunkGenerated(ChunkColumnPos pos)
 	{
 		lock (_chunkMeshes)
 		{
@@ -94,7 +94,7 @@ public class ChunkRenderer : MonoBehaviour
 	/// Adds a chunk to the list of chunks we are rendering, and marks it for mesh regeneration
 	/// </summary>
 	/// <param name="chunk"></param>
-	public void AddChunk(Chunk chunk)
+	public void AddChunk(ChunkColumn chunk)
 	{
 		var chunkMeshObject = Instantiate(ChunkMeshPrefab, new Vector3((chunk.Position.Z * 16) + 0.5f, 0.5f, (chunk.Position.X * 16) + 0.5f), Quaternion.identity);
 		chunkMeshObject.transform.parent = this.transform;
@@ -133,7 +133,7 @@ public class ChunkRenderer : MonoBehaviour
 	/// Unloads a chunkmesh at the specified position
 	/// </summary>
 	/// <param name="pos"></param>
-	public void UnloadChunk(ChunkPos pos)
+	public void UnloadChunk(ChunkColumnPos pos)
 	{
 		lock (_chunkMeshes)
 		{
@@ -169,7 +169,7 @@ public class ChunkRenderer : MonoBehaviour
 	/// Marks that we need to regenerate the mesh for a chunk
 	/// </summary>
 	/// <param name="chunk"></param>
-	public void MarkChunkForRegeneration(Chunk chunk)
+	public void MarkChunkForRegeneration(ChunkColumn chunk)
 	{
 		lock (_chunkMeshes)
 		{
@@ -182,7 +182,7 @@ public class ChunkRenderer : MonoBehaviour
 	/// </summary>
 	/// <param name="chunk"></param>
 	/// <returns></returns>
-	private ChunkMesh GetChunkMesh(Chunk chunk)
+	private ChunkMesh GetChunkMesh(ChunkColumn chunk)
 	{
 		lock (_chunkMeshes)
 		{

@@ -30,7 +30,7 @@ public class UnloadChunkPacket : Packet
 	public int X { get; set; }
 	public int Z { get; set; }
 
-	public ChunkPos Position => new ChunkPos()
+	public ChunkColumnPos Position => new ChunkColumnPos()
 	{
 		X = X,
 		Z = Z

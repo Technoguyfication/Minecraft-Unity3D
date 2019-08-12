@@ -15,9 +15,9 @@ public struct BlockPos
 	/// Gets the position of the chunk the block is in
 	/// </summary>
 	/// <returns></returns>
-	public ChunkPos GetChunk()
+	public ChunkColumnPos GetChunk()
 	{
-		return new ChunkPos()
+		return new ChunkColumnPos()
 		{
 			X = X / 16 - (X < 0 ? 1 : 0),
 			Z = Z / 16 - (Z < 0 ? 1 : 0)
@@ -38,7 +38,7 @@ public struct BlockPos
 		};
 	}
 
-	public BlockPos GetWorldPos(Chunk chunk)
+	public BlockPos GetWorldPos(ChunkColumn chunk)
 	{
 		return new BlockPos()
 		{

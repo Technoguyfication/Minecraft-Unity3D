@@ -9,7 +9,7 @@ public class ChunkDataPacket : Packet
 {
 	public int ChunkX { get; set; }
 	public int ChunkZ { get; set; }
-	public ChunkPos Position => new ChunkPos()
+	public ChunkColumnPos Position => new ChunkColumnPos()
 	{
 		X = ChunkX,
 		Z = ChunkZ

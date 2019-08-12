@@ -8,12 +8,12 @@ using UnityEngine;
 /// <summary>
 /// Represents a Chunk column
 /// </summary>
-public class Chunk
+public class ChunkColumn
 {
 	/// <summary>
 	/// The position of the chunk within the world
 	/// </summary>
-	public ChunkPos Position { get; }
+	public ChunkColumnPos Position { get; }
 
 	public World World { get; set; }
 
@@ -45,9 +45,9 @@ public class Chunk
 	/// </summary>
 	/// <param name="x"></param>
 	/// <param name="z"></param>
-	public Chunk(int x, int z, World world)
+	public ChunkColumn(int x, int z, World world)
 	{
-		Position = new ChunkPos()
+		Position = new ChunkColumnPos()
 		{
 			X = x,
 			Z = z
@@ -60,7 +60,7 @@ public class Chunk
 	/// </summary>
 	/// <param name="packet"></param>
 	/// <param name="world"></param>
-	public Chunk(ChunkDataPacket packet, World world)
+	public ChunkColumn(ChunkDataPacket packet, World world)
 	{
 		Position = packet.Position;
 		World = world;
@@ -281,7 +281,7 @@ public class Chunk
 	// empahsis on "should"
 	public override bool Equals(object obj)
 	{
-		Chunk c = obj as Chunk;
+		ChunkColumn c = obj as ChunkColumn;
 		return c?.Position.Equals(Position) ?? false;
 	}
 
