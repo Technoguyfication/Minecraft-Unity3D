@@ -45,3 +45,10 @@ A "contributor" is any person that distributes its contribution under this licen
 ```
 Made by "PurePixel" http://creativecommons.org/licenses/
 ```
+
+### "Minecraft Font" - https://www.fontspace.com/jdgraphics/minecraft
+```
+Made by "JDGraphics"
+
+Freeware, commercial use requires donation
+```

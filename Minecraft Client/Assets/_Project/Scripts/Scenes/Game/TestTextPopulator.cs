@@ -8,6 +8,7 @@ public class TestTextPopulator : MonoBehaviour
 	public TextMeshProUGUI Text;
 	public float TextTime = 2f;
 
+	private const string ChatMsgPrefix = "\n<font=\"Minecraft Regular SDF\"><mark=#00000065>";
 	private float lastPopulateTime = 0f;
 
 	// Start is called before the first frame update
@@ -33,7 +34,7 @@ public class TestTextPopulator : MonoBehaviour
 
 	void PopulateText(string text)
 	{
-		Text.text += $"\n{text}";
+		Text.text += ChatMsgPrefix + text;
 	}
 
 	void HandleLog(string logString, string stackTrace, LogType type)
