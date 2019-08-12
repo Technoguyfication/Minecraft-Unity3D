@@ -25,10 +25,13 @@ public class DebugCanvas : MonoBehaviour
 
 	public bool Displaying = false;
 
+	private int _currentFps = 0;
+
 	// Use this for initialization
 	void Start()
 	{
 		Canvas.enabled = Displaying;
+		StartCoroutine(UpdateFPSCoroutine());
 	}
 
 	// Update is called once per frame
@@ -58,11 +61,12 @@ public class DebugCanvas : MonoBehaviour
 			}
 
 			textBuilder.AppendLine($"Local Ticks: {TickCount.ToString()}");
+			textBuilder.AppendLine($"FPS: {_currentFps}");
 
 			// player stats
 			if (Player != null)
 			{
-				textBuilder.AppendLine($"({Player.BlockPos.ToString()}); or ({Player.BlockPos.GetPosWithinChunk().ToString()}) in chunk ({Player.BlockPos.GetChunk().ToString()})");
+				textBuilder.AppendLine($"({Player.BlockPos.ToString()}); or ({Player.BlockPos.GetPosWithinChunk().ToString()}) in chunk ({Player.BlockPos.GetChunkColumnPos().ToString()})");
 				textBuilder.AppendLine($"Pos: {Player.MinecraftPosition} Facing: ({Player.Yaw.ToString("0.0")} / {Player.Pitch.ToString("0.0")})");
 			}
 
@@ -78,6 +82,15 @@ public class DebugCanvas : MonoBehaviour
 			}
 
 			DebugText.text = textBuilder.ToString();
+		}
+	}
+
+	private IEnumerator UpdateFPSCoroutine()
+	{
+		while (true)
+		{
+			_currentFps = (int)(1f / Time.smoothDeltaTime);
+			yield return new WaitForSeconds(0.2f);
 		}
 	}
 }

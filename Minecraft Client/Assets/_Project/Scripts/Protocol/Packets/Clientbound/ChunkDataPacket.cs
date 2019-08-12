@@ -9,11 +9,7 @@ public class ChunkDataPacket : Packet
 {
 	public int ChunkX { get; set; }
 	public int ChunkZ { get; set; }
-	public ChunkColumnPos Position => new ChunkColumnPos()
-	{
-		X = ChunkX,
-		Z = ChunkZ
-	};
+	public ChunkColumnPos Position => new ChunkColumnPos(ChunkX, ChunkZ);
 	public bool GroundUpContinuous { get; set; }
 	public int PrimaryBitmask { get; set; }
 	public byte[] Data { get; set; }

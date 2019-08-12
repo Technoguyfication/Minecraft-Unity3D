@@ -13,18 +13,18 @@ public class World
 	public DimensionType Dimension { get; set; }
 	public ChunkRenderer ChunkRenderer;
 
-	private readonly List<ChunkColumn> _chunks;
+	private readonly List<Chunk> _chunks;
 	private readonly DebugCanvas _debugCanvas;
 
 	/// <summary>
 	/// Returns an empty chunk
 	/// </summary>
 	/// <returns></returns>
-	public ChunkColumn EmptyChunk => new ChunkColumn(0, 0, this);
+	public Chunk EmptyChunk => new Chunk(0, 0, this);
 
 	public World(DebugCanvas debug = null)
 	{
-		_chunks = new List<ChunkColumn>();
+		_chunks = new List<Chunk>();
 		_debugCanvas = debug;
 	}
 
@@ -37,7 +37,7 @@ public class World
 	{
 		lock (_chunks)
 		{
-			ChunkColumn c = GetChunk(pos.GetChunk());
+			Chunk c = GetChunk(pos.GetChunkColumnPos());
 
 			if (c == null)
 				return new BlockState(BlockType.VOID_AIR);  // use void air for unloaded chunks
@@ -51,7 +51,7 @@ public class World
 	/// </summary>
 	/// <param name="pos"></param>
 	/// <returns></returns>
-	public ChunkColumn GetChunk(ChunkColumnPos pos)
+	public Chunk GetChunk(ChunkColumnPos pos)
 	{
 		lock (_chunks)
 		{
@@ -99,7 +99,7 @@ public class World
 			}
 			else
 			{
-				ChunkColumn chunk = new ChunkColumn(chunkData, this);
+				Chunk chunk = new Chunk(chunkData, this);
 				_chunks.Add(chunk);
 				ChunkRenderer.AddChunk(chunk);
 			}

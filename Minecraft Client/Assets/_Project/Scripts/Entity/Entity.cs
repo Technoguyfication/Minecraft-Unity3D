@@ -100,7 +100,7 @@ public abstract class Entity : MonoBehaviour
 		{
 			// don't simulate gravity on the rigidbody unless the chunk it's in is loaded
 			// keeps entities from falling through world while generating chunks
-			Rigidbody.useGravity = World.ChunkRenderer.IsChunkGenerated(BlockPos.GetChunk());
+			Rigidbody.useGravity = World.ChunkRenderer.IsChunkSectionGenerated(BlockPos.GetChunkSectionPos());
 		}
 	}
 

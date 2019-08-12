@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
+using IEnumerator = System.Collections.IEnumerator;
 
 /// <summary>
 /// Manages chunk meshes and rendering
@@ -15,9 +16,9 @@ public class ChunkRenderer : MonoBehaviour
 	public GameObject ChunkMeshPrefab;
 	public DebugCanvas DebugCanvas;
 
-	private readonly List<ChunkMesh> _chunkMeshes = new List<ChunkMesh>();
-	private readonly BlockingCollection<ChunkMesh> _regenerationQueue = new BlockingCollection<ChunkMesh>();
-	private readonly List<ChunkMeshData> _finishedMeshData = new List<ChunkMeshData>();
+	private readonly List<PhysicalChunk> _chunkMeshes = new List<PhysicalChunk>();
+	private readonly BlockingCollection<PhysicalChunk> _regenerationQueue = new BlockingCollection<PhysicalChunk>();
+	private readonly ConcurrentQueue<(int, ChunkMeshData)> _finishedMeshData = new ConcurrentQueue<(int, ChunkMeshData)>();
 	private Task _regenerationTask;
 	private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
@@ -29,6 +30,8 @@ public class ChunkRenderer : MonoBehaviour
 			RegenerationWorker(_cancellationTokenSource.Token);
 		}, _cancellationTokenSource.Token);
 		_regenerationTask.Start();
+
+		StartCoroutine(AssignChunkMeshCoroutine(_cancellationTokenSource.Token));
 	}
 
 	private void OnDestroy()
@@ -42,37 +45,41 @@ public class ChunkRenderer : MonoBehaviour
 		if (_regenerationTask.IsFaulted)
 			throw _regenerationTask.Exception;
 
-		// add generated meshes to chunks
-		lock (_finishedMeshData)
+		DebugCanvas.FinishedChunks = _finishedMeshData.Count;
+	}
+
+	private IEnumerator AssignChunkMeshCoroutine(CancellationToken token)
+	{
+		while (!token.IsCancellationRequested)
 		{
+			// try to take the next finished mesh from the queue
+			// if there are none, yield until the next frame
+			if (!_finishedMeshData.TryDequeue(out (int, ChunkMeshData) finishedMesh))
+				yield return null;
+
+			var sectionIndex = finishedMesh.Item1;
+			var meshData = finishedMesh.Item2;
 			lock (_chunkMeshes)
 			{
-				DebugCanvas.FinishedChunks = _finishedMeshData.Count;
+				// if the chunk has been unloaded the mesh data will become an orhpan, so ignore it
+				if (!_chunkMeshes.Contains(meshData.PhysicalChunk))
+					continue;
 
-				foreach (var meshData in _finishedMeshData)
+				Mesh mesh = new Mesh()
 				{
-					// if the chunk has been unloaded the mesh data will become an orhpan, so ignore it
-					if (!_chunkMeshes.Contains(meshData.ChunkMesh))
-						continue;
+					vertices = meshData.Vertices,
+					triangles = meshData.Triangles,
+					normals = meshData.Normals
+				};
 
-					UnityEngine.Profiling.Profiler.BeginSample("Mesh assignment");
+				// assign mesh and set generated
+				var chunkSection = meshData.PhysicalChunk.Sections[sectionIndex];
+				chunkSection.SetMesh(mesh);
+				chunkSection.IsGenerated = true;
 
-					Mesh mesh = new Mesh()
-					{
-						vertices = meshData.Vertices,
-						triangles = meshData.Triangles,
-						normals = meshData.Normals
-					};
-
-					meshData.ChunkMesh.SetMesh(mesh);
-					meshData.ChunkMesh.IsGenerated = true;
-
-					UnityEngine.Profiling.Profiler.EndSample();
-
-					// add chunk time to debug screen
-					DebugCanvas.AverageChunkTime.Add(meshData.Time);
-				}
-				_finishedMeshData.Clear();
+				// if we're over the frame budget, wait for the next frame
+				if (Time.deltaTime > 1 / 60)
+					yield return null;
 			}
 		}
 	}
@@ -82,11 +89,11 @@ public class ChunkRenderer : MonoBehaviour
 	/// </summary>
 	/// <param name="pos"></param>
 	/// <returns></returns>
-	public bool IsChunkGenerated(ChunkColumnPos pos)
+	public bool IsChunkSectionGenerated(ChunkSectionPos pos)
 	{
 		lock (_chunkMeshes)
 		{
-			return _chunkMeshes.Exists(c => c.Chunk.Position.Equals(pos) && c.IsGenerated);
+			return _chunkMeshes.Exists(c => c.Chunk.Position.Equals(pos.ChunkColumnPos) && (c.GetSection(pos.Y)?.IsGenerated ?? false));
 		}
 	}
 
@@ -94,11 +101,10 @@ public class ChunkRenderer : MonoBehaviour
 	/// Adds a chunk to the list of chunks we are rendering, and marks it for mesh regeneration
 	/// </summary>
 	/// <param name="chunk"></param>
-	public void AddChunk(ChunkColumn chunk)
+	public void AddChunk(Chunk chunk)
 	{
-		var chunkMeshObject = Instantiate(ChunkMeshPrefab, new Vector3((chunk.Position.Z * 16) + 0.5f, 0.5f, (chunk.Position.X * 16) + 0.5f), Quaternion.identity);
-		chunkMeshObject.transform.parent = this.transform;
-		var chunkMesh = chunkMeshObject.GetComponent<ChunkMesh>();
+		var chunkMeshObject = Instantiate(ChunkMeshPrefab, new Vector3((chunk.Position.Z * 16) + 0.5f, 0.5f, (chunk.Position.X * 16) + 0.5f), Quaternion.identity, transform);
+		var chunkMesh = chunkMeshObject.GetComponent<PhysicalChunk>();
 		chunkMesh.Chunk = chunk;
 		chunkMesh.name = chunk.Position.ToString();
 
@@ -116,7 +122,7 @@ public class ChunkRenderer : MonoBehaviour
 	/// Unloads a chunkmesh
 	/// </summary>
 	/// <param name="chunkMesh"></param>
-	public void UnloadChunkMesh(ChunkMesh chunkMesh)
+	public void UnloadChunkMesh(PhysicalChunk chunkMesh)
 	{
 		lock (_chunkMeshes)
 		{
@@ -160,7 +166,7 @@ public class ChunkRenderer : MonoBehaviour
 	/// Marks that we need to regenerate the mesh for a chunk
 	/// </summary>
 	/// <param name="mesh"></param>
-	public void MarkChunkForRegeneration(ChunkMesh mesh)
+	public void MarkChunkForRegeneration(PhysicalChunk mesh)
 	{
 		_regenerationQueue.Add(mesh);
 	}
@@ -169,7 +175,7 @@ public class ChunkRenderer : MonoBehaviour
 	/// Marks that we need to regenerate the mesh for a chunk
 	/// </summary>
 	/// <param name="chunk"></param>
-	public void MarkChunkForRegeneration(ChunkColumn chunk)
+	public void MarkChunkForRegeneration(Chunk chunk)
 	{
 		lock (_chunkMeshes)
 		{
@@ -182,7 +188,7 @@ public class ChunkRenderer : MonoBehaviour
 	/// </summary>
 	/// <param name="chunk"></param>
 	/// <returns></returns>
-	private ChunkMesh GetChunkMesh(ChunkColumn chunk)
+	private PhysicalChunk GetChunkMesh(Chunk chunk)
 	{
 		lock (_chunkMeshes)
 		{
@@ -194,14 +200,12 @@ public class ChunkRenderer : MonoBehaviour
 	{
 		var sw = new System.Diagnostics.Stopwatch();
 
-		UnityEngine.Profiling.Profiler.BeginThreadProfiling("chunk generation", "mesh generation");
-
 		while (!token.IsCancellationRequested)
 		{
 			DebugCanvas.QueuedChunks = _regenerationQueue.Count;
 
 			// generate mesh on another thread
-			ChunkMesh chunkMesh;
+			PhysicalChunk chunkMesh;
 			try
 			{
 				chunkMesh = _regenerationQueue.Take(token);
@@ -217,27 +221,29 @@ public class ChunkRenderer : MonoBehaviour
 
 			// time how long it takes to generate mesh
 			sw.Restart();
-			var meshData = chunkMesh.GenerateMesh();
+			var meshData = chunkMesh.GenerateMesh(0xffff);
 			sw.Stop();
 
-			meshData.Time = sw.Elapsed.Milliseconds / 1000f;
+			// add chunk time to debug screen
+			DebugCanvas.AverageChunkTime.Add(sw.Elapsed.Milliseconds / 1000f);
 
-			// add finished mesh to queue so we can quickly add it to our chunk object
-			lock (_finishedMeshData)
+			// add finished mesh data to queue so it can be assigned to the mesh filter
+			foreach (var data in meshData)
 			{
-				_finishedMeshData.Add(meshData);
+				_finishedMeshData.Enqueue(data);
 			}
 		}
-
-		UnityEngine.Profiling.Profiler.EndThreadProfiling();
 	}
 }
 
+/// <summary>
+/// Represents raw vertices used to create a mesh of a chunk section in-game
+/// </summary>
 public struct ChunkMeshData
 {
-	public ChunkMesh ChunkMesh { get; set; }
+	public PhysicalChunk PhysicalChunk { get; set; }
 	public Vector3[] Vertices { get; set; }
 	public Vector3[] Normals { get; set; }
 	public int[] Triangles { get; set; }
-	public float Time { get; set; }
+	public bool InitialGeneration { get; set; }
 }

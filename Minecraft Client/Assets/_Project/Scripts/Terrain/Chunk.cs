@@ -8,7 +8,7 @@ using UnityEngine;
 /// <summary>
 /// Represents a Chunk column
 /// </summary>
-public class ChunkColumn
+public class Chunk
 {
 	/// <summary>
 	/// The position of the chunk within the world
@@ -45,13 +45,9 @@ public class ChunkColumn
 	/// </summary>
 	/// <param name="x"></param>
 	/// <param name="z"></param>
-	public ChunkColumn(int x, int z, World world)
+	public Chunk(int x, int z, World world)
 	{
-		Position = new ChunkColumnPos()
-		{
-			X = x,
-			Z = z
-		};
+		Position = new ChunkColumnPos(x, z);
 		World = world;
 	}
 
@@ -60,7 +56,7 @@ public class ChunkColumn
 	/// </summary>
 	/// <param name="packet"></param>
 	/// <param name="world"></param>
-	public ChunkColumn(ChunkDataPacket packet, World world)
+	public Chunk(ChunkDataPacket packet, World world)
 	{
 		Position = packet.Position;
 		World = world;
@@ -281,7 +277,7 @@ public class ChunkColumn
 	// empahsis on "should"
 	public override bool Equals(object obj)
 	{
-		ChunkColumn c = obj as ChunkColumn;
+		Chunk c = obj as Chunk;
 		return c?.Position.Equals(Position) ?? false;
 	}
 

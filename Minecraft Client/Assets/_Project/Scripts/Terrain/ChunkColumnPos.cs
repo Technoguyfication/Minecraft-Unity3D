@@ -6,8 +6,14 @@ using System.Threading.Tasks;
 
 public struct ChunkColumnPos
 {
-	public int X { get; set; }
-	public int Z { get; set; }
+	public int X { get; }
+	public int Z { get; }
+
+	public ChunkColumnPos(int x, int z)
+	{
+		X = x;
+		Z = z;
+	}
 
 	public override string ToString()
 	{
@@ -30,10 +36,8 @@ public struct ChunkColumnPos
 
 	public static ChunkColumnPos operator +(ChunkColumnPos left, ChunkColumnPos right)
 	{
-		return new ChunkColumnPos()
-		{
-			X = left.X + right.X,
-			Z = left.Z + right.Z
-		};
+		return new ChunkColumnPos(
+			left.X + right.X,
+			left.Z + right.Z);
 	}
 }

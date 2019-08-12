@@ -12,16 +12,26 @@ public struct BlockPos
 	public int Z { get; set; }
 
 	/// <summary>
-	/// Gets the position of the chunk the block is in
+	/// Gets the position of the chunk column the block is in
 	/// </summary>
 	/// <returns></returns>
-	public ChunkColumnPos GetChunk()
+	public ChunkColumnPos GetChunkColumnPos()
 	{
-		return new ChunkColumnPos()
-		{
-			X = X / 16 - (X < 0 ? 1 : 0),
-			Z = Z / 16 - (Z < 0 ? 1 : 0)
-		};
+		return new ChunkColumnPos(
+			X / 16 - (X < 0 ? 1 : 0),
+			Z / 16 - (Z < 0 ? 1 : 0));
+	}
+
+	/// <summary>
+	/// Gets the position of the chunk section the block is in
+	/// </summary>
+	/// <returns></returns>
+	public ChunkSectionPos GetChunkSectionPos()
+	{
+		return new ChunkSectionPos(
+			X / 16 - (X < 0 ? 1 : 0),
+			Y / 16,
+			Z / 16 - (Z < 0 ? 1 : 0));
 	}
 
 	/// <summary>
@@ -38,7 +48,7 @@ public struct BlockPos
 		};
 	}
 
-	public BlockPos GetWorldPos(ChunkColumn chunk)
+	public BlockPos GetWorldPos(Chunk chunk)
 	{
 		return new BlockPos()
 		{
