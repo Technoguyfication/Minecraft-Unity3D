@@ -16,14 +16,6 @@ public class PhysicalChunkSection : MonoBehaviour
 	/// </summary>
 	public bool IsGenerated = false;
 
-	private void Start()
-	{	
-	}
-
-	private void Update()
-	{	
-	}
-
 	public void SetMesh(Mesh mesh)
 	{
 		GetComponent<MeshFilter>().mesh = mesh;

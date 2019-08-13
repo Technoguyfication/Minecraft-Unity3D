@@ -14,7 +14,7 @@ public class Player : LivingEntity
 		Type = EntityType.PLAYER;
 	}
 
-	protected override void Update()
+	protected void Update()
 	{
 		// simplify pitch degrees
 		if (Pitch > 90f)
@@ -42,7 +42,5 @@ public class Player : LivingEntity
 		{
 			Yaw %= 360f;
 		}
-
-		base.Update();
 	}
 }

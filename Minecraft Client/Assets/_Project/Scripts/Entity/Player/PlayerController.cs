@@ -49,7 +49,7 @@ public class PlayerController : Player
 	}
 
 	// Update is called once per frame
-	protected override void Update()
+	new protected void Update()
 	{
 		Pitch -= Input.GetAxis("Mouse Y") * MouseSensitivity;
 		Pitch = Mathf.Clamp(Pitch, HeadMinX, HeadMaxX);
@@ -65,10 +65,11 @@ public class PlayerController : Player
 		base.Update();
 	}
 
-	protected override void FixedUpdate()
+	protected void FixedUpdate()
 	{
-		// base has to be called first because it determines whether gravity is set
-		base.FixedUpdate();
+		// only simulate gravity on the player if the chunk we are in is loaded
+		// stops player from falling through world when loading
+		Rigidbody.useGravity = World?.ChunkRenderer.IsChunkSectionGenerated(BlockPos.GetChunkSectionPos()) ?? false;
 
 		Vector3 inputVelocity = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;    // get raw input from user
 

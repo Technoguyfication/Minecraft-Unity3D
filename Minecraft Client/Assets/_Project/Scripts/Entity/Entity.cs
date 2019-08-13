@@ -88,20 +88,8 @@ public abstract class Entity : MonoBehaviour
 	{
 		Collider = Physical.GetComponent<BoxCollider>();
 		Rigidbody = GetComponent<Rigidbody>();
-	}
 
-	// called once per frame
-	protected virtual void Update()
-	{ }
-
-	protected virtual void FixedUpdate()
-	{
-		if (World != null)
-		{
-			// don't simulate gravity on the rigidbody unless the chunk it's in is loaded
-			// keeps entities from falling through world while generating chunks
-			Rigidbody.useGravity = World.ChunkRenderer.IsChunkSectionGenerated(BlockPos.GetChunkSectionPos());
-		}
+		Rigidbody.useGravity = false;	// don't use gravity by default for entities
 	}
 
 	public void SetRotation(float pitch, float yaw)
