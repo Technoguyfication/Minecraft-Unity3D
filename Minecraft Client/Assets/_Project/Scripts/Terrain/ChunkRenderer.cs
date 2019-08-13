@@ -21,7 +21,7 @@ public class ChunkRenderer : MonoBehaviour
 	public DebugCanvas DebugCanvas;
 
 	private readonly List<PhysicalChunk> _chunkMeshes = new List<PhysicalChunk>();
-	private readonly ConcurrentQueue<PhysicalChunk> _regenerationQueue = new ConcurrentQueue<PhysicalChunk>();
+	//private readonly ConcurrentQueue<PhysicalChunk> _regenerationQueue = new ConcurrentQueue<PhysicalChunk>();
 	private readonly ConcurrentQueue<(int, ChunkMeshData)> _finishedMeshData = new ConcurrentQueue<(int, ChunkMeshData)>();
 	private readonly List<Task> _regenTasks = new List<Task>();
 	private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
@@ -41,7 +41,7 @@ public class ChunkRenderer : MonoBehaviour
 		// remove completed regen tasks from list
 		_regenTasks.RemoveAll(t => t.IsCompleted);
 
-		DebugCanvas.QueuedChunks = _regenerationQueue.Count;
+		//DebugCanvas.QueuedChunks = _regenerationQueue.Count;
 		DebugCanvas.ProcessingChunks = _regenTasks.Count;
 		DebugCanvas.FinishedChunks = _finishedMeshData.Count;
 	}
