@@ -8,12 +8,15 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using IEnumerator = System.Collections.IEnumerator;
+using Debug = UnityEngine.Debug;
 
 /// <summary>
 /// Manages chunk meshes and rendering
 /// </summary>
 public class ChunkRenderer : MonoBehaviour
 {
+	public const ushort ALL_SECTIONS = 0xffff;
+
 	public GameObject ChunkMeshPrefab;
 	public DebugCanvas DebugCanvas;
 
@@ -25,7 +28,6 @@ public class ChunkRenderer : MonoBehaviour
 
 	private void Start()
 	{
-		StartCoroutine(RegenerationCoroutine(_cancellationTokenSource.Token));
 		StartCoroutine(AssignChunkMeshCoroutine(_cancellationTokenSource.Token));
 	}
 
@@ -160,21 +162,18 @@ public class ChunkRenderer : MonoBehaviour
 	/// Marks that we need to regenerate the mesh for a chunk
 	/// </summary>
 	/// <param name="mesh"></param>
-	public void MarkChunkForRegeneration(PhysicalChunk mesh)
+	public void MarkChunkForRegeneration(PhysicalChunk mesh, ushort sections)
 	{
-		_regenerationQueue.Enqueue(mesh);
+		StartCoroutine(RegenerateChunkCoroutine(mesh, sections));
 	}
 
 	/// <summary>
 	/// Marks that we need to regenerate the mesh for a chunk
 	/// </summary>
 	/// <param name="chunk"></param>
-	public void MarkChunkForRegeneration(Chunk chunk)
+	public void MarkChunkForRegeneration(Chunk chunk, ushort sections)
 	{
-		lock (_chunkMeshes)
-		{
-			MarkChunkForRegeneration(GetChunkMesh(chunk));
-		}
+		MarkChunkForRegeneration(GetPhysicalChunk(chunk), sections);
 	}
 
 	/// <summary>
@@ -182,7 +181,7 @@ public class ChunkRenderer : MonoBehaviour
 	/// </summary>
 	/// <param name="chunk"></param>
 	/// <returns></returns>
-	private PhysicalChunk GetChunkMesh(Chunk chunk)
+	private PhysicalChunk GetPhysicalChunk(Chunk chunk)
 	{
 		lock (_chunkMeshes)
 		{
@@ -190,44 +189,44 @@ public class ChunkRenderer : MonoBehaviour
 		}
 	}
 
-	private IEnumerator RegenerationCoroutine(CancellationToken token)
+	private IEnumerator RegenerateChunkCoroutine(PhysicalChunk physicalChunk, ushort sections)
 	{
-		while (!token.IsCancellationRequested)
-		{		
-			// try to take a chunk from the regen queue, or yield if the queue is empty
-			PhysicalChunk chunkMesh;
-			while (!_regenerationQueue.TryDequeue(out chunkMesh))
-				yield return null;
+		// wait for an available thread
+		while (_regenTasks.Count >= SystemInfo.processorCount)
+			yield return null;
 
-			// check that we are still keeping track of the chunk (i.e. it's not unloaded)
-			if (!_chunkMeshes.Contains(chunkMesh))
-				continue;
+		// generate the mesh on another thread
+		var task = Task.Run(() =>
+		{
+			// time how long it takes to generate mesh
+			var sw = new Stopwatch();
+			sw.Start();
+			var meshData = physicalChunk.GenerateMesh(sections);
+			sw.Stop();
 
-			// limit running tasks to 10
-			while (_regenTasks.Count >= 10)
-				yield return null;
+			// add chunk time to debug screen
+			DebugCanvas.AverageChunkTime.Add(sw.Elapsed.Milliseconds / 1000f);
 
-			// generate the mesh on another thread
-			_regenTasks.Add(Task.Run(() =>
+			// add finished mesh data to queue so it can be assigned to the mesh filter
+			foreach (var data in meshData)
 			{
-				var sw = new Stopwatch();
+				_finishedMeshData.Enqueue(data);
+				DebugCanvas.LifetimeFinishedChunks++;
+			}
+		});
 
-				// time how long it takes to generate mesh
-				sw.Start();
-				var meshData = chunkMesh.GenerateMesh(0xffff);
-				sw.Stop();
+		// add task to list of tasks
+		_regenTasks.Add(task);
 
-				// add chunk time to debug screen
-				DebugCanvas.AverageChunkTime.Add(sw.Elapsed.Milliseconds / 1000f);
+		// wait for task to complete
+		while (!task.IsCompleted)
+			yield return null;
 
-				// add finished mesh data to queue so it can be assigned to the mesh filter
-				foreach (var data in meshData)
-				{
-					_finishedMeshData.Enqueue(data);
-					DebugCanvas.LifetimeFinishedChunks++;
-				}
-			}));
-		}
+		// remove finished task from task list
+		_regenTasks.Remove(task);
+
+		if (task.IsFaulted)
+			throw task.Exception;
 	}
 }
 

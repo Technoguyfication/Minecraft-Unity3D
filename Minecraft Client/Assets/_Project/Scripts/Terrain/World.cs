@@ -17,6 +17,7 @@ public class World
 
 	private readonly List<Chunk> _chunks;
 	private readonly DebugCanvas _debugCanvas;
+	private readonly List<Task> _packetDecodeTasks = new List<Task>();
 
 	/// <summary>
 	/// Returns an empty chunk
@@ -106,24 +107,33 @@ public class World
 			}
 		}
 
+		while (_packetDecodeTasks.Count >= SystemInfo.processorCount)
+			yield return null;
+
 		// add chunk data to chunk in another thread
 		var task = Task.Run(() =>
 		{
-			Profiler.BeginThreadProfiling("addChunkData", chunk.ToString());
+			Profiler.BeginThreadProfiling("Add chunk data", "chunk decoder worker");
+			Profiler.BeginSample($"Add chunk data {chunk.ToString()}");
 			chunk.AddChunkData(chunkData);
+			Profiler.EndSample();
 			Profiler.EndThreadProfiling();
 		});
+
+		_packetDecodeTasks.Add(task);
 
 		// wait for task to complete
 		while (!task.IsCompleted)
 			yield return null;
 
+		_packetDecodeTasks.Remove(task);
+
 		// check for exceptions
 		if (task.IsFaulted)
 			throw task.Exception;
 
-		// regenerate chunk
-		ChunkRenderer.MarkChunkForRegeneration(chunk);
+		// regenerate chunk sections
+		ChunkRenderer.MarkChunkForRegeneration(chunk, /*(ushort)chunkData.PrimaryBitmask*/ChunkRenderer.ALL_SECTIONS);	// todo: only render chunk sections in bitmask
 	}
 
 	/// <summary>

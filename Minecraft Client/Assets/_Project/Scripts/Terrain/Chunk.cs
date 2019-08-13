@@ -63,9 +63,7 @@ public class Chunk
 			return new BlockState(BlockType.VOID_AIR);
 
 		var chunkPos = pos.GetPosWithinChunk();
-
-		lock (BlockArray)
-			return BlockArray[GetBlockIndex(chunkPos)];
+		return BlockArray[GetBlockIndex(chunkPos)];
 	}
 
 	/// <summary>
@@ -75,8 +73,7 @@ public class Chunk
 	/// <returns></returns>
 	public BlockState GetBlockAt(int index)
 	{
-		lock (BlockArray)
-			return BlockArray[index];
+		return BlockArray[index];
 	}
 
 	/// <summary>
@@ -144,89 +141,110 @@ public class Chunk
 		}
 
 		// lock block array to stop block changes from happening
-		lock (BlockArray)
+		var data = new List<byte>(packet.Data);
+
+		Profiler.BeginSample("Loading chunk sections");
+
+		// chunk data
+		for (int s = 0; s < 16; s++)
 		{
-			var data = new List<byte>(packet.Data);
-
-			Profiler.BeginSample("Loading chunk sections");
-
-			// chunk data
-			for (int s = 0; s < 16; s++)
+			// check bitmask to see if we're reading data for this section
+			if ((packet.PrimaryBitmask & (1) << s) != 0)
 			{
-				// check bitmask to see if we're reading data for this section
-				if ((packet.PrimaryBitmask & (1) << s) != 0)
+				Profiler.BeginSample($"Chunk section: {s}");
+
+				// set max block height to the height of this chunk
+				int maxBlockHeight = (s + 1) * 16;
+				if (maxBlockHeight > MaxHeight)
+					MaxHeight = maxBlockHeight;
+
+				// read bits per block
+				byte bitsPerBlock = data.Read(1)[0];
+				if (bitsPerBlock < 4)
+					bitsPerBlock = 4;
+
+				// choose palette type
+				IChunkPalette palette;
+				if (bitsPerBlock <= 8)
+					palette = new IndirectChunkPalette();
+				else
+					palette = new DirectChunkPalette();
+
+				palette.Read(data); // read palette data, bringing chunk data into front of buffer
+
+				// bitmask that contains bitsperblock set bits
+				uint individualValueMask = (uint)((1 << bitsPerBlock) - 1);
+
+				// read data into array of longs
+				int dataArrayLength = VarInt.ReadNext(data);
+				ulong[] dataArray = new ulong[dataArrayLength];
+				for (int i = 0; i < dataArrayLength; i++)
 				{
-					Profiler.BeginSample($"Chunk section: {s}");
+					dataArray[i] = PacketHelper.GetUInt64(data);
+				}
 
-					// set max block height to the height of this chunk
-					int maxBlockHeight = (s + 1) * 16;
-					if (maxBlockHeight > MaxHeight)
-						MaxHeight = maxBlockHeight;
+				Profiler.BeginSample("Block data");
 
-					// read bits per block
-					byte bitsPerBlock = data.Read(1)[0];
-					if (bitsPerBlock < 4)
-						bitsPerBlock = 4;
+				// parse block data
+				for (int b = 0; b < 4096; b++)    // for section height
+				{
+					int startLong = (b * bitsPerBlock) / 64;
+					int startOffset = (b * bitsPerBlock) % 64;
+					int endLong = ((b + 1) * bitsPerBlock - 1) / 64;
 
-					// choose palette type
-					IChunkPalette palette;
-					if (bitsPerBlock <= 8)
-						palette = new IndirectChunkPalette();
+					uint blockData;
+					if (startLong == endLong)
+					{
+						blockData = (uint)(dataArray[startLong] >> startOffset);
+					}
 					else
-						palette = new DirectChunkPalette();
-
-					palette.Read(data); // read palette data, bringing chunk data into front of buffer
-
-					// bitmask that contains bitsperblock set bits
-					uint individualValueMask = (uint)((1 << bitsPerBlock) - 1);
-
-					// read data into array of longs
-					int dataArrayLength = VarInt.ReadNext(data);
-					ulong[] dataArray = new ulong[dataArrayLength];
-					for (int i = 0; i < dataArrayLength; i++)
 					{
-						dataArray[i] = PacketHelper.GetUInt64(data);
+						int endOffset = 64 - startOffset;
+						blockData = (uint)(dataArray[startLong] >> startOffset | dataArray[endLong] << endOffset);
 					}
 
-					Profiler.BeginSample("Block data");
+					blockData &= individualValueMask;
 
-					// parse block data
-					for (int b = 0; b < 4096; b++)    // for section height
-					{
-						int startLong = (b * bitsPerBlock) / 64;
-						int startOffset = (b * bitsPerBlock) % 64;
-						int endLong = ((b + 1) * bitsPerBlock - 1) / 64;
+					uint blockState = palette.GetBlockState(blockData);
+					BlockState blk = new BlockState((BlockType)blockState);
 
-						uint blockData;
-						if (startLong == endLong)
-						{
-							blockData = (uint)(dataArray[startLong] >> startOffset);
-						}
-						else
-						{
-							int endOffset = 64 - startOffset;
-							blockData = (uint)(dataArray[startLong] >> startOffset | dataArray[endLong] << endOffset);
-						}
+					// add block to block array
+					BlockArray[b + (4096 * s)] = blk;
+				}
 
-						blockData &= individualValueMask;
+				Profiler.EndSample();   // block data
 
-						uint blockState = palette.GetBlockState(blockData);
-						BlockState blk = new BlockState((BlockType)blockState);
-
-						// add block to block array
-						BlockArray[b + (4096 * s)] = blk;
-					}
-
-					Profiler.EndSample();   // block data
-
-					// we don't use sky or block lights
-					// read data to move new data to front of buffer
+				// we don't use sky or block lights
+				// read data to move new data to front of buffer
+				data.Read(2048);
+				if (World.Dimension == World.DimensionType.OVERWORLD)
 					data.Read(2048);
-					if (World.Dimension == World.DimensionType.OVERWORLD)
-						data.Read(2048);
 
-					/*
-					Profiler.BeginSample("Block lights");
+				/*
+				Profiler.BeginSample("Block lights");
+
+				// parse block light data
+				for (int y = 0; y < 16; y++)
+				{
+					for (int z = 0; z < 16; z++)
+					{
+						for (int x = 0; x < 16; x += 2)
+						{
+							// light data takes 4 bits. because of this, we read two light values per byte
+							byte value = data.Read(1)[0];
+
+							_blockLights[x, y + (16 * s), z] = value & 0xf;
+							_blockLights[x + 1, y + (16 * s), z] = (value >> 4) & 0xf;
+						}
+					}
+				}
+
+				Profiler.EndSample();	// block lights
+
+				// parse sky lights
+				if (World.Dimension == World.DimensionType.OVERWORLD)
+				{
+					Profiler.BeginSample("Sky lights");
 
 					// parse block light data
 					for (int y = 0; y < 16; y++)
@@ -238,51 +256,27 @@ public class Chunk
 								// light data takes 4 bits. because of this, we read two light values per byte
 								byte value = data.Read(1)[0];
 
-								_blockLights[x, y + (16 * s), z] = value & 0xf;
-								_blockLights[x + 1, y + (16 * s), z] = (value >> 4) & 0xf;
+								_skylights[x, y + (16 * s), z] = value & 0xf;
+								_skylights[x + 1, y + (16 * s), z] = (value >> 4) & 0xf;
 							}
 						}
 					}
 
-					Profiler.EndSample();	// block lights
-
-					// parse sky lights
-					if (World.Dimension == World.DimensionType.OVERWORLD)
-					{
-						Profiler.BeginSample("Sky lights");
-
-						// parse block light data
-						for (int y = 0; y < 16; y++)
-						{
-							for (int z = 0; z < 16; z++)
-							{
-								for (int x = 0; x < 16; x += 2)
-								{
-									// light data takes 4 bits. because of this, we read two light values per byte
-									byte value = data.Read(1)[0];
-
-									_skylights[x, y + (16 * s), z] = value & 0xf;
-									_skylights[x + 1, y + (16 * s), z] = (value >> 4) & 0xf;
-								}
-							}
-						}
-
-						Profiler.EndSample();	// sky lights
-					}
-
-	*/
-
-					Profiler.EndSample();	// chunk section
+					Profiler.EndSample();	// sky lights
 				}
-				else
+
+*/
+
+				Profiler.EndSample();   // chunk section
+			}
+			else
+			{
+				// fill chunk section with air if full chunk
+				if (packet.GroundUpContinuous)
 				{
-					// fill chunk section with air if full chunk
-					if (packet.GroundUpContinuous)
+					for (int i = 0; i < 4096; i++)
 					{
-						for (int i = 0; i < 4096; i++)
-						{
-							BlockArray[s + (4096 * s)] = new BlockState(BlockType.AIR);
-						}
+						BlockArray[s + (4096 * s)] = new BlockState(BlockType.AIR);
 					}
 				}
 			}

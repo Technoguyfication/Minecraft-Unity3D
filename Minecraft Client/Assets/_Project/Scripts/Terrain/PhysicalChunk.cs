@@ -78,104 +78,100 @@ public class PhysicalChunk : MonoBehaviour
 			List<Vector3> normals = new List<Vector3>();
 			int triangleIndex = 0;
 
-			// ensure no changes are made to the chunk data while we are rendering it
-			lock (Chunk.BlockArray)
+			// don't render any blocks if chunk section isn't populated
+			// but don't continue through the loop, so we still add an empty mesh and mark this chunk section as populated
+			if (w * 16 <= Chunk.MaxHeight)
 			{
-				// don't render any blocks if chunk section isn't populated
-				// but don't continue through the loop, so we still add an empty mesh and mark this chunk section as populated
-				if (w * 16 <= Chunk.MaxHeight)
+				// iterate through each block in chunk section
+				for (int y = 0; y < 16; y++)
 				{
-					// iterate through each block in chunk section
-					for (int y = 0; y < 16; y++)
+					for (int z = 0; z < 16; z++)
 					{
-						for (int z = 0; z < 16; z++)
+						for (int x = 0; x < 16; x++)
 						{
-							for (int x = 0; x < 16; x++)
+							BlockPos pos = new BlockPos() { X = x, Y = y + (w * 16), Z = z };
+							int blockIndex = Chunk.GetBlockIndex(pos);
+
+							// check if we need to render this block at all
+							if (!Chunk.BlockArray[blockIndex].IsRendered)
+								continue;
+
+							// check if the block is a solid cube or more complicated block
+							if (Chunk.BlockArray[blockIndex].IsSolid)
 							{
-								BlockPos pos = new BlockPos() { X = x, Y = y + (w * 16), Z = z };
-								int blockIndex = Chunk.GetBlockIndex(pos);
-
-								// check if we need to render this block at all
-								if (!Chunk.BlockArray[blockIndex].IsRendered)
-									continue;
-
-								// check if the block is a solid cube or more complicated block
-								if (Chunk.BlockArray[blockIndex].IsSolid)
+								// check neighbors to find what faces we need to render
+								bool[] neighbors = new bool[6];
+								for (int i = 0; i < 6; i++)
 								{
-									// check neighbors to find what faces we need to render
-									bool[] neighbors = new bool[6];
-									for (int i = 0; i < 6; i++)
+									var neighborPos = _neighborPositions[i] + pos;
+
+									// check if we can use our "locally" cached chunk data to check this block
+									if (Chunk.ExistsInside(neighborPos))
 									{
-										var neighborPos = _neighborPositions[i] + pos;
-
-										// check if we can use our "locally" cached chunk data to check this block
-										if (Chunk.ExistsInside(neighborPos))
-										{
-											neighbors[i] = Chunk.BlockArray[Chunk.GetBlockIndex(neighborPos)].IsSolid;
-										}
-										else
-										{
-											Chunk neighborChunk;
-
-											// find which neighbor chunk the block is in
-											switch (i)
-											{
-												case 0:
-													neighborChunk = neighborChunks[0];
-													break;
-												case 1:
-													neighborChunk = neighborChunks[1];
-													break;
-												case 4:
-													neighborChunk = neighborChunks[2];
-													break;
-												case 5:
-													neighborChunk = neighborChunks[3];
-													break;
-												default:
-													neighbors[i] = Chunk.World.GetBlock(neighborPos.GetWorldPos(Chunk)).IsSolid;
-													continue;
-											}
-
-											neighbors[i] = neighborChunk.GetBlockAt(neighborPos).IsSolid;
-										}
+										neighbors[i] = Chunk.BlockArray[Chunk.GetBlockIndex(neighborPos)].IsSolid;
 									}
-
-									// unity-style position of this block within the chunk to offset verts
-									Vector3 blockPosUnity = new Vector3(z, y, x);
-
-									// iterate through each face and add to mesh if it's visible
-									for (int i = 0; i < 6; i++)
+									else
 									{
-										if (!neighbors[i])
+										Chunk neighborChunk;
+
+										// find which neighbor chunk the block is in
+										switch (i)
 										{
-											Vector3[] newVertices = new Vector3[4];
-											Vector3[] faceVertices = GetVertices(i);
-
-											// translate vertices to relative block position so we can add them to the right place in the mesh
-											// also add normals
-											for (int j = 0; j < 4; j++)
-											{
-												newVertices[j] = faceVertices[j] + blockPosUnity;
-												normals.Add(GetNormals(i));
-											}
-
-											// add mesh vertices
-											vertices.AddRange(newVertices);
-
-											// connect triangles
-											triangles.AddRange(new int[] { triangleIndex, 1 + triangleIndex, 2 + triangleIndex, triangleIndex, 2 + triangleIndex, 3 + triangleIndex });
-											triangleIndex += 4;
+											case 0:
+												neighborChunk = neighborChunks[0];
+												break;
+											case 1:
+												neighborChunk = neighborChunks[1];
+												break;
+											case 4:
+												neighborChunk = neighborChunks[2];
+												break;
+											case 5:
+												neighborChunk = neighborChunks[3];
+												break;
+											default:
+												neighbors[i] = Chunk.World.GetBlock(neighborPos.GetWorldPos(Chunk)).IsSolid;
+												continue;
 										}
+
+										neighbors[i] = neighborChunk.GetBlockAt(neighborPos).IsSolid;
 									}
 								}
-								else
-								{
-									// todo: code for rendering non-solid blocks goes here
-									// ex. hoppers, grass, anything with a mesh defined in a resource pack
 
-									Debug.LogWarning("Non solid blocks cannot be rendered yet");
+								// unity-style position of this block within the chunk to offset verts
+								Vector3 blockPosUnity = new Vector3(z, y, x);
+
+								// iterate through each face and add to mesh if it's visible
+								for (int i = 0; i < 6; i++)
+								{
+									if (!neighbors[i])
+									{
+										Vector3[] newVertices = new Vector3[4];
+										Vector3[] faceVertices = GetVertices(i);
+
+										// translate vertices to relative block position so we can add them to the right place in the mesh
+										// also add normals
+										for (int j = 0; j < 4; j++)
+										{
+											newVertices[j] = faceVertices[j] + blockPosUnity;
+											normals.Add(GetNormals(i));
+										}
+
+										// add mesh vertices
+										vertices.AddRange(newVertices);
+
+										// connect triangles
+										triangles.AddRange(new int[] { triangleIndex, 1 + triangleIndex, 2 + triangleIndex, triangleIndex, 2 + triangleIndex, 3 + triangleIndex });
+										triangleIndex += 4;
+									}
 								}
+							}
+							else
+							{
+								// todo: code for rendering non-solid blocks goes here
+								// ex. hoppers, grass, anything with a mesh defined in a resource pack
+
+								Debug.LogWarning("Non solid blocks cannot be rendered yet");
 							}
 						}
 					}
