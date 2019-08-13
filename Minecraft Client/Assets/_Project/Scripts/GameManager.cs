@@ -44,10 +44,17 @@ public class GameManager : MonoBehaviour
 	private float _lastTick = 0f;
 	private bool _disconnecting = false;
 
-	// Use this for initialization
-	void Start()
+	void Awake()
 	{
-		
+#if UNITY_EDITOR
+		Debug.Log("Running in editor");
+#endif
+#if UNITY_STANDALONE
+		Debug.Log("Running in standalone mode");
+#endif
+#if ENABLE_PROFILER
+		Debug.Log("Unity profiler enabled");
+#endif
 	}
 
 	// Update is called once per frame

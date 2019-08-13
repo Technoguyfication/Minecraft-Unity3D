@@ -41,9 +41,12 @@ public class ChunkRenderer : MonoBehaviour
 		// remove completed regen tasks from list
 		_regenTasks.RemoveAll(t => t.IsCompleted);
 
-		//DebugCanvas.QueuedChunks = _regenerationQueue.Count;
-		DebugCanvas.ProcessingChunks = _regenTasks.Count;
-		DebugCanvas.FinishedChunks = _finishedMeshData.Count;
+		if (DebugCanvas.Displaying)
+		{
+			//DebugCanvas.QueuedChunks = _regenerationQueue.Count;
+			DebugCanvas.ProcessingChunks = _regenTasks.Count;
+			DebugCanvas.FinishedChunks = _finishedMeshData.Count;
+		}
 	}
 
 	private IEnumerator AssignChunkMeshCoroutine(CancellationToken token)
@@ -169,7 +172,7 @@ public class ChunkRenderer : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Marks that we need to regenerate the mesh for a chunk
+	/// Marks that we need to regenerate the mesh for a chunk.
 	/// </summary>
 	/// <param name="chunk"></param>
 	public void MarkChunkForRegeneration(Chunk chunk, ushort sections)
@@ -178,15 +181,28 @@ public class ChunkRenderer : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Gets our ChunkMesh for a chun, or null if it doesn't exist
+	/// Gets the Physical chunk for a chunk, or null if it doesn't exist
 	/// </summary>
 	/// <param name="chunk"></param>
 	/// <returns></returns>
-	private PhysicalChunk GetPhysicalChunk(Chunk chunk)
+	public PhysicalChunk GetPhysicalChunk(Chunk chunk)
 	{
 		lock (_chunkMeshes)
 		{
 			return _chunkMeshes.Find(cm => cm.Chunk.Equals(chunk));
+		}
+	}
+
+	/// <summary>
+	/// Gets the physical chunk at a position, or null if it doesn't exist
+	/// </summary>
+	/// <param name="chunkPos"></param>
+	/// <returns></returns>
+	public PhysicalChunk GetPhysicalChunk(ChunkColumnPos chunkPos)
+	{
+		lock (_chunkMeshes)
+		{
+			return _chunkMeshes.Find(cm => cm.Chunk.Position.Equals(chunkPos));
 		}
 	}
 
