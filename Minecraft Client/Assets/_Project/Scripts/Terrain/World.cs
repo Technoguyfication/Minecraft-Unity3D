@@ -133,7 +133,14 @@ public class World
 			throw task.Exception;
 
 		// regenerate chunk sections
-		ChunkRenderer.MarkChunkForRegeneration(chunk, /*(ushort)chunkData.PrimaryBitmask*/ChunkRenderer.ALL_SECTIONS);	// todo: only render chunk sections in bitmask
+		/* we don't use the bitmask provided in the packet here becase we want
+		 * to "render" all chunks, including empty ones, so that the game
+		 * knows they exist and aren't unloaded
+		 * 
+		 * plus, the renderer won't render chunks above the bitmask provided in
+		 * this packet anyways due to the Chunk.MaxHeight property
+		 * */
+		ChunkRenderer.MarkChunkForRegeneration(chunk, ChunkRenderer.ALL_SECTIONS);
 	}
 
 	/// <summary>

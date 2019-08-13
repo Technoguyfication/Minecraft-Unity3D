@@ -54,9 +54,9 @@ public class PhysicalChunk : MonoBehaviour
 	/// Generates mesh data for this chunk section
 	/// </summary>
 	/// <param name="chunk"></param>
-	public (int, ChunkMeshData)[] GenerateMesh(ushort sections)
+	public ChunkMeshData[] GenerateMesh(ushort sections)
 	{
-		var finishedMeshes = new List<(int, ChunkMeshData)>();
+		var finishedMeshes = new List<ChunkMeshData>();
 
 		// store neighbor chunks so we don't have to look them up through the World
 		Chunk[] neighborChunks = new Chunk[4];
@@ -66,11 +66,14 @@ public class PhysicalChunk : MonoBehaviour
 		}
 
 		// iterate through chunk sections
-		for (int w = 0; w < 16; w++)
+		for (int s = 0; s < 16; s++)
 		{
 			// check that we are rendering this chunk section
-			if (((0x01 << w) & sections) == 0)
+			if (((0x01 << s) & sections) == 0)
 				continue;
+
+			var sw = new System.Diagnostics.Stopwatch();
+			sw.Start();
 
 			// set up vertices and triangles for this section
 			List<Vector3> vertices = new List<Vector3>();
@@ -80,7 +83,7 @@ public class PhysicalChunk : MonoBehaviour
 
 			// don't render any blocks if chunk section isn't populated
 			// but don't continue through the loop, so we still add an empty mesh and mark this chunk section as populated
-			if (w * 16 <= Chunk.MaxHeight)
+			if (s * 16 <= Chunk.MaxHeight)
 			{
 				// iterate through each block in chunk section
 				for (int y = 0; y < 16; y++)
@@ -89,7 +92,7 @@ public class PhysicalChunk : MonoBehaviour
 					{
 						for (int x = 0; x < 16; x++)
 						{
-							BlockPos pos = new BlockPos() { X = x, Y = y + (w * 16), Z = z };
+							BlockPos pos = new BlockPos() { X = x, Y = y + (s * 16), Z = z };
 							int blockIndex = Chunk.GetBlockIndex(pos);
 
 							// check if we need to render this block at all
@@ -178,14 +181,18 @@ public class PhysicalChunk : MonoBehaviour
 				}
 			}
 
+			sw.Stop();
+
 			// add mesh data to the finished meshes
-			finishedMeshes.Add((w, new ChunkMeshData()
+			finishedMeshes.Add(new ChunkMeshData()
 			{
 				Normals = normals.ToArray(),
 				Triangles = triangles.ToArray(),
 				Vertices = vertices.ToArray(),
-				PhysicalChunk = this
-			}));
+				PhysicalChunk = this,
+				ChunkSection = s,
+				ElapsedTime = sw.ElapsedMilliseconds
+			});
 		}
 
 		return finishedMeshes.ToArray();

@@ -245,7 +245,7 @@ Transform:
   - {fileID: 1103229365}
   - {fileID: 85674381}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &13402250
 MonoBehaviour:
@@ -2075,7 +2075,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 100
   m_TargetDisplay: 0
 --- !u!114 &1103229369
 MonoBehaviour:
@@ -2097,8 +2097,9 @@ MonoBehaviour:
   RxPackets: 0
   TickCount: 0
   AverageChunkTime: []
-  QueuedChunks: 0
+  ProcessingChunks: 0
   FinishedChunks: 0
+  LifetimeFinishedChunks: 0
   Displaying: 0
 --- !u!1 &1294479658
 GameObject:
@@ -3407,7 +3408,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1839475966
 GameObject:
@@ -3930,7 +3931,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2005508949
 GameObject:
@@ -4064,7 +4065,7 @@ RectTransform:
   - {fileID: 11063738}
   - {fileID: 678525743}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}

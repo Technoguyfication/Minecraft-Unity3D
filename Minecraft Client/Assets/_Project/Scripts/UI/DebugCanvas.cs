@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,8 @@ using UnityEngine.UI;
 
 public class DebugCanvas : MonoBehaviour
 {
+	public const int MAX_CHUNK_TIME_SAMPLES = 5000;
+
 	public Text DebugText;
 	public Canvas Canvas;
 
@@ -20,7 +23,7 @@ public class DebugCanvas : MonoBehaviour
 	public int RxPackets = 0;
 	public int TickCount = 0;
 	public List<float> AverageChunkTime = new List<float>();
-	public int QueuedChunks = 0;
+	//public int QueuedChunks = 0;
 	public int ProcessingChunks = 0;
 	public int FinishedChunks = 0;
 	public int LifetimeFinishedChunks = 0;
@@ -79,12 +82,12 @@ public class DebugCanvas : MonoBehaviour
 			// calculate chunk time
 			if (AverageChunkTime.Count > 0)
 			{
-				textBuilder.AppendLine($"Chunk gen: {AverageChunkTime.Average().ToString("0.0000")}s over {AverageChunkTime.Count} samples; Q: {QueuedChunks}; P: {ProcessingChunks}; F: {FinishedChunks}; \u029FF: {LifetimeFinishedChunks}");
-
-				if (AverageChunkTime.Count > 25)
+				if (AverageChunkTime.Count > MAX_CHUNK_TIME_SAMPLES)
 				{
-					AverageChunkTime.RemoveRange(0, AverageChunkTime.Count - 25);
+					AverageChunkTime.RemoveRange(0, AverageChunkTime.Count - MAX_CHUNK_TIME_SAMPLES);
 				}
+
+				textBuilder.AppendLine($"Chunk gen: {AverageChunkTime.Average().ToString("0.0")}ms over {AverageChunkTime.Count} samples; P: {ProcessingChunks.ToString("000")}; Fq: {FinishedChunks.ToString("000")}; F\u029F: {LifetimeFinishedChunks}");
 			}
 
 			DebugText.text = textBuilder.ToString();

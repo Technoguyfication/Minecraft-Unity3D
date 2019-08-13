@@ -22,7 +22,7 @@ public class ChunkRenderer : MonoBehaviour
 
 	private readonly List<PhysicalChunk> _chunkMeshes = new List<PhysicalChunk>();
 	//private readonly ConcurrentQueue<PhysicalChunk> _regenerationQueue = new ConcurrentQueue<PhysicalChunk>();
-	private readonly ConcurrentQueue<(int, ChunkMeshData)> _finishedMeshData = new ConcurrentQueue<(int, ChunkMeshData)>();
+	private readonly ConcurrentQueue<ChunkMeshData> _finishedMeshData = new ConcurrentQueue<ChunkMeshData>();
 	private readonly List<Task> _regenTasks = new List<Task>();
 	private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
@@ -52,12 +52,13 @@ public class ChunkRenderer : MonoBehaviour
 		{
 			// try to take the next finished mesh from the queue
 			// if there are none, yield until the next frame
-			(int, ChunkMeshData) finishedMesh;
-			while (!_finishedMeshData.TryDequeue(out finishedMesh))
+			ChunkMeshData meshData;
+			while (!_finishedMeshData.TryDequeue(out meshData))
 				yield return null;
 
-			var sectionIndex = finishedMesh.Item1;
-			var meshData = finishedMesh.Item2;
+			DebugCanvas.LifetimeFinishedChunks++;
+			DebugCanvas.AverageChunkTime.Add(meshData.ElapsedTime);
+
 			lock (_chunkMeshes)
 			{
 				// if the chunk has been unloaded we can't add any data to it
@@ -72,7 +73,7 @@ public class ChunkRenderer : MonoBehaviour
 				};
 
 				// assign mesh and set generated
-				var chunkSection = meshData.PhysicalChunk.Sections[sectionIndex];
+				var chunkSection = meshData.PhysicalChunk.Sections[meshData.ChunkSection];
 				chunkSection.SetMesh(mesh);
 				chunkSection.IsGenerated = true;
 
@@ -198,20 +199,12 @@ public class ChunkRenderer : MonoBehaviour
 		// generate the mesh on another thread
 		var task = Task.Run(() =>
 		{
-			// time how long it takes to generate mesh
-			var sw = new Stopwatch();
-			sw.Start();
-			var meshData = physicalChunk.GenerateMesh(sections);
-			sw.Stop();
-
-			// add chunk time to debug screen
-			DebugCanvas.AverageChunkTime.Add(sw.Elapsed.Milliseconds / 1000f);
+			var finishedRender = physicalChunk.GenerateMesh(sections);
 
 			// add finished mesh data to queue so it can be assigned to the mesh filter
-			foreach (var data in meshData)
+			foreach (var meshData in finishedRender)
 			{
-				_finishedMeshData.Enqueue(data);
-				DebugCanvas.LifetimeFinishedChunks++;
+				_finishedMeshData.Enqueue(meshData);
 			}
 		});
 
@@ -236,8 +229,9 @@ public class ChunkRenderer : MonoBehaviour
 public struct ChunkMeshData
 {
 	public PhysicalChunk PhysicalChunk { get; set; }
+	public int ChunkSection { get; set; }
 	public Vector3[] Vertices { get; set; }
 	public Vector3[] Normals { get; set; }
 	public int[] Triangles { get; set; }
-	public bool InitialGeneration { get; set; }
+	public float ElapsedTime { get; set; }
 }
