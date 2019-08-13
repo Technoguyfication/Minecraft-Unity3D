@@ -21,13 +21,6 @@ public class PhysicalChunk : MonoBehaviour
 			new BlockPos() { Z = 1 },
 			new BlockPos() { Z = -1 },
 		};
-	private readonly ChunkColumnPos[] _neighborChunkPositions = new ChunkColumnPos[]
-		{
-			new ChunkColumnPos(1, 0),
-			new ChunkColumnPos(-1, 0),
-			new ChunkColumnPos(0, 1),
-			new ChunkColumnPos(0, -1),
-		};
 
 	// Use this for initialization
 	void Start()
@@ -60,9 +53,10 @@ public class PhysicalChunk : MonoBehaviour
 
 		// store neighbor chunks so we don't have to look them up through the World
 		Chunk[] neighborChunks = new Chunk[4];
+		var neighborChunkPositions = World.GetNeighbors(Chunk.Position);
 		for (int i = 0; i < 4; i++)
 		{
-			neighborChunks[i] = Chunk.World.GetChunk(_neighborChunkPositions[i] + Chunk.Position) ?? Chunk.World.EmptyChunk;
+			neighborChunks[i] = Chunk.World.GetChunk(neighborChunkPositions[i]);
 		}
 
 		// iterate through chunk sections
@@ -133,11 +127,11 @@ public class PhysicalChunk : MonoBehaviour
 												neighborChunk = neighborChunks[3];
 												break;
 											default:
-												neighbors[i] = false;	// this block is outside 0 < x < 256
+												neighbors[i] = false;	// this block is outside 0 <= x <= 25
 												continue;
 										}
 
-										neighbors[i] = neighborChunk.GetBlockAt(neighborPos).IsSolid;
+										neighbors[i] = neighborChunk?.GetBlockAt(neighborPos).IsSolid ?? false;	// unloaded neighbor chunks are null. if the chunk is unloaded, say it's empty
 									}
 								}
 

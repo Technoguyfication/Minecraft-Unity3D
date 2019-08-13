@@ -19,6 +19,14 @@ public class World
 	private readonly DebugCanvas _debugCanvas;
 	private readonly List<Task> _packetDecodeTasks = new List<Task>();
 
+	private static readonly ChunkColumnPos[] _neighborChunkPositions = new ChunkColumnPos[]
+	{
+			new ChunkColumnPos(1, 0),
+			new ChunkColumnPos(-1, 0),
+			new ChunkColumnPos(0, 1),
+			new ChunkColumnPos(0, -1),
+	};
+
 	/// <summary>
 	/// Returns an empty chunk
 	/// </summary>
@@ -29,6 +37,23 @@ public class World
 	{
 		_chunks = new List<Chunk>();
 		_debugCanvas = debug;
+	}
+
+	/// <summary>
+	/// Gets the positions of each of a chunk column's neighbors
+	/// </summary>
+	/// <param name="pos"></param>
+	/// <returns></returns>
+	public static ChunkColumnPos[] GetNeighbors(ChunkColumnPos pos)
+	{
+		// don't use linq here because it's slow and this function needs to run _fast_
+		ChunkColumnPos[] neighbors = new ChunkColumnPos[4];
+		for (int i = 0; i < 4; i++)
+		{
+			neighbors[i] = pos + _neighborChunkPositions[i];
+		}
+
+		return neighbors;
 	}
 
 	/// <summary>
