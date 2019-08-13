@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Profiling;
+using IEnumerator = System.Collections.IEnumerator;
 
 /// <summary>
 /// Defines a single dimension the player can play in.
@@ -79,31 +81,49 @@ public class World
 	/// Adds chunk data to the world
 	/// </summary>
 	/// <param name="chunkData"></param>
-	public void AddChunkData(ChunkDataPacket chunkData)
+	public IEnumerator AddChunkDataCoroutine(ChunkDataPacket chunkData)
 	{
+		Chunk chunk;
 		lock (_chunks)
 		{
 			// if the chunk already exists, add data
 			// otherwise, make a new chunk
-			var existingChunk = _chunks.Find(c => c.Position.Equals(chunkData.Position));
-			if (existingChunk != null)  // chunk already exists
+			chunk = _chunks.Find(c => c.Position.Equals(chunkData.Position));
+			if (chunk != null)  // chunk already exists
 			{
 				if (chunkData.GroundUpContinuous)
 				{
 					Debug.LogWarning($"Packet data for chunk at {chunkData.Position} tried to load GroundUpContinuous for already loaded chunk!");
-					return;
+					yield break;
 				}
-
-				existingChunk.AddChunkData(chunkData);
-				ChunkRenderer.MarkChunkForRegeneration(existingChunk);
 			}
 			else
 			{
-				Chunk chunk = new Chunk(chunkData, this);
+				// need to create a new chunk
+				chunk = new Chunk(chunkData.ChunkX, chunkData.ChunkZ, this);
 				_chunks.Add(chunk);
 				ChunkRenderer.AddChunk(chunk);
 			}
 		}
+
+		// add chunk data to chunk in another thread
+		var task = Task.Run(() =>
+		{
+			Profiler.BeginThreadProfiling("addChunkData", chunk.ToString());
+			chunk.AddChunkData(chunkData);
+			Profiler.EndThreadProfiling();
+		});
+
+		// wait for task to complete
+		while (!task.IsCompleted)
+			yield return null;
+
+		// check for exceptions
+		if (task.IsFaulted)
+			throw task.Exception;
+
+		// regenerate chunk
+		ChunkRenderer.MarkChunkForRegeneration(chunk);
 	}
 
 	/// <summary>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -17,20 +18,14 @@ public class ChunkRenderer : MonoBehaviour
 	public DebugCanvas DebugCanvas;
 
 	private readonly List<PhysicalChunk> _chunkMeshes = new List<PhysicalChunk>();
-	private readonly BlockingCollection<PhysicalChunk> _regenerationQueue = new BlockingCollection<PhysicalChunk>();
+	private readonly ConcurrentQueue<PhysicalChunk> _regenerationQueue = new ConcurrentQueue<PhysicalChunk>();
 	private readonly ConcurrentQueue<(int, ChunkMeshData)> _finishedMeshData = new ConcurrentQueue<(int, ChunkMeshData)>();
-	private Task _regenerationTask;
+	private readonly List<Task> _regenTasks = new List<Task>();
 	private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
 	private void Start()
 	{
-		// start chunk regen task
-		_regenerationTask = new Task(() =>
-		{
-			RegenerationWorker(_cancellationTokenSource.Token);
-		}, _cancellationTokenSource.Token);
-		_regenerationTask.Start();
-
+		StartCoroutine(RegenerationCoroutine(_cancellationTokenSource.Token));
 		StartCoroutine(AssignChunkMeshCoroutine(_cancellationTokenSource.Token));
 	}
 
@@ -41,10 +36,11 @@ public class ChunkRenderer : MonoBehaviour
 
 	private void Update()
 	{
-		// check regeneration worker
-		if (_regenerationTask.IsFaulted)
-			throw _regenerationTask.Exception;
+		// remove completed regen tasks from list
+		_regenTasks.RemoveAll(t => t.IsCompleted);
 
+		DebugCanvas.QueuedChunks = _regenerationQueue.Count;
+		DebugCanvas.ProcessingChunks = _regenTasks.Count;
 		DebugCanvas.FinishedChunks = _finishedMeshData.Count;
 	}
 
@@ -54,14 +50,15 @@ public class ChunkRenderer : MonoBehaviour
 		{
 			// try to take the next finished mesh from the queue
 			// if there are none, yield until the next frame
-			if (!_finishedMeshData.TryDequeue(out (int, ChunkMeshData) finishedMesh))
+			(int, ChunkMeshData) finishedMesh;
+			while (!_finishedMeshData.TryDequeue(out finishedMesh))
 				yield return null;
 
 			var sectionIndex = finishedMesh.Item1;
 			var meshData = finishedMesh.Item2;
 			lock (_chunkMeshes)
 			{
-				// if the chunk has been unloaded the mesh data will become an orhpan, so ignore it
+				// if the chunk has been unloaded we can't add any data to it
 				if (!_chunkMeshes.Contains(meshData.PhysicalChunk))
 					continue;
 
@@ -78,8 +75,8 @@ public class ChunkRenderer : MonoBehaviour
 				chunkSection.IsGenerated = true;
 
 				// if we're over the frame budget, wait for the next frame
-				if (Time.deltaTime > 1 / 60)
-					yield return null;
+				/*if (Time.deltaTime > 1 / 60)
+					yield return null;*/
 			}
 		}
 	}
@@ -98,7 +95,7 @@ public class ChunkRenderer : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Adds a chunk to the list of chunks we are rendering, and marks it for mesh regeneration
+	/// Adds a chunk to the list of chunks we are rendering. Does not mark it for regeneration
 	/// </summary>
 	/// <param name="chunk"></param>
 	public void AddChunk(Chunk chunk)
@@ -112,9 +109,6 @@ public class ChunkRenderer : MonoBehaviour
 		{
 			// add chunkmesh to list
 			_chunkMeshes.Add(chunkMesh);
-
-			// (re)generate
-			MarkChunkForRegeneration(chunkMesh);
 		}
 	}
 
@@ -168,7 +162,7 @@ public class ChunkRenderer : MonoBehaviour
 	/// <param name="mesh"></param>
 	public void MarkChunkForRegeneration(PhysicalChunk mesh)
 	{
-		_regenerationQueue.Add(mesh);
+		_regenerationQueue.Enqueue(mesh);
 	}
 
 	/// <summary>
@@ -196,42 +190,43 @@ public class ChunkRenderer : MonoBehaviour
 		}
 	}
 
-	private void RegenerationWorker(CancellationToken token)
+	private IEnumerator RegenerationCoroutine(CancellationToken token)
 	{
-		var sw = new System.Diagnostics.Stopwatch();
-
 		while (!token.IsCancellationRequested)
-		{
-			DebugCanvas.QueuedChunks = _regenerationQueue.Count;
-
-			// generate mesh on another thread
+		{		
+			// try to take a chunk from the regen queue, or yield if the queue is empty
 			PhysicalChunk chunkMesh;
-			try
-			{
-				chunkMesh = _regenerationQueue.Take(token);
-			}
-			catch (OperationCanceledException)
-			{
-				break;
-			}
+			while (!_regenerationQueue.TryDequeue(out chunkMesh))
+				yield return null;
 
 			// check that we are still keeping track of the chunk (i.e. it's not unloaded)
 			if (!_chunkMeshes.Contains(chunkMesh))
 				continue;
 
-			// time how long it takes to generate mesh
-			sw.Restart();
-			var meshData = chunkMesh.GenerateMesh(0xffff);
-			sw.Stop();
+			// limit running tasks to 10
+			while (_regenTasks.Count >= 10)
+				yield return null;
 
-			// add chunk time to debug screen
-			DebugCanvas.AverageChunkTime.Add(sw.Elapsed.Milliseconds / 1000f);
-
-			// add finished mesh data to queue so it can be assigned to the mesh filter
-			foreach (var data in meshData)
+			// generate the mesh on another thread
+			_regenTasks.Add(Task.Run(() =>
 			{
-				_finishedMeshData.Enqueue(data);
-			}
+				var sw = new Stopwatch();
+
+				// time how long it takes to generate mesh
+				sw.Start();
+				var meshData = chunkMesh.GenerateMesh(0xffff);
+				sw.Stop();
+
+				// add chunk time to debug screen
+				DebugCanvas.AverageChunkTime.Add(sw.Elapsed.Milliseconds / 1000f);
+
+				// add finished mesh data to queue so it can be assigned to the mesh filter
+				foreach (var data in meshData)
+				{
+					_finishedMeshData.Enqueue(data);
+					DebugCanvas.LifetimeFinishedChunks++;
+				}
+			}));
 		}
 	}
 }

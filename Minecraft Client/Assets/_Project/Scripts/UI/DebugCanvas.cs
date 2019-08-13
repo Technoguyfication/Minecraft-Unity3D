@@ -21,7 +21,9 @@ public class DebugCanvas : MonoBehaviour
 	public int TickCount = 0;
 	public List<float> AverageChunkTime = new List<float>();
 	public int QueuedChunks = 0;
+	public int ProcessingChunks = 0;
 	public int FinishedChunks = 0;
+	public int LifetimeFinishedChunks = 0;
 
 	public bool Displaying = false;
 
@@ -30,6 +32,10 @@ public class DebugCanvas : MonoBehaviour
 	// Use this for initialization
 	void Start()
 	{
+#if UNITY_EDITOR
+		Displaying = true;
+#endif
+
 		Canvas.enabled = Displaying;
 		StartCoroutine(UpdateFPSCoroutine());
 	}
@@ -73,7 +79,7 @@ public class DebugCanvas : MonoBehaviour
 			// calculate chunk time
 			if (AverageChunkTime.Count > 0)
 			{
-				textBuilder.AppendLine($"Chunk gen: {AverageChunkTime.Average().ToString("0.0000")}s over 25 samples; Q: {QueuedChunks}; F: {FinishedChunks}");
+				textBuilder.AppendLine($"Chunk gen: {AverageChunkTime.Average().ToString("0.0000")}s over {AverageChunkTime.Count} samples; Q: {QueuedChunks}; P: {ProcessingChunks}; F: {FinishedChunks}; \u029FF: {LifetimeFinishedChunks}");
 
 				if (AverageChunkTime.Count > 25)
 				{

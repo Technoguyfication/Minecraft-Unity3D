@@ -269,7 +269,7 @@ public class GameManager : MonoBehaviour
 				HandleKeepAlive(new ClientKeepAlivePacket(data));
 				break;
 			case ClientboundIDs.CHUNK_DATA:
-				_currentWorld.AddChunkData(new ChunkDataPacket(data));
+				StartCoroutine(_currentWorld.AddChunkDataCoroutine(new ChunkDataPacket(data)));
 				break;
 			case ClientboundIDs.PLAYER_POSITION_AND_LOOK:
 				HandlePositionAndLook(new ClientPlayerPositionAndLookPacket(data));
