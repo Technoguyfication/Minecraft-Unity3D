@@ -131,7 +131,7 @@ public class PhysicalChunk : MonoBehaviour
 												continue;
 										}
 
-										neighbors[i] = neighborChunk?.GetBlockAt(neighborPos).IsSolid ?? false;	// unloaded neighbor chunks are null. if the chunk is unloaded, say it's empty
+										neighbors[i] = neighborChunk?.GetBlockAt(neighborPos).IsSolid ?? true;	// unloaded neighbor chunks are null. if the chunk is unloaded, say it's empty
 									}
 								}
 
