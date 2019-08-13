@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Profiling;
 
 /// <summary>
 /// Represents a Chunk column
@@ -147,12 +148,16 @@ public class Chunk
 		{
 			var data = new List<byte>(packet.Data);
 
+			Profiler.BeginSample("Loading chunk sections");
+
 			// chunk data
 			for (int s = 0; s < 16; s++)
 			{
 				// check bitmask to see if we're reading data for this section
 				if ((packet.PrimaryBitmask & (1) << s) != 0)
 				{
+					Profiler.BeginSample($"Chunk section: {s}");
+
 					// set max block height to the height of this chunk
 					int maxBlockHeight = (s + 1) * 16;
 					if (maxBlockHeight > MaxHeight)
@@ -183,6 +188,8 @@ public class Chunk
 						dataArray[i] = PacketHelper.GetUInt64(data);
 					}
 
+					Profiler.BeginSample("Block data");
+
 					// parse block data
 					for (int b = 0; b < 4096; b++)    // for section height
 					{
@@ -210,6 +217,17 @@ public class Chunk
 						BlockArray[b + (4096 * s)] = blk;
 					}
 
+					Profiler.EndSample();   // block data
+
+					// we don't use sky or block lights
+					// read data to move new data to front of buffer
+					data.Read(2048);
+					if (World.Dimension == World.DimensionType.OVERWORLD)
+						data.Read(2048);
+
+					/*
+					Profiler.BeginSample("Block lights");
+
 					// parse block light data
 					for (int y = 0; y < 16; y++)
 					{
@@ -226,9 +244,13 @@ public class Chunk
 						}
 					}
 
+					Profiler.EndSample();	// block lights
+
 					// parse sky lights
 					if (World.Dimension == World.DimensionType.OVERWORLD)
 					{
+						Profiler.BeginSample("Sky lights");
+
 						// parse block light data
 						for (int y = 0; y < 16; y++)
 						{
@@ -244,7 +266,13 @@ public class Chunk
 								}
 							}
 						}
+
+						Profiler.EndSample();	// sky lights
 					}
+
+	*/
+
+					Profiler.EndSample();	// chunk section
 				}
 				else
 				{
