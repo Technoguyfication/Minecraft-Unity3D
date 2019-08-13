@@ -59,7 +59,7 @@ public class DebugCanvas : MonoBehaviour
 			var textBuilder = new StringBuilder();
 
 			// game version
-			textBuilder.AppendLine($"Minecraft Client Unity v{PlayerSettings.bundleVersion}");
+			textBuilder.AppendLine($"Minecraft Client Unity v{Application.version}");
 
 			// connected server
 			if (ConnectedHostname != null && ConnectedPort != null)
