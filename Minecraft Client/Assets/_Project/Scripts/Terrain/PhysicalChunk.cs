@@ -133,7 +133,7 @@ public class PhysicalChunk : MonoBehaviour
 												neighborChunk = neighborChunks[3];
 												break;
 											default:
-												neighbors[i] = Chunk.World.GetBlock(neighborPos.GetWorldPos(Chunk)).IsSolid;
+												neighbors[i] = false;	// this block is outside 0 < x < 256
 												continue;
 										}
 
