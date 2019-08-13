@@ -1,5 +1,7 @@
 # Minecraft-Unity3D
 
+### See the Trello board [here](https://trello.com/b/O2Dzeo22/unity-minecraft-client)
+
 I want to recreate the vanilla Minecraft client in Unity to a degree that the game is mostly playable. The idea is you can connect to a server and play with your friends like normal, and have a very close to vanilla experience. I might also add in some client-side modifications in the future ;)
 
 
