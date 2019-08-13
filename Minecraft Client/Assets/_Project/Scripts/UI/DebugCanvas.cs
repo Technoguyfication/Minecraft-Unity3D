@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 public class DebugCanvas : MonoBehaviour
 {
-	public const int MAX_CHUNK_TIME_SAMPLES = 5000;
+	public const int MAX_CHUNK_TIME_SAMPLES = 1000;
 
 	public Text DebugText;
 	public Canvas Canvas;
@@ -70,7 +70,7 @@ public class DebugCanvas : MonoBehaviour
 			}
 
 			textBuilder.AppendLine($"Local Ticks: {TickCount.ToString()}");
-			textBuilder.AppendLine($"FPS: {_currentFps}");
+			textBuilder.AppendLine($"FPS: {_currentFps} / {((1f / _currentFps) * 1000).ToString("0.00")}ms");
 
 			// player stats
 			if (Player != null)
@@ -87,7 +87,7 @@ public class DebugCanvas : MonoBehaviour
 					AverageChunkTime.RemoveRange(0, AverageChunkTime.Count - MAX_CHUNK_TIME_SAMPLES);
 				}
 
-				textBuilder.AppendLine($"Chunk gen: {AverageChunkTime.Average().ToString("0.0")}ms over {AverageChunkTime.Count} samples; P: {ProcessingChunks.ToString("000")}; Fq: {FinishedChunks.ToString("000")}; F\u029F: {LifetimeFinishedChunks}");
+				textBuilder.AppendLine($"Chunk gen: {AverageChunkTime.Average().ToString("0.0")}ms over {AverageChunkTime.Count} samples; P: {ProcessingChunks.ToString("00")}; Fq: {FinishedChunks.ToString("000")}; F\u029F: {LifetimeFinishedChunks}");
 			}
 
 			DebugText.text = textBuilder.ToString();
