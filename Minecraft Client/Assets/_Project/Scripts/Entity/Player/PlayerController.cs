@@ -6,7 +6,7 @@ using UnityEngine;
 /// <summary>
 /// The local player
 /// </summary>
-public class PlayerController : Player
+public class PlayerController : EntityPlayer
 {
 	public const float DEFAULT_JUMP_HEIGHT = 1.25f;
 

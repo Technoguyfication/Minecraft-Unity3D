@@ -305,6 +305,9 @@ public class GameManager : MonoBehaviour
 			case ClientboundIDs.ENTITY_HEAD_LOOK:
 				EntityManager.HandleEntityHeadLook(new EntityHeadLookPacket(data));
 				break;
+			case ClientboundIDs.PLAYER_INFO:
+				Debug.Log($"Player info: {Convert.ToBase64String(data.Payload)}");
+				break;
 			default:
 				break;
 		}

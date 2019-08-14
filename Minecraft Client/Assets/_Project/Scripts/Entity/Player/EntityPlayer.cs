@@ -5,11 +5,11 @@ using UnityEngine;
 /// <summary>
 /// A player in game
 /// </summary>
-public class Player : LivingEntity
+public class EntityPlayer : LivingEntity
 {
 	public Texture Skin { get; set; }
 
-	public Player()
+	public EntityPlayer()
 	{
 		Type = EntityType.PLAYER;
 	}

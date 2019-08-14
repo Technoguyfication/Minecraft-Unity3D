@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DefaultMob : Mob
+public class EntityCow : Mob
 {
 
 }

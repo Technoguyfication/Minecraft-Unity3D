@@ -59,7 +59,8 @@ public enum ClientboundIDs : int
 	ENTITY_LOOK_AND_RELATIVE_MOVE = 0x29,
 	ENTITY_LOOK = 0x2A,
 	ENTITY_TELEPORT = 0x50,
-	ENTITY_HEAD_LOOK = 0x39
+	ENTITY_HEAD_LOOK = 0x39,
+	PLAYER_INFO = 0x30
 }
 
 public enum ServerboundIDs : int

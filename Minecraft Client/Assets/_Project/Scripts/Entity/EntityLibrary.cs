@@ -11,6 +11,7 @@ public class EntityLibrary : MonoBehaviour
 	public GameObject Cow;
 	public GameObject Pig;
 
+	// todo: use reflection to generate this as a dictionary dynamically at runtime
 	public GameObject GetEntity(EntityType type)
 	{
 		switch (type)
