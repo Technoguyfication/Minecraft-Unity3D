@@ -6,10 +6,10 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 /// <summary>
-/// Used for authenticating with mojang's servers.
+/// Used for communicating with mojang's servers.
 /// All methods are blocking
 /// </summary>
-public static class MojangAuthentication
+public static class MojangAPI
 {
 	public static string Username { get; private set; }
 	public static Guid UUID { get; private set; }

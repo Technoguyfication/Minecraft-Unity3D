@@ -22,7 +22,7 @@ public class AuthenticatePayload
 	public Agent agent = new Agent();
 	public string username;
 	public string password;
-	public string clientToken = MojangAuthentication.GetClientToken();
+	public string clientToken = MojangAPI.GetClientToken();
 	public bool requestUser = false;
 }
 

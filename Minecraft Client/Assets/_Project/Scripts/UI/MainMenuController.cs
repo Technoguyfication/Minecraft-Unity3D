@@ -136,7 +136,7 @@ public class MainMenuController : MonoBehaviour
 		}
 
 		SetAuthImage(AuthImageStatus.LOADING);
-		StartCoroutine(MojangAuthentication.Login(username, password, HandleLoginResponse));
+		StartCoroutine(MojangAPI.Login(username, password, HandleLoginResponse));
 	}
 
 	/// <summary>
@@ -145,31 +145,31 @@ public class MainMenuController : MonoBehaviour
 	public void RefreshLoginStatus()
 	{
 		Debug.Log("Checking user login..");
-		Debug.Log($"Client auth server token: {MojangAuthentication.GetClientToken()}");
+		Debug.Log($"Client auth server token: {MojangAPI.GetClientToken()}");
 
 		SetAuthImage(AuthImageStatus.LOADING);
-		StartCoroutine(MojangAuthentication.GetLoginStatus(HandleLoginResponse));
+		StartCoroutine(MojangAPI.GetLoginStatus(HandleLoginResponse));
 	}
 
-	private void HandleLoginResponse(MojangAuthentication.AccountStatus status)
+	private void HandleLoginResponse(MojangAPI.AccountStatus status)
 	{
 		switch (status)
 		{
-			case MojangAuthentication.AccountStatus.LOGGED_IN:
+			case MojangAPI.AccountStatus.LOGGED_IN:
 				SetAuthImage(AuthImageStatus.VALID);
-				AuthStatusText.text = $"Logged in as {MojangAuthentication.Username}";
+				AuthStatusText.text = $"Logged in as {MojangAPI.Username}";
 				SetLoginLogoutButtons(true);
-				GameManager.Username = MojangAuthentication.Username;
+				GameManager.Username = MojangAPI.Username;
 				break;
-			case MojangAuthentication.AccountStatus.LOGGED_OUT:
-			case MojangAuthentication.AccountStatus.INVALID_CREDENTIALS:
+			case MojangAPI.AccountStatus.LOGGED_OUT:
+			case MojangAPI.AccountStatus.INVALID_CREDENTIALS:
 				SetAuthImage(AuthImageStatus.INVALID);
 				AuthStatusText.text = "Not Logged In";
 				SetLoginLogoutButtons(false);
 				break;
-			case MojangAuthentication.AccountStatus.NOT_PREMIUM:
+			case MojangAPI.AccountStatus.NOT_PREMIUM:
 				SetAuthImage(AuthImageStatus.INVALID);
-				AuthStatusText.text = $"Logged in as {MojangAuthentication.Username}\nAccount not premium.";
+				AuthStatusText.text = $"Logged in as {MojangAPI.Username}\nAccount not premium.";
 				SetLoginLogoutButtons(false);
 				break;
 		}

@@ -269,7 +269,7 @@ public class NetworkClient : IDisposable
 				Debug.Log($"Sending hash to Mojang servers: {authHash}");
 
 				// check session with mojang
-				if (!MojangAuthentication.JoinServer(authHash))
+				if (!MojangAPI.JoinServer(authHash))
 					throw new UnityException("Invalid session. (Try restarting game or relogging into Minecraft account)");
 
 				// use pub key to encrypt shared secret

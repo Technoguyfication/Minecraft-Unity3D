@@ -7,17 +7,16 @@ using System.Threading.Tasks;
 #pragma warning disable IDE1006
 
 [Serializable]
-public class RefreshPayload
+public class InvalidatePayload
 {
-	public RefreshPayload()
+	public InvalidatePayload()
 	{ }
 
-	public RefreshPayload(string accessToken)
+	public InvalidatePayload(string accessToken)
 	{
 		this.accessToken = accessToken;
 	}
 
 	public string accessToken;
-	public string clientToken = MojangAuthentication.GetClientToken();
-	public bool requestUser = false;
+	public string clientToken = MojangAPI.GetClientToken();
 }
