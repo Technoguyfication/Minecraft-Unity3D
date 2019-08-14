@@ -11,22 +11,28 @@ using UnityEngine.Networking;
 /// </summary>
 public static class MojangAPI
 {
-	public static string Username { get; private set; }
-	public static Guid UUID { get; private set; }
+	/* in this class we do some nasty stuff with IEnumerable and coroutines
+	 * essentially, i didn't want to make this a MonoBehaviour, but I still
+	 * want to use nested coroutines. I ended up using task.MoveNext() manually
+	 * a lot, and it doesn't make a lot of sense until you realize this
+	 * */
 
-	private const string LoginServer = @"https://authserver.mojang.com";
-	private const string clientTokenPrefKey = "authClientToken";
-	private const string accessTokenPrefKey = "authAccessToken";
+	public static string Username { get; private set; }
+
+	private static Guid _uuid;
+	private const string _loginServer = @"https://authserver.mojang.com";
+	private const string _clientTokenPrefKey = "authClientToken";
+	private const string _accessTokenPrefKey = "authAccessToken";
 
 	/// <summary>
 	/// The access token to be used by the client
 	/// </summary>
 	public static string AccessToken
 	{
-		get => PlayerPrefs.GetString(accessTokenPrefKey, null);
+		get => PlayerPrefs.GetString(_accessTokenPrefKey, null);
 		set
 		{
-			PlayerPrefs.SetString(accessTokenPrefKey, value);
+			PlayerPrefs.SetString(_accessTokenPrefKey, value);
 			PlayerPrefs.Save();
 		}
 	}
@@ -37,16 +43,18 @@ public static class MojangAPI
 	/// <returns></returns>
 	public static string GetClientToken()
 	{
-		// generate new client token if we need
-		if (!PlayerPrefs.HasKey(clientTokenPrefKey))
+		if (PlayerPrefs.HasKey(_clientTokenPrefKey))
 		{
+			return PlayerPrefs.GetString(_clientTokenPrefKey);
+		}
+		else
+		{
+			// generate a new access token
 			string newToken = Guid.NewGuid().ToString();
-			PlayerPrefs.SetString(clientTokenPrefKey, newToken);
+			PlayerPrefs.SetString(_clientTokenPrefKey, newToken);
 			PlayerPrefs.Save();
 			return newToken;
 		}
-
-		return PlayerPrefs.GetString(clientTokenPrefKey);
 	}
 
 	/// <summary>
@@ -58,7 +66,7 @@ public static class MojangAPI
 	public static IEnumerator Login(string username, string password, Action<AccountStatus> callback)
 	{
 		// send login request to server
-		var task = MakeRequest<RefreshResponse>(LoginServer + "/authenticate", JsonUtility.ToJson(new AuthenticatePayload(username, password)), (responseData) =>
+		var task = MakeRequest<RefreshResponse>(_loginServer + "/authenticate", JsonUtility.ToJson(new AuthenticatePayload(username, password)), (responseData) =>
 		{
 			callback(HandleRefreshResponse(responseData));
 		});
@@ -80,7 +88,7 @@ public static class MojangAPI
 		}
 
 		// refresh access token
-		var task = MakeRequest<RefreshResponse>(LoginServer + "/refresh", JsonUtility.ToJson(new RefreshPayload(AccessToken)), responseData =>
+		var task = MakeRequest<RefreshResponse>(_loginServer + "/refresh", JsonUtility.ToJson(new RefreshPayload(AccessToken)), responseData =>
 		{
 			callback(HandleRefreshResponse(responseData));
 		});
@@ -96,7 +104,7 @@ public static class MojangAPI
 	/// <param name="token"></param>
 	public static IEnumerator InvalidateAccessToken(string token = null)
 	{
-		var task = MakeRequest<object>(LoginServer + "/invalidate", JsonUtility.ToJson(new InvalidatePayload(token ?? AccessToken)), responseData =>
+		var task = MakeRequest<object>(_loginServer + "/invalidate", JsonUtility.ToJson(new InvalidatePayload(token ?? AccessToken)), responseData =>
 		{
 			// we don't need to do anything here
 		});
@@ -110,7 +118,7 @@ public static class MojangAPI
 	/// <param name="hash"></param>
 	public static bool JoinServer(string hash)
 	{
-		var payload = new JoinServerPayload(AccessToken, UUID.ToString("N"), hash);
+		var payload = new JoinServerPayload(AccessToken, _uuid.ToString("N"), hash);
 		bool success = false;
 
 		var task = MakeRequest<object>("https://sessionserver.mojang.com/session/minecraft/join", JsonUtility.ToJson(payload), (data) =>
@@ -158,7 +166,7 @@ public static class MojangAPI
 		// get body from response data
 		var responseBody = (RefreshResponse)responseData.ResponseObject;
 		Username = responseBody.selectedProfile.name;
-		UUID = Guid.Parse(responseBody.selectedProfile.id);
+		_uuid = Guid.Parse(responseBody.selectedProfile.id);
 		AccountStatus status;
 
 		// check if user is premium
@@ -211,7 +219,7 @@ public static class MojangAPI
 				error = new ServerErrorResponse(ex);
 			}
 
-			callback(new ResponseData() { ErrorData = error, ResponseCode = request.responseCode });
+			callback(new ResponseData(error, request.responseCode));
 		}
 		else
 		{
@@ -225,7 +233,7 @@ public static class MojangAPI
 			{
 				// error parsing response
 				Debug.LogWarning($"Exception deserializing server response:\n{ex}\nBody:\n{request.downloadHandler.text}");
-				callback(new ResponseData() { ErrorData = new ServerErrorResponse(ex) });
+				callback(new ResponseData(new ServerErrorResponse(ex)));
 			}
 		}
 	}
@@ -242,28 +250,37 @@ public static class MojangAPI
 	}
 }
 
-class ResponseData
+/// <summary>
+/// A really simple struct to return a boxed object and http response code 
+/// </summary>
+struct ResponseData
 {
-	public ResponseData()
-	{ }
+	public ResponseData(ServerErrorResponse errorData, long? responseCode = null)
+	{
+		ErrorData = errorData;
+		ResponseObject = null;
+		ResponseCode = responseCode;
+	}
 
 	public ResponseData(object boxedResponse)
 	{
+		ErrorData = null;
 		ResponseObject = boxedResponse;
+		ResponseCode = null;
 	}
 
 	/// <summary>
 	/// The error this response contains
 	/// </summary>
-	public ServerErrorResponse ErrorData { get; set; } = null;
+	public ServerErrorResponse ErrorData { get; }
 
 	/// <summary>
 	/// A boxed version of the response object
 	/// </summary>
-	public object ResponseObject { get; set; }
+	public object ResponseObject { get; }
 
 	/// <summary>
 	/// The response code sent by the server
 	/// </summary>
-	public long ResponseCode { get; set; }
+	public long? ResponseCode { get; }
 }
