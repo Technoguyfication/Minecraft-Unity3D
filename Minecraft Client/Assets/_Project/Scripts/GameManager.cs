@@ -64,17 +64,17 @@ public class GameManager : MonoBehaviour
 		if (_initialized)
 		{
 			// make sure we aren't disconnected
-			if (_netReadTask.IsFaulted)
+			if (_netReadTask?.IsFaulted ?? false)
 			{
 				Disconnect(_netReadTask.Exception.InnerExceptions[0].Message);
 				return;
 			}
-			if (_netWriteTask.IsFaulted)
+			if (_netWriteTask?.IsFaulted ?? false)
 			{
 				Disconnect(_netWriteTask.Exception.InnerExceptions[0].Message);
 				return;
 			}
-			if (!_client.Connected)
+			if (!_client?.Connected ?? true)
 			{
 				Disconnect("Network disconnected");
 				return;

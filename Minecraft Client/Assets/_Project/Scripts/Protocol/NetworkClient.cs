@@ -97,28 +97,20 @@ public class NetworkClient : IDisposable
 		{
 			while (bytesRead < amount)
 			{
-				int i = 0; ;
-				try
+				int i = 0;
+
+				if (_encrypted)
 				{
-					if (_encrypted)
-						i = _aesStream.Read(buffer, bytesRead, amount - bytesRead);
-					else
-						i = Client.GetStream().Read(buffer, bytesRead, amount - bytesRead);
+					i = _aesStream.Read(buffer, bytesRead, amount - bytesRead);
 				}
-				catch (IOException ex)
+				else
 				{
-					Disconnect($"Connection closed: {ex.Message}");
-					break;
+					i = Client.GetStream().Read(buffer, bytesRead, amount - bytesRead);
 				}
-				catch (Exception ex)
-				{
-					Disconnect($"Error reading from socket: {ex.Message}");
-					break;
-				}
+
 				if (i == 0)
 				{
-					Disconnect("Connection closed");
-					break;
+					throw new IOException("Connection closed");
 				}
 
 				bytesRead += i;
