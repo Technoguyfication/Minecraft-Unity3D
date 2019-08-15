@@ -60,7 +60,8 @@ public enum ClientboundIDs : int
 	ENTITY_LOOK = 0x2A,
 	ENTITY_TELEPORT = 0x50,
 	ENTITY_HEAD_LOOK = 0x39,
-	PLAYER_INFO = 0x30
+	PLAYER_INFO = 0x30,
+	CHAT_MESSAGE = 0x0E
 }
 
 public enum ServerboundIDs : int
