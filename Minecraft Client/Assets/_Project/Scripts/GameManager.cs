@@ -125,6 +125,9 @@ public class GameManager : MonoBehaviour
 	/// </summary>
 	public IEnumerator ConnectToServerCoroutine(string hostname, int port)
 	{
+		// disable main menu controller
+		GetComponent<MainMenuController>().enabled = false;
+		
 		// open loading screen
 		AsyncOperation loadLoadingScreenTask = SceneManager.LoadSceneAsync("LoadingScreen", LoadSceneMode.Additive);
 		while (!loadLoadingScreenTask.isDone)
