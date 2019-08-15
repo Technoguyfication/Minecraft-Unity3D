@@ -29,13 +29,13 @@ public class GameManager : MonoBehaviour
 	private Task _netWriteTask;
 	private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 	private bool _initialized = false;
-	private World _currentWorld
+	private World CurrentWorld
 	{
 		get => _currentWorldVar;
 		set
 		{
 			_currentWorldVar = value;
-			EntityManager.World = _currentWorld;
+			EntityManager.World = CurrentWorld;
 		}
 	}
 	private World _currentWorldVar;
@@ -221,7 +221,7 @@ public class GameManager : MonoBehaviour
 
 		// set settings from server
 		_playerUuid = loginSuccess.UUID;
-		_currentWorld = new World(DebugCanvas)
+		CurrentWorld = new World(DebugCanvas)
 		{
 			Dimension = joinGame.Dimension,
 		};
@@ -234,8 +234,8 @@ public class GameManager : MonoBehaviour
 		SceneManager.MoveGameObjectToScene(gameObject, SceneManager.GetSceneByName("Game"));
 
 		// set up references in game scene
-		_currentWorld.ChunkRenderer = Instantiate(ChunkRendererPrefab, Vector3.zero, Quaternion.identity).GetComponent<ChunkRenderer>();
-		_currentWorld.ChunkRenderer.DebugCanvas = DebugCanvas;
+		CurrentWorld.ChunkRenderer = Instantiate(ChunkRendererPrefab, Vector3.zero, Quaternion.identity).GetComponent<ChunkRenderer>();
+		CurrentWorld.ChunkRenderer.DebugCanvas = DebugCanvas;
 
 		// start network worker tasks
 		_netReadTask = new Task(() =>
@@ -276,13 +276,13 @@ public class GameManager : MonoBehaviour
 				HandleKeepAlive(new ClientKeepAlivePacket(data));
 				break;
 			case ClientboundIDs.CHUNK_DATA:
-				StartCoroutine(_currentWorld.AddChunkDataCoroutine(new ChunkDataPacket(data)));
+				StartCoroutine(CurrentWorld.AddChunkDataCoroutine(new ChunkDataPacket(data)));
 				break;
 			case ClientboundIDs.PLAYER_POSITION_AND_LOOK:
 				HandlePositionAndLook(new ClientPlayerPositionAndLookPacket(data));
 				break;
 			case ClientboundIDs.UNLOAD_CHUNK:
-				_currentWorld.UnloadChunk(new UnloadChunkPacket(data).Position);
+				CurrentWorld.UnloadChunk(new UnloadChunkPacket(data).Position);
 				break;
 			case ClientboundIDs.SPAWN_MOB:
 				EntityManager.HandleSpawnMobPacket(new SpawnMobPacket(data));
@@ -309,7 +309,7 @@ public class GameManager : MonoBehaviour
 				Debug.Log($"Player info: {Convert.ToBase64String(data.Payload)}");
 				break;
 			case ClientboundIDs.CHAT_MESSAGE:
-				Debug.Log($"Chat message: {new ChatMessagePacket(data).Json}");
+				Debug.Log($"Chat message: {new ChatMessage(new ChatMessagePacket(data)).PlaintextMessage}");
 				break;
 			default:
 				break;
@@ -338,7 +338,7 @@ public class GameManager : MonoBehaviour
 		if (_player == null)
 		{
 			_player = Instantiate(PlayerPrefab).GetComponent<PlayerController>();
-			_player.World = _currentWorld;
+			_player.World = CurrentWorld;
 			_player.UUID = _playerUuid;
 			_player.OnGroundChanged += PlayerOnGroundChanged;
 			_loadingScreen.HideLoadingScreen();

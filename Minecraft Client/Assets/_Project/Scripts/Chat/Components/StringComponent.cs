@@ -11,8 +11,8 @@ class StringComponent : ChatComponent
 {
 	public string text;
 
-	public override string GetComponentText(bool useFormatting, LinkedList<string> endBuilder)
+	public override string ToString()
 	{
-		return AppendFormatting(this, endBuilder) + text;
+		return text;
 	}
 }

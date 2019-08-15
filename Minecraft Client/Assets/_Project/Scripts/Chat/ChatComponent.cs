@@ -43,7 +43,7 @@ class ChatComponent
 		// check which type of ChatComponent this is
 		if (obj["text"] != null)    // string component
 			return obj.ToObject<StringComponent>();
-		if (obj["translation"] != null) // translate component
+		if (obj["translate"] != null) // translate component
 			return obj.ToObject<TranslateComponent>();
 		else if (obj["keybind"] != null)    // keybind component
 			throw new NotImplementedException("Keybind chat components are not yet supported");
@@ -51,32 +51,6 @@ class ChatComponent
 			throw new NotImplementedException("Score chat components are not yet supported");
 		else    // default to normal ChatComponent as all components can have these values
 			return obj.ToObject<ChatComponent>();
-	}
-
-	/// <summary>
-	/// Returns 
-	/// </summary>
-	/// <param name="comp"></param>
-	/// <returns></returns>
-	public static string AppendFormatting(ChatComponent comp, LinkedList<string> endBuilder)
-	{
-		if (comp.Bold)
-		{
-			return addTag("bold");
-		}
-
-		return string.Empty;    // no formatting applied
-
-		string addTag(string tag)
-		{
-			endBuilder.Prepend($"</{tag}>");
-			return $"<{tag}>";
-		}
-	}
-
-	public virtual string GetComponentText(bool useFormatting, LinkedList<string> endBuilder)
-	{
-		return string.Empty;
 	}
 }
 

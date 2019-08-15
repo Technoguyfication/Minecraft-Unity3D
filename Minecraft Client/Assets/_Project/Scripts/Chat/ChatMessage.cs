@@ -21,7 +21,8 @@ public class ChatMessage
 	{
 		var chatComponent = ChatComponent.FromJson(pkt.Json);
 
-		PlaintextMessage = chatComponent.GetComponentText(false, new LinkedList<string>());
+		// use .ToString() for plaintext and components will output text with no formatting
+		PlaintextMessage = chatComponent.ToString();
 	}
 
 	public enum Position : byte

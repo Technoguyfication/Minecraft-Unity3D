@@ -42,20 +42,6 @@ public class MainMenuController : MonoBehaviour
 	// Use this for initialization
 	void Start()
 	{
-		Debug.Log(ChatComponent.FromJson(@"{
-	'text': 'test'
-}").GetType().ToString());
-
-		var trans = ChatComponent.FromJson(@"{
-	'translation': 'chat.type.text',
-'with': [{
-	'bold': 'true',
-'text': 'test message'
-},'tknoguyfication']
-}");
-
-		Debug.Log(trans.GetType().ToString());
-
 		// set hostname and port textbox to last used
 		// todo: server list page
 		AddressInput.text = PlayerPrefs.GetString(ADDRESS_PREF_KEY, AddressInput.text);

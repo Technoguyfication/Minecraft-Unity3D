@@ -10,13 +10,13 @@ using Newtonsoft.Json;
 [Serializable]
 class TranslateComponent : ChatComponent
 {
-	public string translation;
+	public string translate;
 
 	[JsonConverter(typeof(ChatComponentJsonConverter))]
 	public ChatComponent[] with;
 
-	public override string GetComponentText(bool useFormatting, LinkedList<string> endBuilder)
+	public override string ToString()
 	{
-		return AppendFormatting(this, endBuilder) + ChatTranslation.TranslateString(translation, with.Select(c => c.GetComponentText(useFormatting, endBuilder)).ToArray());
+		return ChatTranslation.TranslateString(translate, with.Select(c => c.ToString()).ToArray());
 	}
 }
