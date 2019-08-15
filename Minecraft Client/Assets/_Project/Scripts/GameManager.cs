@@ -309,7 +309,7 @@ public class GameManager : MonoBehaviour
 				Debug.Log($"Player info: {Convert.ToBase64String(data.Payload)}");
 				break;
 			case ClientboundIDs.CHAT_MESSAGE:
-				Debug.Log($"Chat message: {new ChatMessagePacket(data).ChatMessage}");
+				Debug.Log($"Chat message: {new ChatMessagePacket(data).Json}");
 				break;
 			default:
 				break;

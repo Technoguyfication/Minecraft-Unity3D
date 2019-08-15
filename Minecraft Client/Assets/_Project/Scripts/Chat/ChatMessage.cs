@@ -13,13 +13,15 @@ public class ChatMessage
 	/// <summary>
 	/// For use in TextMeshPro dialogs
 	/// </summary>
-	public string  HTMLFormattedMessage { get; set; }
+	public string  HtmlFormattedMessage { get; set; }
 
 	public Position ChatPosition { get; set; }
 
 	public ChatMessage(ChatMessagePacket pkt)
 	{
+		var chatComponent = ChatComponent.FromJson(pkt.Json);
 
+		PlaintextMessage = chatComponent.GetComponentText(false, new LinkedList<string>());
 	}
 
 	public enum Position : byte

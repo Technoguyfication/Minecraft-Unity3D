@@ -42,12 +42,16 @@ public class MainMenuController : MonoBehaviour
 	// Use this for initialization
 	void Start()
 	{
-		Debug.Log(ChatComponent.GetChatComponent(@"{
+		Debug.Log(ChatComponent.FromJson(@"{
 	'text': 'test'
 }").GetType().ToString());
 
-		var trans = ChatComponent.GetChatComponent(@"{
-	'translation': 'test'
+		var trans = ChatComponent.FromJson(@"{
+	'translation': 'chat.type.text',
+'with': [{
+	'bold': 'true',
+'text': 'test message'
+},'tknoguyfication']
 }");
 
 		Debug.Log(trans.GetType().ToString());

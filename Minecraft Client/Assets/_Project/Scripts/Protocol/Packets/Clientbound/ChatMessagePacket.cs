@@ -22,11 +22,11 @@ public class ChatMessagePacket : Packet
 		set
 		{
 			var buffer = new List<byte>(value);
-			ChatMessage = PacketHelper.GetString(buffer);
+			Json = PacketHelper.GetString(buffer);
 			Position = (global::ChatMessage.Position)buffer.Read(1)[0];
 		}
 	}
 
-	public string ChatMessage { get; set; }
+	public string Json { get; set; }
 	public ChatMessage.Position Position { get; set; }
 }

@@ -11,29 +11,111 @@ using Newtonsoft.Json.Linq;
 [Serializable]
 class ChatComponent
 {
-	public string text;
-	public bool bold;
-	public bool italic;
-	public bool underlined;
-	public bool obfuscated;
-	public string color;
-	public string insertion;
-	public ChatClickEvent clickEvent;
+	[JsonProperty("bold")]
+	public bool Bold { get; set; }
+
+	[JsonProperty("italic")]
+	public bool Italic { get; set; }
+
+	[JsonProperty("underlined")]
+	public bool Underlined { get; set; }
+
+	[JsonProperty("obfuscated")]
+	public bool Obfuscated { get; set; }
+
+	[JsonProperty("color")]
+	public string Color { get; set; }
+
+	[JsonProperty("insertion")]
+	public string Insertion { get; set; }
+
+	[JsonProperty("clickEvent")]
+	public ChatClickEvent ClickEvent { get; set; }
 	// hoverEvent
 
-	public static ChatComponent GetChatComponent(string json)
+	public static ChatComponent FromJson(string json)
 	{
-		var obj = JObject.Parse(json);
+		return GetChatComponent(JObject.Parse(json));
+	}
 
+	public static ChatComponent GetChatComponent(JObject obj)
+	{
 		// check which type of ChatComponent this is
-		if (obj["translation"] != null)
-			return JsonConvert.DeserializeObject<TranslateComponent>(json);
-
-		return JsonConvert.DeserializeObject<ChatComponent>(json);
+		if (obj["text"] != null)    // string component
+			return obj.ToObject<StringComponent>();
+		if (obj["translation"] != null) // translate component
+			return obj.ToObject<TranslateComponent>();
+		else if (obj["keybind"] != null)    // keybind component
+			throw new NotImplementedException("Keybind chat components are not yet supported");
+		else if (obj["score"] != null)  // score component
+			throw new NotImplementedException("Score chat components are not yet supported");
+		else    // default to normal ChatComponent as all components can have these values
+			return obj.ToObject<ChatComponent>();
 	}
 
-	public override string ToString()
+	/// <summary>
+	/// Returns 
+	/// </summary>
+	/// <param name="comp"></param>
+	/// <returns></returns>
+	public static string AppendFormatting(ChatComponent comp, LinkedList<string> endBuilder)
 	{
-		return text;
+		if (comp.Bold)
+		{
+			return addTag("bold");
+		}
+
+		return string.Empty;    // no formatting applied
+
+		string addTag(string tag)
+		{
+			endBuilder.Prepend($"</{tag}>");
+			return $"<{tag}>";
+		}
 	}
+
+	public virtual string GetComponentText(bool useFormatting, LinkedList<string> endBuilder)
+	{
+		return string.Empty;
+	}
+}
+
+public class ChatComponentJsonConverter : JsonConverter
+{
+	public override bool CanConvert(Type objectType)
+	{
+		return objectType.Equals(typeof(ChatComponent));
+	}
+
+	public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+	{
+		if (objectType.Equals(typeof(ChatComponent)))
+		{
+			var obj = JObject.Load(reader);
+			return ChatComponent.GetChatComponent(obj);
+		}
+		else if (objectType.Equals(typeof(ChatComponent[])))
+		{
+			var objArr = JArray.Load(reader);
+			var chatComponents = new ChatComponent[objArr.Count];
+			for (int i = 0; i < chatComponents.Length; i++)
+			{
+				if (objArr[i].Type == JTokenType.Object)	// object type can be any component
+					chatComponents[i] = ChatComponent.GetChatComponent((JObject)objArr[i]);
+				else if (objArr[i].Type == JTokenType.String)	// string component
+					chatComponents[i] = new StringComponent() { text = (string)objArr[i] };
+			}
+
+			return chatComponents;
+		}
+
+		throw new JsonReaderException($"ChatComponentJsonConverter cannot deserialize to {objectType.ToString()}");
+	}
+
+	public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+	{
+		throw new NotImplementedException();
+	}
+
+	public override bool CanWrite => false;
 }
