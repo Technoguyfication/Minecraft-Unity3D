@@ -315,9 +315,6 @@ public class GameManager : MonoBehaviour
 
 	private void HandleKeepAlive(ClientKeepAlivePacket pkt)
 	{
-#if DEBUG
-		Debug.Log($"Keep-alive: {pkt.KeepAliveID}");
-#endif
 		DispatchWritePacket(new ServerKeepAlivePacket()
 		{
 			KeepAliveID = pkt.KeepAliveID
