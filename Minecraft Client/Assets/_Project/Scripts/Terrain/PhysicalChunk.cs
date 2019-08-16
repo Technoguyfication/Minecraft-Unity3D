@@ -47,7 +47,7 @@ public class PhysicalChunk : MonoBehaviour
 	/// Generates mesh data for this chunk section
 	/// </summary>
 	/// <param name="chunk"></param>
-	public ChunkMeshData[] GenerateMesh(ushort sections)
+	public ChunkMeshData[] GenerateMesh(ushort sections, bool regenerateNearbye)
 	{
 		var finishedMeshes = new List<ChunkMeshData>();
 
@@ -131,7 +131,7 @@ public class PhysicalChunk : MonoBehaviour
 												continue;
 										}
 
-										neighbors[i] = neighborChunk?.GetBlockAt(neighborPos).IsSolid ?? true;	// unloaded neighbor chunks are null. if the chunk is unloaded, say it's empty
+                                        neighbors[i] = neighborChunk?.GetBlockAt(neighborPos).IsSolid ?? true;	// unloaded neighbor chunks are null. if the chunk is unloaded, say it's empty
 									}
 								}
 
@@ -187,7 +187,7 @@ public class PhysicalChunk : MonoBehaviour
 				ChunkSection = s,
 				ElapsedTime = sw.ElapsedMilliseconds
 			});
-		}
+        }
 
 		return finishedMeshes.ToArray();
 	}

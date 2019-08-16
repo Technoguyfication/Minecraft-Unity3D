@@ -165,7 +165,7 @@ public class World
 		 * plus, the renderer won't render chunks above the bitmask provided in
 		 * this packet anyways due to the Chunk.MaxHeight property
 		 * */
-		ChunkRenderer.MarkChunkForRegeneration(chunk, ChunkRenderer.ALL_SECTIONS);
+		ChunkRenderer.MarkChunkForRegeneration(chunk, ChunkRenderer.ALL_SECTIONS, true);
 	}
 
 	/// <summary>
@@ -181,7 +181,7 @@ public class World
 		}
 	}
 
-	public enum DimensionType
+    public enum DimensionType
 	{
 		OVERWORLD = 0,
 		NETHER = -1,

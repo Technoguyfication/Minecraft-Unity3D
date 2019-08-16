@@ -309,7 +309,7 @@ public class GameManager : MonoBehaviour
 				EntityManager.HandleEntityHeadLook(new EntityHeadLookPacket(data));
 				break;
 			case ClientboundIDs.PLAYER_INFO:
-				Debug.Log($"Player info: {Convert.ToBase64String(data.Payload)}");
+                new PlayerInfoPacket(data);
 				break;
 			case ClientboundIDs.CHAT_MESSAGE:
 				Debug.Log($"Chat message: {new ChatMessage(new ChatMessagePacket(data)).PlaintextMessage}");
