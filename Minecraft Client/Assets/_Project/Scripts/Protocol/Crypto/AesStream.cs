@@ -13,13 +13,20 @@ public class AesStream : Stream
 {
 	Stream BaseStream { get; set; }
 
-	readonly CryptoStream enc;
-	readonly CryptoStream dec;
+	readonly CryptoStream encryptionStream;
+	readonly CryptoStream decryptionStream;
+	readonly SymmetricAlgorithm encryptor;
+	readonly SymmetricAlgorithm decryptor;
 	public AesStream(Stream underlyingStream, byte[] secret)
 	{
 		BaseStream = underlyingStream;
-		enc = new CryptoStream(underlyingStream, GenerateAES(secret).CreateEncryptor(), CryptoStreamMode.Write);
-		dec = new CryptoStream(underlyingStream, GenerateAES(secret).CreateDecryptor(), CryptoStreamMode.Read);
+
+		encryptor = GenerateAES(secret);
+		encryptionStream = new CryptoStream(underlyingStream, encryptor.CreateEncryptor(), CryptoStreamMode.Write);
+
+		decryptor = GenerateAES(secret);
+		decryptionStream = new CryptoStream(underlyingStream, decryptor.CreateDecryptor(), CryptoStreamMode.Read);
+
 	}
 
 	public override bool CanRead => true;
@@ -43,12 +50,12 @@ public class AesStream : Stream
 
 	public override int ReadByte()
 	{
-		return dec.ReadByte();
+		return decryptionStream.ReadByte();
 	}
 
 	public override int Read(byte[] buffer, int offset, int count)
 	{
-		return dec.Read(buffer, offset, count);
+		return decryptionStream.Read(buffer, offset, count);
 	}
 
 	public override long Seek(long offset, SeekOrigin origin)
@@ -63,23 +70,39 @@ public class AesStream : Stream
 
 	public override void WriteByte(byte b)
 	{
-		enc.WriteByte(b);
+		encryptionStream.WriteByte(b);
 	}
 
 	public override void Write(byte[] buffer, int offset, int count)
 	{
-		enc.Write(buffer, offset, count);
+		encryptionStream.Write(buffer, offset, count);
 	}
 
 	private RijndaelManaged GenerateAES(byte[] key)
 	{
-		RijndaelManaged cipher = new RijndaelManaged();
-		cipher.Mode = CipherMode.CFB;
-		cipher.Padding = PaddingMode.None;
-		cipher.KeySize = 128;
-		cipher.FeedbackSize = 8;
-		cipher.Key = key;
-		cipher.IV = key;
+		RijndaelManaged cipher = new RijndaelManaged
+		{
+			Mode = CipherMode.CFB,
+			Padding = PaddingMode.None,
+			KeySize = 128,
+			FeedbackSize = 8,
+			Key = key,
+			IV = key
+		};
+
 		return cipher;
+	}
+
+	~AesStream()
+	{
+		Dispose();
+	}
+
+	new void Dispose()
+	{
+		encryptor?.Dispose();
+		decryptor?.Dispose();
+
+		base.Dispose();
 	}
 }

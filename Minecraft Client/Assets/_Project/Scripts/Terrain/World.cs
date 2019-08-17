@@ -16,7 +16,6 @@ public class World
 	public ChunkRenderer ChunkRenderer;
 
 	private readonly List<Chunk> _chunks;
-	private readonly DebugCanvas _debugCanvas;
 	private readonly List<Task> _packetDecodeTasks = new List<Task>();
 
 	private static readonly ChunkColumnPos[] _neighborChunkPositions = new ChunkColumnPos[]
@@ -33,10 +32,9 @@ public class World
 	/// <returns></returns>
 	public Chunk EmptyChunk => new Chunk(0, 0, this);
 
-	public World(DebugCanvas debug = null)
+	public World()
 	{
 		_chunks = new List<Chunk>();
-		_debugCanvas = debug;
 	}
 
 	/// <summary>

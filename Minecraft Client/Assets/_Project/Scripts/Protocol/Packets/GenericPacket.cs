@@ -10,7 +10,7 @@ public class GenericPacket : Packet
 
 	public GenericPacket()
 	{
-		PacketID = default(int);
+		PacketID = default;
 	}
 
 	public GenericPacket(PacketData data) : base(data) { } // packet id should be set correctly if this ctor is used
