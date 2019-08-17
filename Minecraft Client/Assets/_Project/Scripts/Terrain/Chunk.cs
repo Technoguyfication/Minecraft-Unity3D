@@ -98,7 +98,18 @@ public class Chunk
 			throw new Exception("Sky lights do not exist in this dimension!");
 
 		var chunkPos = pos.GetPosWithinChunk();
-		return _blockLights[chunkPos.X, chunkPos.Y, chunkPos.Z];
+		return _skylights[chunkPos.X, chunkPos.Y, chunkPos.Z];
+	}
+
+	/// <summary>
+	/// Gets the biome of a block, all blocks in a column have the same biome
+	/// </summary>
+	/// <param name="pos"></param>
+	/// <returns></returns>
+	public Biome GetBiome(BlockPos pos)
+	{
+		var localPos = pos.GetPosWithinChunk();
+		return _biomeMap[localPos.X, localPos.Z];
 	}
 
 	/// <summary>

@@ -1,16 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+using TMPro;
 
 public class ChatHistoryManager : MonoBehaviour
 {
-    private static Text text;
+    private static TMP_Text text;
     private static Queue<string> messages = new Queue<string>();
     private const int maxMessage = 8;
     void Awake()
     {
-        text = GetComponent<Text>();
+        text = GetComponent<TMP_Text>();
         ClearHistory();
     }
 

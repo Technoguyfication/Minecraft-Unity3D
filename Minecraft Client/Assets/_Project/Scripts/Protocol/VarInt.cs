@@ -14,7 +14,7 @@ public static class VarInt
 	/// <returns></returns>
 	public static int ReadNext(List<byte> bytes)
 	{
-		int value = 0, numRead = 0, result = 0;
+		int value, numRead = 0, result = 0;
 		byte read;
 		while (true)
 		{
@@ -46,7 +46,7 @@ public static class VarInt
 	/// <returns></returns>
 	public static int ReadNext(Utility.ReadBytes readFunction)
 	{
-		int value = 0, numRead = 0, result = 0;
+		int value, numRead = 0, result = 0;
 		byte read;
 		while (true)
 		{

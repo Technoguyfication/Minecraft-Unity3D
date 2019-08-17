@@ -12,7 +12,6 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public class GameManager : MonoBehaviour
 {
-
 	[Header("Prefabs")]
 	public GameObject PlayerPrefab;
 	public GameObject ChunkRendererPrefab;
@@ -98,7 +97,6 @@ public class GameManager : MonoBehaviour
 	private void OnDestroy()
 	{
 		Disconnect("Game stopped");
-		_client?.Dispose();
 	}
 
 	public void Disconnect(string reason)
@@ -109,6 +107,7 @@ public class GameManager : MonoBehaviour
 		_disconnecting = true;
 		_cancellationTokenSource.Cancel();
 		_client?.Disconnect(reason);
+		_client?.Dispose();
 		_initialized = false;
 
 		Debug.Log($"Disconnected: {reason}");
@@ -129,7 +128,7 @@ public class GameManager : MonoBehaviour
 	public IEnumerator ConnectToServerCoroutine(string hostname, int port)
 	{
 		// disable main menu controller
-		GetComponent<MainMenuController>().enabled = false;
+		//GetComponent<MainMenuController>().enabled = false;
 		
 		// open loading screen
 		AsyncOperation loadLoadingScreenTask = SceneManager.LoadSceneAsync("LoadingScreen", LoadSceneMode.Additive);
@@ -142,7 +141,7 @@ public class GameManager : MonoBehaviour
 		SceneManager.MoveGameObjectToScene(gameObject, SceneManager.GetSceneByName("LoadingScreen"));
 		AsyncOperation unloadMainMenuTask = SceneManager.UnloadSceneAsync("MainMenu");
 
-		while (!unloadMainMenuTask.isDone)
+		while (!unloadMainMenuTask?.isDone ?? false)	// if main menu isn't loaded in the first place, asyncoperation is null
 			yield return null;
 
 		Debug.Log("Closed main menu");
@@ -210,9 +209,9 @@ public class GameManager : MonoBehaviour
 						yield break;
 				}
 			}
-			catch (Exception e)
+			catch (Exception ex)
 			{
-				Disconnect($"Failed to login: {e.Message}");
+				Disconnect($"Failed to login: {ex}");
 				yield break;
 			}
 
@@ -227,7 +226,7 @@ public class GameManager : MonoBehaviour
 
 		// set settings from server
 		_playerUuid = loginSuccess.UUID;
-		CurrentWorld = new World(DebugCanvas)
+		CurrentWorld = new World()
 		{
 			Dimension = joinGame.Dimension,
 		};
@@ -243,6 +242,7 @@ public class GameManager : MonoBehaviour
 		CurrentWorld.ChunkRenderer = Instantiate(ChunkRendererPrefab, Vector3.zero, Quaternion.identity).GetComponent<ChunkRenderer>();
 		CurrentWorld.ChunkRenderer.DebugCanvas = DebugCanvas;
 		Chat = GameObject.FindGameObjectWithTag("Chat").GetComponent<Chat>();
+		Chat.ChatSend += Chat_ChatSend;
 
 		// start network worker tasks
 		_netReadTask = new Task(() =>
@@ -261,6 +261,14 @@ public class GameManager : MonoBehaviour
 
 		// start tick loop
 		StartCoroutine(ClientTickLoopCoroutine(_cancellationTokenSource.Token));
+	}
+
+	private void Chat_ChatSend(Chat.ChatSendEventArgs e, object sender)
+	{
+		DispatchWritePacket(new CSChatMessagePacket()
+		{
+			Message = e.Message
+		});
 	}
 
 	private void ClientDisconnectedEventHandler(object sender, DisconnectedEventArgs e)

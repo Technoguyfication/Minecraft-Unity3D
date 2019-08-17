@@ -33,7 +33,7 @@ public class ClientPlayerPositionAndLookPacket : Packet
 
 	public ClientPlayerPositionAndLookPacket()
 	{
-		PacketID = default(int);
+		PacketID = (int)ClientboundIDs.PLAYER_POSITION_AND_LOOK;
 	}
 
 	public ClientPlayerPositionAndLookPacket(PacketData data) : base(data) { } // packet id should be set correctly if this ctor is used

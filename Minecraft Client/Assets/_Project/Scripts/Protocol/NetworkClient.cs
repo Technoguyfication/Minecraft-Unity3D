@@ -27,7 +27,6 @@ public class NetworkClient : IDisposable
 	public event DisconnectedEventHandler Disconnected;
 
 	private bool _disconnecting = false;
-	private readonly CryptoHandler _encryptionUtility = new CryptoHandler();
 	private int _compressionThreshold = -1;
 	private TcpClient Client;
 	private readonly object _streamWriteLock = new object();
@@ -49,6 +48,7 @@ public class NetworkClient : IDisposable
 	{
 		Disconnect("Client disposing");
 		Client?.Dispose();
+		_aesStream.Dispose();
 	}
 
 	/// <summary>
@@ -265,24 +265,27 @@ public class NetworkClient : IDisposable
 					throw new UnityException("Invalid session. (Try restarting game or relogging into Minecraft account)");
 
 				// use pub key to encrypt shared secret
-				var rsaProvider = CryptoHandler.DecodeRSAPublicKey(encRequestPkt.PublicKey);
-				byte[] encSecret = rsaProvider.Encrypt(aesSecret, false);
-				byte[] encToken = rsaProvider.Encrypt(encRequestPkt.VerifyToken, false);
-
-				// respond to server with private key
-				var responsePkt = new EncryptionResponsePacket()
+				using (var rsaProvider = CryptoHandler.DecodeRSAPublicKey(encRequestPkt.PublicKey))
 				{
-					SharedSecret = encSecret,
-					VerifyToken = encToken
-				};
-				WritePacket(responsePkt);
+					byte[] encSecret = rsaProvider.Encrypt(aesSecret, false);
+					byte[] encToken = rsaProvider.Encrypt(encRequestPkt.VerifyToken, false);
 
-				// enable aes encryption
-				_aesStream = new AesStream(Client.GetStream(), aesSecret);
-				_encrypted = true;
+					// respond to server with private key
+					var responsePkt = new EncryptionResponsePacket()
+					{
+						SharedSecret = encSecret,
+						VerifyToken = encToken
+					};
+					WritePacket(responsePkt);
 
-				// read the next packet
-				return ReadNextPacket();
+
+					// enable aes encryption
+					_aesStream = new AesStream(Client.GetStream(), aesSecret);
+					_encrypted = true;
+
+					// read the next packet
+					return ReadNextPacket();
+				}
 			}
 		}
 
