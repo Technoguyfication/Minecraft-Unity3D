@@ -324,13 +324,14 @@ public class GameManager : MonoBehaviour
                 Debug.Log($"Chat message: {chatMsg.PlaintextMessage}");
                 ChatHistoryManager.AddMessage(chatMsg.PlaintextMessage);
 				break;
+                /*
             case ClientboundIDs.ENTITY_METADATA:
                 EntityMetadataPacket metadata = new EntityMetadataPacket(data);
 
                 Debug.Log(metadata.ToString());
-                break;
+                break;*/
 			default:
-                Debug.Log($"Case {data.ID} is not handled!");
+                //Debug.Log($"Case {data.ID} is not handled!");
 				break;
 		}
 	}
