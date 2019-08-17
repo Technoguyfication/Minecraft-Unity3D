@@ -16,7 +16,7 @@ public class TeleportConfirmPacket : Packet
 
 	public TeleportConfirmPacket()
 	{
-		PacketID = default(int);
+		PacketID = (int)ServerboundIDs.TELEPORT_CONFIRM;
 	}
 
 	public TeleportConfirmPacket(PacketData data) : base(data) { } // packet id should be set correctly if this ctor is used

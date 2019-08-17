@@ -235,6 +235,8 @@ public class MainMenuController : MonoBehaviour
 		PlayerPrefs.SetString(PORT_PREF_KEY, PortInput.text);
 		Debug.Log("Starting game load coroutine");
 		StartCoroutine(GameManager.ConnectToServerCoroutine(hostname, port));
+
+		enabled = false;	// close main menu
 	}
 
 	private IEnumerator QueryServerCoroutine(string hostname, int port)

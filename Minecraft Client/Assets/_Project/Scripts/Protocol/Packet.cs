@@ -75,6 +75,7 @@ public enum ServerboundIDs : int
 	LOGIN_ENCRYPTION_RESPONSE = 0x01,
 
 	// play
+	TELEPORT_CONFIRM = 0x00,
 	KEEP_ALIVE = 0x0E,
 	PLAYER = 0x0F,
 	PLAYER_POSITION_AND_LOOK = 0x11,

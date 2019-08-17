@@ -14,7 +14,7 @@ public class Chat : MonoBehaviour
 	/// <summary>
 	/// The time it takes for a chat message to disappear in seconds
 	/// </summary>
-	const float CHATBOX_TIMEOUT = 6f;
+	const float CHATBOX_TIMEOUT = 6.5f;
 
 	public delegate void ChatSendEventHandler(ChatSendEventArgs e, object sender);
 	public event ChatSendEventHandler ChatSend;
@@ -25,11 +25,13 @@ public class Chat : MonoBehaviour
 
 	private readonly List<string> _formattedMessages = new List<string>();
 	private bool _open = false;
-	// set this to the negative of timeout so if somehow someone starts the game within the timeout the box doesn't show
-	private float _lastMessageReceived = -CHATBOX_TIMEOUT;
+	// set this to the negative of timeout * 2 so if somehow someone starts the game within the timeout the box doesn't show
+	// it also helps with starting the game from the "Game" scene
+	private float _lastMessageReceived = -CHATBOX_TIMEOUT * 2;
 
 	private void Awake()
 	{
+		CloseChat();
 		CheckChatVisibility();
 	}
 
@@ -76,7 +78,7 @@ public class Chat : MonoBehaviour
 		CheckChatVisibility();
 
 		// check again after the timout
-		Invoke("CheckChatVisibility", CHATBOX_TIMEOUT + 0.5f);	// the extra 0.5s shouldn't be needed but I don't trust unity
+		Invoke("CheckChatVisibility", CHATBOX_TIMEOUT + 0.1f);  // the extra 0.1s shouldn't be needed but I don't trust unity
 	}
 
 	private void RepopulateText()
@@ -99,12 +101,11 @@ public class Chat : MonoBehaviour
 			SendChatMessage();
 			return;
 		}
-
-		if (Input.GetKeyDown(KeyCode.Escape))
+		else
 		{
 			CloseChat();
 			return;
-		}		
+		}
 	}
 
 	/// <summary>
@@ -113,6 +114,8 @@ public class Chat : MonoBehaviour
 	public void OpenChat()
 	{
 		ChatInput.gameObject.SetActive(true);
+		ChatInput.Select();
+		ChatInput.ActivateInputField();
 
 		_open = true;
 
@@ -145,12 +148,15 @@ public class Chat : MonoBehaviour
 	public void SendChatMessage()
 	{
 		if (string.IsNullOrWhiteSpace(ChatInput.text))
+		{
+			CloseChat();
 			return;
+		}
 
 		// send chat packet
 		ChatSend?.Invoke(new ChatSendEventArgs() { Message = ChatInput.text }, this);
 
-		CloseChat();	// this also clears the chat box
+		CloseChat();    // this also clears the chat box
 	}
 
 	/// <summary>
@@ -158,8 +164,6 @@ public class Chat : MonoBehaviour
 	/// </summary>
 	private void CheckChatVisibility()
 	{
-		Debug.Log("checking " + Time.time);
-
 		// see if the chatbox needs to close
 		if (Time.time - _lastMessageReceived > CHATBOX_TIMEOUT && !_open)
 		{
