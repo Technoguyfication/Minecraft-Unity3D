@@ -33,6 +33,12 @@ public class Chat : MonoBehaviour
 		CheckChatVisibility();
 	}
 
+	private void Update()
+	{
+		if (Input.GetKeyDown(KeyCode.T))
+			OpenChat();
+	}
+
 	/// <summary>
 	/// Handles a chat packet from the server
 	/// </summary>

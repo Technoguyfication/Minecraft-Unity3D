@@ -12,7 +12,6 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public class GameManager : MonoBehaviour
 {
-
 	[Header("Prefabs")]
 	public GameObject PlayerPrefab;
 	public GameObject ChunkRendererPrefab;
