@@ -20,6 +20,7 @@ public class GameManager : MonoBehaviour
 	public string Username = "mcplayer";
 	public DebugCanvas DebugCanvas;
 	public EntityManager EntityManager;
+	public Chat Chat;
 
 	private PlayerController _player = null;
 	private NetworkClient _client;
@@ -241,6 +242,7 @@ public class GameManager : MonoBehaviour
 		// set up references in game scene
 		CurrentWorld.ChunkRenderer = Instantiate(ChunkRendererPrefab, Vector3.zero, Quaternion.identity).GetComponent<ChunkRenderer>();
 		CurrentWorld.ChunkRenderer.DebugCanvas = DebugCanvas;
+		Chat = GameObject.FindGameObjectWithTag("Chat").GetComponent<Chat>();
 
 		// start network worker tasks
 		_netReadTask = new Task(() =>

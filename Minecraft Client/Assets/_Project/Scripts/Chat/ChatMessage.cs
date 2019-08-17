@@ -3,18 +3,24 @@ using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
 
+/// <summary>
+/// Represents a chat message from the server. Uses <see cref="ChatComponent"/> for formatting and styling
+/// </summary>
 public class ChatMessage
 {
 	/// <summary>
 	/// Gets the message with no styling information
 	/// </summary>
-	public string PlaintextMessage { get; set; }
+	public string PlaintextMessage { get; }
 	
 	/// <summary>
 	/// For use in TextMeshPro dialogs
 	/// </summary>
-	public string  HtmlFormattedMessage { get; set; }
+	public string  HtmlFormattedMessage { get; }
 
+	/// <summary>
+	/// The position of the message on the screen
+	/// </summary>
 	public Position ChatPosition { get; set; }
 
 	public ChatMessage(ChatMessagePacket pkt)
@@ -23,6 +29,8 @@ public class ChatMessage
 
 		// use .ToString() for plaintext and components will output text with no formatting
 		PlaintextMessage = chatComponent.ToString();
+
+		HtmlFormattedMessage = ChatComponent.GetFormattedString(chatComponent, null);
 	}
 
 	public enum Position : byte

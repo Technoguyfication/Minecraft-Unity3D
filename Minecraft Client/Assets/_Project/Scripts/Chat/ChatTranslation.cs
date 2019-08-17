@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 class ChatTranslation
 {
-	private static Dictionary<string, string> _translationTable = new Dictionary<string, string>();
+	private static readonly Dictionary<string, string> _translationTable = new Dictionary<string, string>();
 
 	static ChatTranslation()
 	{
@@ -24,6 +24,6 @@ class ChatTranslation
 		if (_translationTable.ContainsKey(key))
 			return string.Format(_translationTable[key], insertions);
 		else
-			return $"{key}: \"{(string.Join("\", \"", insertions))}";	// chat.type.text: "PlayerName", "message here"
+			return $"{key}: \"{(string.Join("\", \"", insertions))}\"";	// chat.type.text: "PlayerName", "message here"
 	}
 }
