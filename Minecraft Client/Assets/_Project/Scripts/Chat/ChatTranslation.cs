@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 class ChatTranslation
 {
-	private static Dictionary<string, string> _translationTable = new Dictionary<string, string>();
+	private static readonly Dictionary<string, string> _translationTable = new Dictionary<string, string>();
 
 	static ChatTranslation()
 	{

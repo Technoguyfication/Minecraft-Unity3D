@@ -39,6 +39,10 @@ class ChatComponent
 	[JsonProperty("clickEvent")]
 	public ChatClickEvent ClickEvent { get; set; }
 
+	[JsonProperty("extra")]
+	[JsonConverter(typeof(ChatComponentJsonConverter))]
+	public ChatComponent[] Extra;
+
 	/// <summary>
 	/// Gets a <see cref="ChatComponent"/> from a JSON string, parsing all it's children as well
 	/// </summary>
@@ -111,15 +115,15 @@ class ChatComponent
 				case "o":   // italic
 					writeTag("i");
 					break;
-				case "n":	// underlined
+				case "n":   // underlined
 					writeTag("u");
 					break;
 				case "m":   // strikethrough
 					writeTag("s");
 					break;
-				case "r":	// reset - don't write any color at all
+				case "r":   // reset - don't write any color at all
 					return;
-				case "k":	// obfuscated or magic
+				case "k":   // obfuscated or magic
 					writeTag("s");  // placeholder for obfuscated text
 					break;
 				default:    // "color" isn't a formatting code so it must be an actual color
@@ -138,7 +142,7 @@ class ChatComponent
 				break;
 			case TranslateComponent translateComponent:
 				var formattedWith = translateComponent.with.Select(w => GetFormattedString(w, component));  // get formatted translation inserts
-				formattedString.Append(ChatTranslation.TranslateString(translateComponent.translate, formattedWith.ToArray()));	// translate string and append
+				formattedString.Append(ChatTranslation.TranslateString(translateComponent.translate, formattedWith.ToArray())); // translate string and append
 				break;
 			default:
 				throw new NotImplementedException($"{component.GetType().ToString()} is not supported yet");
@@ -146,6 +150,15 @@ class ChatComponent
 
 		// append the close tags
 		formattedString.Append(string.Join(string.Empty, closeTags));
+
+		// add extra ChatComponents
+		if (component.Extra != null)
+		{
+			foreach (var extraComp in component.Extra)
+			{
+				formattedString.Append(GetFormattedString(extraComp, component));
+			}
+		}
 
 		return formattedString.ToString();
 	}
@@ -232,6 +245,25 @@ class ChatComponent
 		PINK,
 		YELLOW,
 		WHITE
+	}
+
+	public override string ToString()
+	{
+		if (Extra != null)
+		{
+			var sb = new StringBuilder();
+
+			foreach (var extra in Extra)
+			{
+				sb.Append(extra.ToString());
+			}
+
+			return sb.ToString();
+		}
+		else
+		{
+			return string.Empty;
+		}
 	}
 }
 

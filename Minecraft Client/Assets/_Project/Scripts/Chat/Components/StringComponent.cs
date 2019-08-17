@@ -13,6 +13,6 @@ class StringComponent : ChatComponent
 
 	public override string ToString()
 	{
-		return text;
+		return text + base.ToString();
 	}
 }

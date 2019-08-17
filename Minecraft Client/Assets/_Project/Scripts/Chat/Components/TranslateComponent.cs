@@ -17,6 +17,6 @@ class TranslateComponent : ChatComponent
 
 	public override string ToString()
 	{
-		return ChatTranslation.TranslateString(translate, with.Select(c => c.ToString()).ToArray());
+		return ChatTranslation.TranslateString(translate, with.Select(c => c.ToString()).ToArray()) + base.ToString();
 	}
 }
