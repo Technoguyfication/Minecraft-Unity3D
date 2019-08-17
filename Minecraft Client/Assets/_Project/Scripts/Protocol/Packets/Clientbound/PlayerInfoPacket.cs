@@ -29,8 +29,6 @@ public class PlayerInfoPacket : Packet
 
                     PacketReader.ReadVarInt(reader, out int playerCount);
 
-                    Debug.Log($"Action: {messageAction.ToString()}, Players: {playerCount}");
-
                     switch (messageAction)
                     {
                         case MessageAction.AddPlayer:
@@ -70,7 +68,6 @@ public class PlayerInfoPacket : Packet
                                 }
 
                                 addedPlayers.Enqueue(new AddPlayerAction(guid, name, properties.ToArray(), (GameMode)gameMode, ping, hasDisplayName, displayName));
-                                Debug.Log($"Added player with name {name}, with {propertyCount} properties, in game mode {gameMode.ToString()}, with ping {ping}, has display name is {hasDisplayName}, with a display name of {displayName}");
                             }
 
                             addPlayerActions = addedPlayers.ToArray();
@@ -85,8 +82,6 @@ public class PlayerInfoPacket : Packet
                                 PacketReader.ReadVarInt(reader, out int gameMode);
 
                                 updatedGamemodes.Enqueue(new UpdateGamemodeAction(guid, (GameMode)gameMode));
-
-                                Debug.Log($"Updated gamemode for player");
                             }
 
                             updateGamemodeActions = updatedGamemodes.ToArray();
@@ -101,8 +96,6 @@ public class PlayerInfoPacket : Packet
                                 PacketReader.ReadVarInt(reader, out int ping);
 
                                 updatedLatencies.Enqueue(new UpdateLatencyAction(guid, ping));
-
-                                Debug.Log($"Updated ping for player");
                             }
 
                             updateLatencyActions = updatedLatencies.ToArray();
@@ -124,8 +117,6 @@ public class PlayerInfoPacket : Packet
                                 }
 
                                 updatedDisplayNames.Enqueue(new UpdateDisplayNameAction(guid, hasDisplayName, displayName));
-
-                                Debug.Log($"Updated display name / chat for player");
                             }
 
                             updateDisplayNameActions = updatedDisplayNames.ToArray();
@@ -140,8 +131,6 @@ public class PlayerInfoPacket : Packet
                                 PacketReader.ReadGUID(reader, out Guid guid);
 
                                 removedPlayerActions.Enqueue(new RemovePlayerAction(guid));
-
-                                Debug.Log($"Removed player");
                             }
 
                             removePlayerActions = removedPlayerActions.ToArray();
@@ -152,6 +141,53 @@ public class PlayerInfoPacket : Packet
                 }
             }
         }
+    }
+
+    public override string ToString()
+    {
+        StringBuilder outputString = new StringBuilder();
+        switch (messageAction)
+        {
+            case MessageAction.AddPlayer:
+                outputString.Append("PlayerInfoPacket: Action AddPlayer, ");
+                for (int i = 0; i < addPlayerActions.Length; i++)
+                {
+                    outputString.Append($"For GUID {addPlayerActions[i].guid} with name {addPlayerActions[i].name} with {addPlayerActions[i].properties.Length} properties in game mode {addPlayerActions[i].gameMode.ToString()} with ping {addPlayerActions[i].ping} has display name is {addPlayerActions[i].hasDisplayName} with a display name of {addPlayerActions[i].displayName}{((i + 1 != addPlayerActions.Length) ? "," : "") }");
+                }
+                break;
+            case MessageAction.UpdateGameMode:
+                outputString.Append("PlayerInfoPacket: Action UpdateGameMode, ");
+                for (int i = 0; i < updateGamemodeActions.Length; i++)
+                {
+                    outputString.Append($"For GUID {updateGamemodeActions[i].guid} new gamemode {updateGamemodeActions[i].gameMode}{((i + 1 != updateGamemodeActions.Length) ? "," : "") }");
+                }
+                break;
+            case MessageAction.UpdateLatency:
+                outputString.Append("PlayerInfoPacket: Action UpdateLatency, ");
+                for (int i = 0; i < updateLatencyActions.Length; i++)
+                {
+                    outputString.Append($"For GUID {updateLatencyActions[i].guid} new latency {updateLatencyActions[i].ping}{((i + 1 != updateLatencyActions.Length) ? "," : "") }");
+                }
+                break;
+            case MessageAction.UpdateDisplayName:
+                outputString.Append("PlayerInfoPacket: Action UpdateGameMode, ");
+                for (int i = 0; i < updateDisplayNameActions.Length; i++)
+                {
+                    outputString.Append($"For GUID {updateDisplayNameActions[i].guid} hasDisplayName {updateDisplayNameActions[i].hasDisplayName} display name {updateDisplayNameActions[i].displayName}{((i + 1 != updateDisplayNameActions.Length) ? "," : "") }");
+                }
+                break;
+            case MessageAction.RemovePlayer:
+                outputString.Append("PlayerInfoPacket: Action RemovePlayer, ");
+                for (int i = 0; i < removePlayerActions.Length; i++)
+                {
+                    outputString.Append($"For GUID {removePlayerActions[i].guid}{((i + 1 != removePlayerActions.Length) ? "," : "") }");
+                }
+                break;
+            default:
+                break;
+        }
+
+        return outputString.ToString();
     }
 
     public MessageAction messageAction { get; private set; }

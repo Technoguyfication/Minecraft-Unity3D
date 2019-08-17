@@ -55,6 +55,8 @@ public class GameManager : MonoBehaviour
 #if ENABLE_PROFILER
 		Debug.Log("Unity profiler enabled");
 #endif
+
+        PlayerLibrary.Initialize();
 	}
 
 	// Update is called once per frame
@@ -309,10 +311,16 @@ public class GameManager : MonoBehaviour
 				EntityManager.HandleEntityHeadLook(new EntityHeadLookPacket(data));
 				break;
 			case ClientboundIDs.PLAYER_INFO:
-                new PlayerInfoPacket(data);
+                PlayerInfoPacket playerInfo = new PlayerInfoPacket(data);
+
+                Debug.Log(playerInfo.ToString());
+                PlayerLibrary.HandleUpdatePacket(playerInfo);
 				break;
 			case ClientboundIDs.CHAT_MESSAGE:
-				Debug.Log($"Chat message: {new ChatMessage(new ChatMessagePacket(data)).PlaintextMessage}");
+                ChatMessage chatMsg = new ChatMessage(new ChatMessagePacket(data));
+
+                Debug.Log($"Chat message: {chatMsg.PlaintextMessage}");
+                ChatHistoryManager.AddMessage(chatMsg.PlaintextMessage);
 				break;
 			default:
 				break;
