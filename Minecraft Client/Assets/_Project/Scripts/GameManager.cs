@@ -241,6 +241,7 @@ public class GameManager : MonoBehaviour
 		CurrentWorld.ChunkRenderer = Instantiate(ChunkRendererPrefab, Vector3.zero, Quaternion.identity).GetComponent<ChunkRenderer>();
 		CurrentWorld.ChunkRenderer.DebugCanvas = DebugCanvas;
 		Chat = GameObject.FindGameObjectWithTag("Chat").GetComponent<Chat>();
+		Chat.ChatSend += Chat_ChatSend;
 
 		// start network worker tasks
 		_netReadTask = new Task(() =>
@@ -259,6 +260,14 @@ public class GameManager : MonoBehaviour
 
 		// start tick loop
 		StartCoroutine(ClientTickLoopCoroutine(_cancellationTokenSource.Token));
+	}
+
+	private void Chat_ChatSend(Chat.ChatSendEventArgs e, object sender)
+	{
+		DispatchWritePacket(new CSChatMessagePacket()
+		{
+			Message = e.Message
+		});
 	}
 
 	private void ClientDisconnectedEventHandler(object sender, DisconnectedEventArgs e)

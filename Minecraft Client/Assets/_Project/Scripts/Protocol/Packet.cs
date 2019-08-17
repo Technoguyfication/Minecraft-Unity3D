@@ -78,6 +78,7 @@ public enum ServerboundIDs : int
 	KEEP_ALIVE = 0x0E,
 	PLAYER = 0x0F,
 	PLAYER_POSITION_AND_LOOK = 0x11,
+	CHAT_MESSAGE = 0x02
 
 }
 
