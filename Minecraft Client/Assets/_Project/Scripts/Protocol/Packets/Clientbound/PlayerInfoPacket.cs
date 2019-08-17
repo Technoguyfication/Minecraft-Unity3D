@@ -8,23 +8,26 @@ using UnityEngine;
 
 public class PlayerInfoPacket : Packet
 {
-	public override byte[] Payload { get; set; }
-
-	public PlayerInfoPacket()
+    public PlayerInfoPacket()
 	{
 		PacketID = (int)ClientboundIDs.PLAYER_INFO;
 	}
 
-	public PlayerInfoPacket(PacketData data) : base(data) // packet id should be set correctly if this ctor is used
+    public PlayerInfoPacket(PacketData data) : base(data) { } // packet id should be set correctly if this ctor is used
+
+    public override byte[] Payload
     {
-        using (MemoryStream stream = new MemoryStream(data.Payload))
+        get => throw new NotImplementedException();
+        set
         {
-            using (BinaryReader reader = new BinaryReader(stream))
+            using (MemoryStream stream = new MemoryStream(value))
             {
-                try
+                using (BinaryReader reader = new BinaryReader(stream))
                 {
-                    messageAction = (MessageAction)ReadVarInt(reader);
-                    int playerCount = ReadVarInt(reader);
+                    PacketReader.ReadVarInt(reader, out int msgAction);
+                    messageAction = (MessageAction)msgAction;
+
+                    PacketReader.ReadVarInt(reader, out int playerCount);
 
                     Debug.Log($"Action: {messageAction.ToString()}, Players: {playerCount}");
 
@@ -35,26 +38,38 @@ public class PlayerInfoPacket : Packet
 
                             for (int i = 0; i < playerCount; i++)
                             {
-                                Guid guid = new Guid(reader.ReadBytes(16));
+                                PacketReader.ReadGUID(reader, out Guid guid);
 
-                                string name = reader.ReadString();
-                                int propertyCount = ReadVarInt(reader);
+                                PacketReader.ReadString(reader, out string name);
+                                PacketReader.ReadVarInt(reader, out int propertyCount);
 
                                 Queue<Property> properties = new Queue<Property>();
                                 for (int prop = 0; prop < propertyCount; prop++)
                                 {
-                                    string propertyName = reader.ReadString();
-                                    string propertyValue = reader.ReadString();
-                                    bool isSigned = reader.ReadBoolean();
-                                    properties.Enqueue(new Property(propertyName, propertyValue, isSigned, (isSigned) ? reader.ReadString() : ""));
+                                    PacketReader.ReadString(reader, out string propertyName);
+                                    PacketReader.ReadString(reader, out string propertyValue);
+                                    PacketReader.ReadBoolean(reader, out bool isSigned);
+
+                                    string signature = "";
+                                    if (isSigned)
+                                    {
+                                        PacketReader.ReadString(reader, out signature);
+                                    }
+
+                                    properties.Enqueue(new Property(propertyName, propertyValue, isSigned, signature));
                                 }
 
-                                GameMode gameMode = (GameMode)ReadVarInt(reader);
-                                int ping = ReadVarInt(reader);
-                                bool hasDisplayName = reader.ReadBoolean();
-                                string displayName = hasDisplayName ? reader.ReadString() : "";
+                                PacketReader.ReadVarInt(reader, out int gameMode);
+                                PacketReader.ReadVarInt(reader, out int ping);
+                                PacketReader.ReadBoolean(reader, out bool hasDisplayName);
 
-                                addedPlayers.Enqueue(new AddPlayerAction(guid, name, properties.ToArray(), gameMode, ping, hasDisplayName, displayName));
+                                string displayName = "";
+                                if (hasDisplayName)
+                                {
+                                    PacketReader.ReadString(reader, out displayName);
+                                }
+
+                                addedPlayers.Enqueue(new AddPlayerAction(guid, name, properties.ToArray(), (GameMode)gameMode, ping, hasDisplayName, displayName));
                                 Debug.Log($"Added player with name {name}, with {propertyCount} properties, in game mode {gameMode.ToString()}, with ping {ping}, has display name is {hasDisplayName}, with a display name of {displayName}");
                             }
 
@@ -66,10 +81,10 @@ public class PlayerInfoPacket : Packet
 
                             for (int i = 0; i < playerCount; i++)
                             {
-                                Guid guid = new Guid(reader.ReadBytes(16));
-                                GameMode gameMode = (GameMode)ReadVarInt(reader);
+                                PacketReader.ReadGUID(reader, out Guid guid);
+                                PacketReader.ReadVarInt(reader, out int gameMode);
 
-                                updatedGamemodes.Enqueue(new UpdateGamemodeAction(guid, gameMode));
+                                updatedGamemodes.Enqueue(new UpdateGamemodeAction(guid, (GameMode)gameMode));
 
                                 Debug.Log($"Updated gamemode for player");
                             }
@@ -82,8 +97,8 @@ public class PlayerInfoPacket : Packet
 
                             for (int i = 0; i < playerCount; i++)
                             {
-                                Guid guid = new Guid(reader.ReadBytes(16));
-                                int ping = ReadVarInt(reader);
+                                PacketReader.ReadGUID(reader, out Guid guid);
+                                PacketReader.ReadVarInt(reader, out int ping);
 
                                 updatedLatencies.Enqueue(new UpdateLatencyAction(guid, ping));
 
@@ -99,9 +114,14 @@ public class PlayerInfoPacket : Packet
 
                             for (int i = 0; i < playerCount; i++)
                             {
-                                Guid guid = new Guid(reader.ReadBytes(16));
-                                bool hasDisplayName = reader.ReadBoolean();
-                                string displayName = hasDisplayName ? reader.ReadString() : "";
+                                PacketReader.ReadGUID(reader, out Guid guid);
+                                PacketReader.ReadBoolean(reader, out bool hasDisplayName);
+
+                                string displayName = "";
+                                if (hasDisplayName)
+                                {
+                                    PacketReader.ReadString(reader, out displayName);
+                                }
 
                                 updatedDisplayNames.Enqueue(new UpdateDisplayNameAction(guid, hasDisplayName, displayName));
 
@@ -117,7 +137,7 @@ public class PlayerInfoPacket : Packet
 
                             for (int i = 0; i < playerCount; i++)
                             {
-                                Guid guid = new Guid(reader.ReadBytes(16));
+                                PacketReader.ReadGUID(reader, out Guid guid);
 
                                 removedPlayerActions.Enqueue(new RemovePlayerAction(guid));
 
@@ -130,22 +150,18 @@ public class PlayerInfoPacket : Packet
                             break;
                     }
                 }
-                catch (Exception e)
-                {
-                    Debug.Log(e.ToString());
-                }
             }
         }
     }
 
-    public MessageAction messageAction;
-    public AddPlayerAction[] addPlayerActions;
-    public UpdateGamemodeAction[] updateGamemodeActions;
-    public UpdateLatencyAction[] updateLatencyActions;
-    public UpdateDisplayNameAction[] updateDisplayNameActions;
-    public RemovePlayerAction[] removePlayerActions;
+    public MessageAction messageAction { get; private set; }
+    public AddPlayerAction[] addPlayerActions { get; private set; }
+    public UpdateGamemodeAction[] updateGamemodeActions { get; private set; }
+    public UpdateLatencyAction[] updateLatencyActions { get; private set; }
+    public UpdateDisplayNameAction[] updateDisplayNameActions { get; private set; }
+    public RemovePlayerAction[] removePlayerActions { get; private set; }
 
-	public struct AddPlayerAction
+    public struct AddPlayerAction
 	{
         public Guid guid { get; }
 		public string name { get; }
@@ -238,23 +254,5 @@ public class PlayerInfoPacket : Packet
         UpdateLatency,
         UpdateDisplayName,
         RemovePlayer
-    }
-
-    private static int ReadVarInt(BinaryReader reader)
-    {
-        int value = 0, numRead = 0, result = 0;
-        byte read;
-        while (true)
-        {
-            read = reader.ReadByte();
-            value = (read & 0x7F);
-            result |= (value << (7 * numRead));
-
-            numRead++;
-            if (numRead > 5)
-                throw new UnityException("VarInt too big!");
-            if ((read & 0x80) != 128) break;
-        }
-        return result;
     }
 }
