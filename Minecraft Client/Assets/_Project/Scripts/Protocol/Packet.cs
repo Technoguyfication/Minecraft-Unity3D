@@ -61,6 +61,7 @@ public enum ClientboundIDs : int
 	ENTITY_TELEPORT = 0x50,
 	ENTITY_HEAD_LOOK = 0x39,
 	PLAYER_INFO = 0x30,
+    ENTITY_METADATA = 0x3F,
 	CHAT_MESSAGE = 0x0E
 }
 
