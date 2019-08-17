@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Loading Screen Controller
   - Chunk Renderer
+  - Chat
   layers:
   - Default
   - TransparentFX

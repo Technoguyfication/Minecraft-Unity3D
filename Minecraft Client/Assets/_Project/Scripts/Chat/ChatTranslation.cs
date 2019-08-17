@@ -24,6 +24,6 @@ class ChatTranslation
 		if (_translationTable.ContainsKey(key))
 			return string.Format(_translationTable[key], insertions);
 		else
-			return $"{key}: \"{(string.Join("\", \"", insertions))}";	// chat.type.text: "PlayerName", "message here"
+			return $"{key}: \"{(string.Join("\", \"", insertions))}\"";	// chat.type.text: "PlayerName", "message here"
 	}
 }

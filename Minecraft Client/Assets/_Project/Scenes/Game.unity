@@ -903,7 +903,7 @@ MonoBehaviour:
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   m_CustomCaretColor: 0
   m_SelectionColor: {r: 1, g: 1, b: 1, a: 0.7529412}
-  m_Text: your mother is a homosexual
+  m_Text: 
   m_CaretBlinkRate: 0.85
   m_CaretWidth: 1
   m_ReadOnly: 0
@@ -1933,7 +1933,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1781307190}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 058cba836c1846c3aa1c5fd2e28aea77, type: 3}
   m_Name: 
@@ -1976,7 +1976,6 @@ GameObject:
   - component: {fileID: 1926488982}
   - component: {fileID: 1926488984}
   - component: {fileID: 1926488983}
-  - component: {fileID: 1926488985}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -2138,20 +2137,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1926488981}
   m_CullTransparentMesh: 0
---- !u!114 &1926488985
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1926488981}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4a7fae4c1c0d36947ac143bbd259e27c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Text: {fileID: 1926488983}
-  TextTime: 2
 --- !u!1 &1933294538
 GameObject:
   m_ObjectHideFlags: 0
@@ -2161,13 +2146,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1933294539}
+  - component: {fileID: 1933294540}
   m_Layer: 5
   m_Name: Chat
-  m_TagString: Untagged
+  m_TagString: Chat
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1933294539
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2189,6 +2175,21 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 158.3}
   m_SizeDelta: {x: 0, y: 316.7}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1933294540
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1933294538}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d1c6d11521c50648a58b943f51f9f22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ChatBox: {fileID: 1926488983}
+  MaxMessages: 100
+  ChatInput: {fileID: 464925237}
 --- !u!1 &1973019137
 GameObject:
   m_ObjectHideFlags: 0
@@ -2350,7 +2351,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: your mother is a homosexual
+  m_Text: 
 --- !u!222 &1981791340
 CanvasRenderer:
   m_ObjectHideFlags: 0
