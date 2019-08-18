@@ -1,74 +1,209 @@
 fileFormatVersion: 2
 guid: 261668ba9b1b1ee4e9cd8f5e8ab6e050
 ModelImporter:
-  serializedVersion: 23
-  fileIDToRecycleName:
-    100000: //RootNode
-    100002: Body
-    100004: Cube
-    100006: Cube_001
-    100008: Cube_002
-    100010: Cube_003
-    100012: Cube_004
-    100014: BL_Foot
-    100016: BR_Foot
-    100018: FL_foot
-    100020: fr_fOOT
-    100022: HEad
-    400000: //RootNode
-    400002: Body
-    400004: Cube
-    400006: Cube_001
-    400008: Cube_002
-    400010: Cube_003
-    400012: Cube_004
-    400014: BL_Foot
-    400016: BR_Foot
-    400018: FL_foot
-    400020: fr_fOOT
-    400022: HEad
-    2100000: unnamed
-    2100002: None__creeper_png
-    2100004: Material__creeper_png
-    2100006: Material__creeper_png_001
-    2100008: Creeper__creeper_png
-    2100010: Creeper__creeper_png_001
-    2300000: //RootNode
-    2300002: Body
-    2300004: Cube
-    2300006: Cube_001
-    2300008: Cube_002
-    2300010: Cube_003
-    2300012: Cube_004
-    2300014: BL_Foot
-    2300016: BR_Foot
-    2300018: FL_foot
-    2300020: fr_fOOT
-    2300022: HEad
-    3300000: //RootNode
-    3300002: Body
-    3300004: Cube
-    3300006: Cube_001
-    3300008: Cube_002
-    3300010: Cube_003
-    3300012: Cube_004
-    3300014: BL_Foot
-    3300016: BR_Foot
-    3300018: FL_foot
-    3300020: fr_fOOT
-    3300022: HEad
-    4300000: Body
-    4300002: Cube_003
-    4300004: Cube_002
-    4300006: Cube_001
-    4300008: Cube
-    4300010: Cube_004
-    4300012: fr_fOOT
-    4300014: FL_foot
-    4300016: HEad
-    4300018: BR_Foot
-    4300020: BL_Foot
+  serializedVersion: 25
+  internalIDToNameTable:
+  - first:
+      1: 100000
+    second: //RootNode
+  - first:
+      1: 100002
+    second: Body
+  - first:
+      1: 100004
+    second: Cube
+  - first:
+      1: 100006
+    second: Cube_001
+  - first:
+      1: 100008
+    second: Cube_002
+  - first:
+      1: 100010
+    second: Cube_003
+  - first:
+      1: 100012
+    second: Cube_004
+  - first:
+      1: 100014
+    second: BL_Foot
+  - first:
+      1: 100016
+    second: BR_Foot
+  - first:
+      1: 100018
+    second: FL_foot
+  - first:
+      1: 100020
+    second: fr_fOOT
+  - first:
+      1: 100022
+    second: HEad
+  - first:
+      4: 400000
+    second: //RootNode
+  - first:
+      4: 400002
+    second: Body
+  - first:
+      4: 400004
+    second: Cube
+  - first:
+      4: 400006
+    second: Cube_001
+  - first:
+      4: 400008
+    second: Cube_002
+  - first:
+      4: 400010
+    second: Cube_003
+  - first:
+      4: 400012
+    second: Cube_004
+  - first:
+      4: 400014
+    second: BL_Foot
+  - first:
+      4: 400016
+    second: BR_Foot
+  - first:
+      4: 400018
+    second: FL_foot
+  - first:
+      4: 400020
+    second: fr_fOOT
+  - first:
+      4: 400022
+    second: HEad
+  - first:
+      21: 2100000
+    second: unnamed
+  - first:
+      21: 2100002
+    second: None__creeper_png
+  - first:
+      21: 2100004
+    second: Material__creeper_png
+  - first:
+      21: 2100006
+    second: Material__creeper_png_001
+  - first:
+      21: 2100008
+    second: Creeper__creeper_png
+  - first:
+      21: 2100010
+    second: Creeper__creeper_png_001
+  - first:
+      23: 2300000
+    second: //RootNode
+  - first:
+      23: 2300002
+    second: Body
+  - first:
+      23: 2300004
+    second: Cube
+  - first:
+      23: 2300006
+    second: Cube_001
+  - first:
+      23: 2300008
+    second: Cube_002
+  - first:
+      23: 2300010
+    second: Cube_003
+  - first:
+      23: 2300012
+    second: Cube_004
+  - first:
+      23: 2300014
+    second: BL_Foot
+  - first:
+      23: 2300016
+    second: BR_Foot
+  - first:
+      23: 2300018
+    second: FL_foot
+  - first:
+      23: 2300020
+    second: fr_fOOT
+  - first:
+      23: 2300022
+    second: HEad
+  - first:
+      33: 3300000
+    second: //RootNode
+  - first:
+      33: 3300002
+    second: Body
+  - first:
+      33: 3300004
+    second: Cube
+  - first:
+      33: 3300006
+    second: Cube_001
+  - first:
+      33: 3300008
+    second: Cube_002
+  - first:
+      33: 3300010
+    second: Cube_003
+  - first:
+      33: 3300012
+    second: Cube_004
+  - first:
+      33: 3300014
+    second: BL_Foot
+  - first:
+      33: 3300016
+    second: BR_Foot
+  - first:
+      33: 3300018
+    second: FL_foot
+  - first:
+      33: 3300020
+    second: fr_fOOT
+  - first:
+      33: 3300022
+    second: HEad
+  - first:
+      43: 4300000
+    second: Body
+  - first:
+      43: 4300002
+    second: Cube_003
+  - first:
+      43: 4300004
+    second: Cube_002
+  - first:
+      43: 4300006
+    second: Cube_001
+  - first:
+      43: 4300008
+    second: Cube
+  - first:
+      43: 4300010
+    second: Cube_004
+  - first:
+      43: 4300012
+    second: fr_fOOT
+  - first:
+      43: 4300014
+    second: FL_foot
+  - first:
+      43: 4300016
+    second: HEad
+  - first:
+      43: 4300018
+    second: BR_Foot
+  - first:
+      43: 4300020
+    second: BL_Foot
   externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Creeper
+    second: {fileID: 2100000, guid: 8f180444015cadb4b8d8f018f0ea2fb5, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
@@ -84,10 +219,15 @@ ModelImporter:
       assembly: UnityEngine.CoreModule
       name: Material.001
     second: {fileID: 2100000, guid: cc8062a5e2c0804409c92b336c7f7807, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Player
+    second: {fileID: 2100000, guid: a8fdeda9f421b154d9319ac6cc3a3fd0, type: 2}
   materials:
     importMaterials: 1
-    materialName: 0
-    materialSearch: 1
+    materialName: 1
+    materialSearch: 2
     materialLocation: 1
   animations:
     legacyGenerateAnimations: 4
@@ -122,21 +262,22 @@ ModelImporter:
     importBlendShapes: 1
     importCameras: 0
     importLights: 0
-    swapUVChannels: 0
+    swapUVChannels: 1
     generateSecondaryUV: 0
     useFileUnits: 1
-    optimizeMeshForGPU: 1
     keepQuads: 0
     weldVertices: 1
     preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    meshOptimizationFlags: -1
     indexFormat: 0
     secondaryUVAngleDistortion: 8
     secondaryUVAreaDistortion: 15.000001
     secondaryUVHardAngle: 88
     secondaryUVPackMargin: 4
     useFileScale: 1
-    previousCalculatedGlobalScale: 1
-    hasPreviousCalculatedGlobalScale: 0
   tangentSpace:
     normalSmoothAngle: 60
     normalImportMode: 0
@@ -145,10 +286,11 @@ ModelImporter:
     legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
     blendShapeNormalImportMode: 1
     normalSmoothingSource: 0
+  referencedClips: []
   importAnimation: 0
   copyAvatar: 0
   humanDescription:
-    serializedVersion: 2
+    serializedVersion: 3
     human: []
     skeleton: []
     armTwist: 0.5
@@ -158,6 +300,7 @@ ModelImporter:
     armStretch: 0.05
     legStretch: 0.05
     feetSpacing: 0
+    globalScale: 1
     rootMotionBoneName: 
     hasTranslationDoF: 0
     hasExtraRoot: 0
