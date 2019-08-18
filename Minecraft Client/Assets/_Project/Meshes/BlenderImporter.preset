@@ -6,7 +6,7 @@ Preset:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: FBXImporter
+  m_Name: BlenderImporter
   m_TargetType:
     m_NativeTypeID: 1041
     m_ManagedTypePPtr: {fileID: 0}
@@ -14,7 +14,7 @@ Preset:
   m_Properties:
   - target: {fileID: 0}
     propertyPath: m_ExternalObjects.Array.size
-    value: 1
+    value: 5
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: m_ExternalObjects.Array.data[0].first.type
@@ -26,23 +26,87 @@ Preset:
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: m_ExternalObjects.Array.data[0].first.name
-    value: Material.001
+    value: Creeper
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: m_ExternalObjects.Array.data[0].second
     value: 
+    objectReference: {fileID: 2100000, guid: 8f180444015cadb4b8d8f018f0ea2fb5, type: 2}
+  - target: {fileID: 0}
+    propertyPath: m_ExternalObjects.Array.data[1].first.type
+    value: UnityEngine:Material
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_ExternalObjects.Array.data[1].first.assembly
+    value: UnityEngine.CoreModule
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_ExternalObjects.Array.data[1].first.name
+    value: Creeper__creeper_png
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_ExternalObjects.Array.data[1].second
+    value: 
+    objectReference: {fileID: 2100000, guid: 8f180444015cadb4b8d8f018f0ea2fb5, type: 2}
+  - target: {fileID: 0}
+    propertyPath: m_ExternalObjects.Array.data[2].first.type
+    value: UnityEngine:Material
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_ExternalObjects.Array.data[2].first.assembly
+    value: UnityEngine.CoreModule
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_ExternalObjects.Array.data[2].first.name
+    value: Creeper__creeper_png_001
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_ExternalObjects.Array.data[2].second
+    value: 
+    objectReference: {fileID: 2100000, guid: 8f180444015cadb4b8d8f018f0ea2fb5, type: 2}
+  - target: {fileID: 0}
+    propertyPath: m_ExternalObjects.Array.data[3].first.type
+    value: UnityEngine:Material
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_ExternalObjects.Array.data[3].first.assembly
+    value: UnityEngine.CoreModule
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_ExternalObjects.Array.data[3].first.name
+    value: Material.001
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_ExternalObjects.Array.data[3].second
+    value: 
     objectReference: {fileID: 2100000, guid: cc8062a5e2c0804409c92b336c7f7807, type: 2}
+  - target: {fileID: 0}
+    propertyPath: m_ExternalObjects.Array.data[4].first.type
+    value: UnityEngine:Material
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_ExternalObjects.Array.data[4].first.assembly
+    value: UnityEngine.CoreModule
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_ExternalObjects.Array.data[4].first.name
+    value: Player
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_ExternalObjects.Array.data[4].second
+    value: 
+    objectReference: {fileID: 2100000, guid: a8fdeda9f421b154d9319ac6cc3a3fd0, type: 2}
   - target: {fileID: 0}
     propertyPath: m_ImportMaterials
     value: 1
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: m_MaterialName
-    value: 0
+    value: 1
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: m_MaterialSearch
-    value: 1
+    value: 2
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: m_MaterialLocation
@@ -174,7 +238,7 @@ Preset:
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: swapUVChannels
-    value: 0
+    value: 1
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: generateSecondaryUV
@@ -182,10 +246,6 @@ Preset:
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: m_UseFileUnits
-    value: 1
-    objectReference: {fileID: 0}
-  - target: {fileID: 0}
-    propertyPath: optimizeMeshForGPU
     value: 1
     objectReference: {fileID: 0}
   - target: {fileID: 0}
@@ -199,6 +259,22 @@ Preset:
   - target: {fileID: 0}
     propertyPath: m_PreserveHierarchy
     value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: skinWeightsMode
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: maxBonesPerVertex
+    value: 4
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: minBoneWeight
+    value: 0.001
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: meshOptimizationFlags
+    value: -1
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: indexFormat
@@ -223,14 +299,6 @@ Preset:
   - target: {fileID: 0}
     propertyPath: m_UseFileScale
     value: 1
-    objectReference: {fileID: 0}
-  - target: {fileID: 0}
-    propertyPath: m_PreviousCalculatedGlobalScale
-    value: 1
-    objectReference: {fileID: 0}
-  - target: {fileID: 0}
-    propertyPath: m_HasPreviousCalculatedGlobalScale
-    value: 0
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: normalSmoothAngle
@@ -258,6 +326,10 @@ Preset:
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: normalSmoothingSource
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_ReferencedClips.Array.size
     value: 0
     objectReference: {fileID: 0}
   - target: {fileID: 0}
@@ -303,6 +375,10 @@ Preset:
   - target: {fileID: 0}
     propertyPath: m_HumanDescription.m_FeetSpacing
     value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_HumanDescription.m_GlobalScale
+    value: 1
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: m_HumanDescription.m_RootMotionBoneName
