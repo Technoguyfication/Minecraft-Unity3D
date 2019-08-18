@@ -26,17 +26,17 @@ public class ChunkRenderer : MonoBehaviour
 	private readonly List<Task> _regenTasks = new List<Task>();
 	private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
-	private void Start()
+	public void Start()
 	{
 		StartCoroutine(AssignChunkMeshCoroutine(_cancellationTokenSource.Token));
 	}
 
-	private void OnDestroy()
+    public void OnDestroy()
 	{
 		_cancellationTokenSource.Cancel();
 	}
 
-	private void Update()
+    public void Update()
 	{
 		// remove completed regen tasks from list
 		_regenTasks.RemoveAll(t => t.IsCompleted);
@@ -166,18 +166,18 @@ public class ChunkRenderer : MonoBehaviour
 	/// Marks that we need to regenerate the mesh for a chunk
 	/// </summary>
 	/// <param name="mesh"></param>
-	public void MarkChunkForRegeneration(PhysicalChunk mesh, ushort sections, bool regenerateNearbye)
+	public void MarkChunkForRegeneration(PhysicalChunk mesh, ushort sections)
 	{
-		StartCoroutine(RegenerateChunkCoroutine(mesh, sections, regenerateNearbye));
+		StartCoroutine(RegenerateChunkCoroutine(mesh, sections));
 	}
 
 	/// <summary>
 	/// Marks that we need to regenerate the mesh for a chunk.
 	/// </summary>
 	/// <param name="chunk"></param>
-	public void MarkChunkForRegeneration(Chunk chunk, ushort sections, bool regenerateNearbye)
+	public void MarkChunkForRegeneration(Chunk chunk, ushort sections)
 	{
-		MarkChunkForRegeneration(GetPhysicalChunk(chunk), sections, regenerateNearbye);
+		MarkChunkForRegeneration(GetPhysicalChunk(chunk), sections);
 	}
 
 	/// <summary>
@@ -211,7 +211,7 @@ public class ChunkRenderer : MonoBehaviour
         _finishedMeshData.Enqueue(data);
     }
 
-	private IEnumerator RegenerateChunkCoroutine(PhysicalChunk physicalChunk, ushort sections, bool regenerateNearbye)
+	private IEnumerator RegenerateChunkCoroutine(PhysicalChunk physicalChunk, ushort sections)
 	{
 		// wait for an available thread
 		while (_regenTasks.Count >= SystemInfo.processorCount)
@@ -220,7 +220,7 @@ public class ChunkRenderer : MonoBehaviour
 		// generate the mesh on another thread
 		var task = Task.Run(() =>
 		{
-			var finishedRender = physicalChunk.GenerateMesh(sections, regenerateNearbye);
+			var finishedRender = physicalChunk.GenerateMesh(sections);
 
 			// add finished mesh data to queue so it can be assigned to the mesh filter
 			foreach (var meshData in finishedRender)

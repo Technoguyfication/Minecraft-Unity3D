@@ -208,6 +208,6 @@ public class EntityManager : MonoBehaviour
 
     public void HandleEntityMetadataPacket(EntityMetadataPacket packet)
     {
-
+        throw new NotImplementedException("Not yet implemented");
     }
 }

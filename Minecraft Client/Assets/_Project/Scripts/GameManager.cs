@@ -44,7 +44,7 @@ public class GameManager : MonoBehaviour
 	private float _lastTick = 0f;
 	private bool _disconnecting = false;
 
-	void Awake()
+	public void Awake()
 	{
 #if UNITY_EDITOR
 		Debug.Log("Running in editor");
@@ -60,7 +60,7 @@ public class GameManager : MonoBehaviour
 	}
 
 	// Update is called once per frame
-	void Update()
+	public void Update()
 	{
 		// this only happens if we are actively connected to a server
 		if (_initialized)
@@ -94,7 +94,7 @@ public class GameManager : MonoBehaviour
 		}
 	}
 
-	private void OnDestroy()
+	public void OnDestroy()
 	{
 		Disconnect("Game stopped");
 	}
@@ -198,13 +198,13 @@ public class GameManager : MonoBehaviour
 				var packet = _client.ReadNextPacket();
 				switch ((ClientboundIDs)packet.ID)
 				{
-					case ClientboundIDs.LOGIN_SUCCESS:
+					case ClientboundIDs.LogIn_Success:
 						loginSuccess = new LoginSuccessPacket(packet);
 						break;
-					case ClientboundIDs.JOIN_GAME:
+					case ClientboundIDs.JoinGame:
 						joinGame = new JoinGamePacket(packet);
 						break;
-					case ClientboundIDs.LOGIN_DISCONNECT:
+					case ClientboundIDs.LogIn_Disconnect:
 						Disconnect($"Disconnected from server: {new DisconnectPacket(packet).JSONResponse}");
 						yield break;
 				}
@@ -284,52 +284,48 @@ public class GameManager : MonoBehaviour
 	{
 		switch ((ClientboundIDs)data.ID)
 		{
-			case ClientboundIDs.DISCONNECT:
+			case ClientboundIDs.Disconnect:
 				Disconnect(new DisconnectPacket(data).JSONResponse);
 				break;
-			case ClientboundIDs.KEEP_ALIVE:
+			case ClientboundIDs.KeepAlive:
 				HandleKeepAlive(new ClientKeepAlivePacket(data));
 				break;
-			case ClientboundIDs.CHUNK_DATA:
+			case ClientboundIDs.ChunkData:
 				StartCoroutine(CurrentWorld.AddChunkDataCoroutine(new ChunkDataPacket(data)));
 				break;
-			case ClientboundIDs.PLAYER_POSITION_AND_LOOK:
+			case ClientboundIDs.PlayerPositionAndLook:
 				HandlePositionAndLook(new ClientPlayerPositionAndLookPacket(data));
 				break;
-			case ClientboundIDs.UNLOAD_CHUNK:
+			case ClientboundIDs.UnloadChunk:
 				CurrentWorld.UnloadChunk(new UnloadChunkPacket(data).Position);
 				break;
-			case ClientboundIDs.SPAWN_MOB:
+			case ClientboundIDs.SpawnMob:
 				EntityManager.HandleSpawnMobPacket(new SpawnMobPacket(data));
 				break;
-			case ClientboundIDs.DESTROY_ENTITIES:
+			case ClientboundIDs.DestroyEntities:
 				EntityManager.DestroyEntities(new DestroyEntitiesPacket(data).EntityIDs);
 				break;
-			case ClientboundIDs.ENTITY_RELATIVE_MOVE:
+			case ClientboundIDs.EntityRelativeMove:
 				EntityManager.HandleEntityRelativeMovePacket(new EntityRelativeMovePacket(data));
 				break;
-			case ClientboundIDs.ENTITY_LOOK:
+			case ClientboundIDs.EntityMove:
 				EntityManager.HandleEntityLook(new EntityLookPacket(data));
 				break;
-			case ClientboundIDs.ENTITY_LOOK_AND_RELATIVE_MOVE:
+			case ClientboundIDs.EntityLookAndRelativeMove:
 				EntityManager.HandleEntityLookAndRelativeMovePacket(new EntityLookAndRelativeMovePacket(data));
 				break;
-			case ClientboundIDs.ENTITY_TELEPORT:
+			case ClientboundIDs.EntityTeleport:
 				EntityManager.HandleEntityTeleport(new EntityTeleportPacket(data));
 				break;
-			case ClientboundIDs.ENTITY_HEAD_LOOK:
+			case ClientboundIDs.EntityHeadLook:
 				EntityManager.HandleEntityHeadLook(new EntityHeadLookPacket(data));
 				break;
-			case ClientboundIDs.PLAYER_INFO:
+			case ClientboundIDs.PlayerInfo:
                 PlayerInfoPacket playerInfo = new PlayerInfoPacket(data);
-
-                Debug.Log(playerInfo.ToString());
                 PlayerLibrary.HandleUpdatePacket(playerInfo);
 				break;
-			case ClientboundIDs.CHAT_MESSAGE:
+			case ClientboundIDs.ChatMessage:
                 ChatMessage chatMsg = new ChatMessage(new ChatMessagePacket(data));
-
-                Debug.Log($"Chat message: {chatMsg.PlaintextMessage}");
                 ChatHistoryManager.AddMessage(chatMsg.PlaintextMessage);
 				break;
                 /*

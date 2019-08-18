@@ -5,12 +5,12 @@ using TMPro;
 
 public class ChatHistoryManager : MonoBehaviour
 {
-    private static TMP_Text text;
-    private static Queue<string> messages = new Queue<string>();
-    private const int maxMessage = 8;
-    void Awake()
+    private static TMP_Text _chatText;
+    private static readonly Queue<string> _messages = new Queue<string>();
+    public const int MaxMessages = 8;
+    public void Awake()
     {
-        text = GetComponent<TMP_Text>();
+        _chatText = GetComponent<TMP_Text>();
         ClearHistory();
     }
 
@@ -20,9 +20,9 @@ public class ChatHistoryManager : MonoBehaviour
     /// <param name="message">The message to add, can be rich text.</param>
     public static void AddMessage(string message)
     {
-        messages.Enqueue(message);
-        if (messages.Count > maxMessage)
-            messages.Dequeue();
+        _messages.Enqueue(message);
+        if (_messages.Count > MaxMessages)
+            _messages.Dequeue();
         RewriteToUI();
     }
 
@@ -31,18 +31,18 @@ public class ChatHistoryManager : MonoBehaviour
     /// </summary>
     public static void ClearHistory()
     {
-        messages.Clear();
+        _messages.Clear();
         AddMessage("Chat History Ready");
         RewriteToUI();
     }
 
     private static void RewriteToUI()
     {
-        text.text = "";
-        foreach (string entry in messages)
+        _chatText.text = "";
+        foreach (string entry in _messages)
         {
-            text.text += (text.text.Length != 0 ? "\n" : "");
-            text.text += entry;
+            _chatText.text += (_chatText.text.Length != 0 ? "\n" : "");
+            _chatText.text += entry;
         }
     }
 }

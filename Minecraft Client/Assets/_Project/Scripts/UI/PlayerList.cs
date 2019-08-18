@@ -58,7 +58,7 @@ public class PlayerList : MonoBehaviour
             foreach (KeyValuePair<Guid, PlayerListEntry> entry in entries)
             {
                 Player player = players[entry.Key];
-                entry.Value.SetValues((player.hasDisplayName) ? player.displayName : player.name, player.ping);
+                entry.Value.SetValues((player.HasDisplayName) ? player.DisplayName : player.Name, player.Ping);
             }
         }
 	}

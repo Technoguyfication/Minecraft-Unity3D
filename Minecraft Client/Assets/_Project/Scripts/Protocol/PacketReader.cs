@@ -11,10 +11,9 @@ public static class PacketReader
     /// </summary>
     /// <param name="reader">The reader to use</param>
     /// <param name="result">The int representation of the VarInt</param>
-    public static void ReadVarInt(in BinaryReader reader, out int result)
+    public static int ReadVarInt(in BinaryReader reader)
     {
-        int value = 0, numRead = 0;
-        result = 0;
+        int value, numRead = 0, result = 0;
         byte read;
         while (true)
         {
@@ -27,6 +26,8 @@ public static class PacketReader
                 throw new UnityException("VarInt too big!");
             if ((read & 0x80) != 128) break;
         }
+
+        return result;
     }
 
     /// <summary>
@@ -34,9 +35,9 @@ public static class PacketReader
     /// </summary>
     /// <param name="reader">The reader to use</param>
     /// <param name="result">The read string</param>
-    public static void ReadString(in BinaryReader reader, out string result)
+    public static string ReadString(in BinaryReader reader)
     {
-        result = reader.ReadString();
+        return reader.ReadString();
     }
 
     /// <summary>
@@ -44,9 +45,9 @@ public static class PacketReader
     /// </summary>
     /// <param name="reader">The reader to use</param>
     /// <param name="result">The read GUID</param>
-    public static void ReadGUID(in BinaryReader reader, out Guid result)
+    public static Guid ReadGUID(in BinaryReader reader)
     {
-        result = new Guid(reader.ReadBytes(16));
+        return new Guid(reader.ReadBytes(16));
     }
 
     /// <summary>
@@ -54,9 +55,9 @@ public static class PacketReader
     /// </summary>
     /// <param name="reader">The reader to use</param>
     /// <param name="result">The read boolean</param>
-    public static void ReadBoolean(in BinaryReader reader, out bool result)
+    public static bool ReadBoolean(in BinaryReader reader)
     {
-        result = reader.ReadBoolean();
+        return reader.ReadBoolean();
     }
 
     /// <summary>
@@ -64,9 +65,16 @@ public static class PacketReader
     /// </summary>
     /// <param name="reader">The reader to use</param>
     /// <param name="result">The read float</param>
-    public static void ReadFloat(in BinaryReader reader, out float result)
+    public static float ReadSingle(in BinaryReader reader)
     {
-        result = reader.ReadSingle();
+        byte[] floatData = reader.ReadBytes(4);
+        return BitConverter.ToSingle(floatData.ReverseIfLittleEndian(), 0);
+    }
+
+    public static double ReadDouble(in BinaryReader reader)
+    {
+        byte[] doubleData = reader.ReadBytes(8);
+        return BitConverter.ToDouble(doubleData.ReverseIfLittleEndian(), 0);
     }
 
     /// <summary>
@@ -74,9 +82,53 @@ public static class PacketReader
     /// </summary>
     /// <param name="reader">The reader to use</param>
     /// <param name="result">The read byte</param>
-    public static void ReadByte(in BinaryReader reader, out byte result)
+    public static byte ReadByte(in BinaryReader reader)
     {
-        result = reader.ReadByte();
+        return reader.ReadByte();
+    }
+
+    /// <summary>
+    /// Reads a Int16 from the given BinaryReader
+    /// </summary>
+    /// <param name="reader">The reader to use</param>
+    /// <returns>The read Int16</returns>
+    public static short ReadInt16(in BinaryReader reader)
+    {
+        byte[] shortData = reader.ReadBytes(2);
+        return BitConverter.ToInt16(shortData.ReverseIfLittleEndian(), 0);
+    }
+
+    /// <summary>
+    /// Reads an int32 (int) from the given BinaryReader
+    /// </summary>
+    /// <param name="reader">The reader to use</param>
+    /// <returns>The read int32</returns>
+    public static int ReadInt32(in BinaryReader reader)
+    {
+        byte[] intData = reader.ReadBytes(4);
+        return BitConverter.ToInt32(intData.ReverseIfLittleEndian(), 0);
+    }
+
+    /// <summary>
+    /// Reads an int64 (long) from the given BinaryReader
+    /// </summary>
+    /// <param name="reader">The reader to use</param>
+    /// <returns>The read int64</returns>
+    public static long ReadInt64(in BinaryReader reader)
+    {
+        byte[] intData = reader.ReadBytes(8);
+        return BitConverter.ToInt64(intData.ReverseIfLittleEndian(), 0);
+    }
+
+    /// <summary>
+    /// Reads a byte[] from the given BinaryReader
+    /// </summary>
+    /// <param name="reader">The reader to use</param>
+    /// <param name="count">The amount of bytes to read</param>
+    /// <returns>The read byte[]</returns>
+    public static byte[] ReadBytes(in BinaryReader reader, int count)
+    {
+        return reader.ReadBytes(count);
     }
 
     /// <summary>
@@ -84,14 +136,9 @@ public static class PacketReader
     /// </summary>
     /// <param name="reader">The reader to use</param>
     /// <param name="result">The read position (3 ints)</param>
-    public static void ReadPosition(in BinaryReader reader, out Position result)
+    public static Position ReadPosition(in BinaryReader reader)
     {
-        ulong val = reader.ReadUInt64();
-        int x = (int)val >> 38;
-        int y = (int)(val >> 26) & 0xFFF;
-        int z = (int)val << 38 >> 38;
-
-        result = new Position(x, y, z);
+        return new Position(reader);
     }
 
     /// <summary>
@@ -99,13 +146,13 @@ public static class PacketReader
     /// </summary>
     /// <param name="reader">The reader to use</param>
     /// <param name="rotation">The read rotation (3 floats as Vector3)</param>
-    public static void ReadRotation(in BinaryReader reader, out Vector3 rotation)
+    public static Vector3 ReadRotation(in BinaryReader reader)
     {
-        ReadFloat(reader, out float x);
-        ReadFloat(reader, out float y);
-        ReadFloat(reader, out float z);
+        float x = ReadSingle(reader);
+        float y = ReadSingle(reader);
+        float z = ReadSingle(reader);
 
-        rotation = new Vector3(x, y, z);
+        return new Vector3(x, y, z);
     }
 
     /// <summary>
@@ -144,37 +191,8 @@ public static class PacketReader
     /// </summary>
     /// <param name="reader">The reader to use</param>
     /// <param name="particle">The read particle (type and extra data)</param>
-    public static void ReadParticle(in BinaryReader reader, out Particle particle)
+    public static Particle ReadParticle(in BinaryReader reader)
     {
-        ReadVarInt(reader, out int particleType);
-        Particle.ParticleType type = (Particle.ParticleType)particleType;
-
-        int blockState = 0;
-
-        float red = 0;
-        float green = 0;
-        float blue = 0;
-        float scale = 0;
-
-        SlotData slotData = new SlotData();
-
-        switch (type)
-        {
-            case Particle.ParticleType.minecraft_block:
-            case Particle.ParticleType.minecraft_falling_dust:
-                ReadVarInt(reader, out blockState);
-                break;
-            case Particle.ParticleType.minecraft_dust:
-                ReadFloat(reader, out red);
-                ReadFloat(reader, out green);
-                ReadFloat(reader, out blue);
-                ReadFloat(reader, out scale);
-                break;
-            case Particle.ParticleType.minecraft_item:
-                //ReadSlotData(reader, out slotData);
-                break;
-        }
-
-        particle = new Particle(type, blockState, red, green, blue, scale, slotData);
+        return new Particle(reader);
     }
 }

@@ -10,22 +10,22 @@ using UnityEngine;
 /// </summary>
 public class Player
 {
-	public bool hasDisplayName { get; set; }
-	public string displayName { get; set; }
-	public Texture skin { get; set; }
-	public byte skinBitmask { get; set; }
-	public GameMode gameMode { get; set; }
-	public int ping { get; set; }
-    public string name { get; set; }
+	public bool HasDisplayName { get; set; }
+	public string DisplayName { get; set; }
+	public Texture SkinTexture { get; set; }
+	public byte SkinBitmask { get; set; }
+	public GameMode PlayerGameMode { get; set; }
+	public int Ping { get; set; }
+    public string Name { get; set; }
 
     public Player(bool hasDisplayName, string displayName, Texture skin, byte skinBitmask, GameMode gameMode, int ping, string name)
     {
-        this.hasDisplayName = hasDisplayName;
-        this.displayName = displayName;
-        this.skin = skin;
-        this.skinBitmask = skinBitmask;
-        this.gameMode = gameMode;
-        this.ping = ping;
-        this.name = name;
+        HasDisplayName = hasDisplayName;
+        DisplayName = displayName;
+        SkinTexture = skin;
+        SkinBitmask = skinBitmask;
+        PlayerGameMode = gameMode;
+        Ping = ping;
+        Name = name;
     }
 }

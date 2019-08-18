@@ -22,8 +22,8 @@ public class PhysicalChunk : MonoBehaviour
 			new BlockPos() { Z = -1 },
 		};
 
-	// Use this for initialization
-	void Start()
+    // Use this for initialization
+    public void Start()
 	{
 		name = Chunk.Position.ToString();
 
@@ -47,7 +47,7 @@ public class PhysicalChunk : MonoBehaviour
 	/// Generates mesh data for this chunk section
 	/// </summary>
 	/// <param name="chunk"></param>
-	public ChunkMeshData[] GenerateMesh(ushort sections, bool regenerateNearbye)
+	public ChunkMeshData[] GenerateMesh(ushort sections)
 	{
 		var finishedMeshes = new List<ChunkMeshData>();
 
@@ -192,6 +192,7 @@ public class PhysicalChunk : MonoBehaviour
 		return finishedMeshes.ToArray();
 	}
 
+    /*
 	private bool HasAllNeighbors(bool[] blocks)
 	{
 		foreach (var neighbor in blocks)
@@ -199,7 +200,7 @@ public class PhysicalChunk : MonoBehaviour
 				return false;
 
 		return true;
-	}
+	}*/
 
 	/// <summary>
 	/// Get vertices for face inx: (minecraft: +X -X +Y -Y +Z -Z) (unity: +Z -Z +Y -Y +X -X)
