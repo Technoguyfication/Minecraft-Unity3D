@@ -206,6 +206,7 @@ public class EntityManager : MonoBehaviour
 		_entities.Clear();
 	}
 
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Notimplemented")]
 	public void HandleEntityMetadataPacket(EntityMetadataPacket packet)
 	{
 		throw new NotImplementedException("Not yet implemented");
