@@ -16,7 +16,7 @@ public class PlayerInfoPacket : Packet
 	public PlayerInfoPacket(PacketData data) : base(data) { } // packet id should be set correctly if this ctor is used
 
 	public Action[] Actions { get; set; }
-
+	public ActionType Type { get; set; }
 	public override byte[] Payload
 	{
 		get => throw new NotImplementedException();
@@ -30,17 +30,16 @@ public class PlayerInfoPacket : Packet
 					int actionCount = PacketReader.ReadVarInt(reader);
 					Actions = new Action[actionCount];
 
-					switch (actionType)
+					for (int i = 0; i < Actions.Length; i++)
 					{
-						case ActionType.AddPlayer:
-							for (int i = 0; i < Actions.Length; i++)
-							{
-								var action = new Action()
-								{
-									ActionType = actionType
-								};
+						var action = new Action
+						{
+							UUID = PacketReader.ReadGuid(reader)
+						};
 
-								action.UUID = PacketReader.ReadGuid(reader);
+						switch (actionType)
+						{
+							case ActionType.AddPlayer:
 								action.Name = PacketReader.ReadString(reader);
 
 								// read property array
@@ -68,75 +67,33 @@ public class PlayerInfoPacket : Packet
 								// displayname only exists if HasDisplayName = true
 								if (action.HasDisplayName)
 								{
-									action.DisplayNameJSON = PacketReader.ReadString(reader);
+									string displayNameJson = PacketReader.ReadString(reader);
+									action.DisplayName = ChatComponent.FromJson(displayNameJson);
 								}
-
-								Actions[i] = action;
-							}
-							break;
-						case ActionType.UpdateGameMode:
-							for (int i = 0; i < Actions.Length; i++)
-							{
-								var action = new Action()
-								{
-									ActionType = actionType
-								};
-
-								action.UUID = PacketReader.ReadGuid(reader);
+								break;
+							case ActionType.UpdateGameMode:
 								action.GameMode = (GameMode)PacketReader.ReadVarInt(reader);
-
-								Actions[i] = action;
-							}
-							break;
-						case ActionType.UpdateLatency:
-							for (int i = 0; i < Actions.Length; i++)
-							{
-								var action = new Action()
-								{
-									ActionType = actionType
-								};
-
-								action.UUID = PacketReader.ReadGuid(reader);
+								break;
+							case ActionType.UpdateLatency:
 								action.Ping = PacketReader.ReadVarInt(reader);
-
-								Actions[i] = action;
-							}
-							break;
-						case ActionType.UpdateDisplayName:
-							for (int i = 0; i < Actions.Length; i++)
-							{
-								var action = new Action()
-								{
-									ActionType = actionType
-								};
-
-								action.UUID = PacketReader.ReadGuid(reader);
+								break;
+							case ActionType.UpdateDisplayName:
 								action.HasDisplayName = PacketReader.ReadBoolean(reader);
 
 								// displayname only exists if HasDisplayName = true
 								if (action.HasDisplayName)
 								{
-									action.DisplayNameJSON = PacketReader.ReadString(reader);
+									string displayNameJson = PacketReader.ReadString(reader);
+									action.DisplayName = ChatComponent.FromJson(displayNameJson);
 								}
+								break;
+							case ActionType.RemovePlayer:
+								break;
+							default:
+								throw new Exception($"Unknown PlayerInfo action type: {actionType}");
+						}
 
-								Actions[i] = action;
-							}
-							break;
-						case ActionType.RemovePlayer:
-							for (int i = 0; i < Actions.Length; i++)
-							{
-								var action = new Action()
-								{
-									ActionType = actionType
-								};
-
-								action.UUID = PacketReader.ReadGuid(reader);
-
-								Actions[i] = action;
-							}
-							break;
-						default:
-							throw new Exception($"Unknown PlayerInfo action type: {actionType}");
+						Actions[i] = action;
 					}
 				}
 			}
@@ -154,8 +111,7 @@ public class PlayerInfoPacket : Packet
 		public GameMode GameMode { get; set; }
 		public int Ping { get; set; }
 		public bool HasDisplayName { get; set; }
-		public string DisplayNameJSON { get; set; }
-		public ActionType ActionType { get; set; }
+		public ChatComponent DisplayName { get; set; }
 	}
 
 	public class Property
