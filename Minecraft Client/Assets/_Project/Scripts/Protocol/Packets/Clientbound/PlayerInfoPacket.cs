@@ -36,7 +36,7 @@ public class PlayerInfoPacket : Packet
 
 							for (int i = 0; i < playerCount; i++)
 							{
-								Guid guid = PacketReader.ReadGUID(reader);
+								Guid guid = PacketReader.ReadGuid(reader);
 
 								string name = PacketReader.ReadString(reader);
 								int propertyCount = PacketReader.ReadVarInt(reader);
@@ -78,7 +78,7 @@ public class PlayerInfoPacket : Packet
 
 							for (int i = 0; i < playerCount; i++)
 							{
-								Guid guid = PacketReader.ReadGUID(reader);
+								Guid guid = PacketReader.ReadGuid(reader);
 								GameMode gameMode = (GameMode)PacketReader.ReadVarInt(reader);
 
 								updatedGamemodes.Enqueue(new UpdateGamemodeAction(guid, gameMode));
@@ -92,7 +92,7 @@ public class PlayerInfoPacket : Packet
 
 							for (int i = 0; i < playerCount; i++)
 							{
-								Guid guid = PacketReader.ReadGUID(reader);
+								Guid guid = PacketReader.ReadGuid(reader);
 								int ping = PacketReader.ReadVarInt(reader);
 
 								updatedLatencies.Enqueue(new UpdateLatencyAction(guid, ping));
@@ -107,7 +107,7 @@ public class PlayerInfoPacket : Packet
 
 							for (int i = 0; i < playerCount; i++)
 							{
-								Guid guid = PacketReader.ReadGUID(reader);
+								Guid guid = PacketReader.ReadGuid(reader);
 								bool hasDisplayName = PacketReader.ReadBoolean(reader);
 
 								string displayName = "";
@@ -128,7 +128,7 @@ public class PlayerInfoPacket : Packet
 
 							for (int i = 0; i < playerCount; i++)
 							{
-								Guid guid = PacketReader.ReadGUID(reader);
+								Guid guid = PacketReader.ReadGuid(reader);
 
 								removedPlayerActions.Enqueue(new RemovePlayerAction(guid));
 							}
@@ -141,53 +141,6 @@ public class PlayerInfoPacket : Packet
 				}
 			}
 		}
-	}
-
-	public override string ToString()
-	{
-		StringBuilder outputString = new StringBuilder();
-		switch (PacketAction)
-		{
-			case InfoPacketAction.AddPlayer:
-				outputString.Append("PlayerInfoPacket: Action AddPlayer, ");
-				for (int i = 0; i < AddPlayerActions.Length; i++)
-				{
-					outputString.Append($"For GUID {AddPlayerActions[i].Guid} with name {AddPlayerActions[i].Name} with {AddPlayerActions[i].Properties.Length} properties in game mode {AddPlayerActions[i].GameMode} with ping {AddPlayerActions[i].Ping} has display name is {AddPlayerActions[i].HasDisplayName} with a display name of {AddPlayerActions[i].DisplayName}{((i + 1 != AddPlayerActions.Length) ? "," : "") }");
-				}
-				break;
-			case InfoPacketAction.UpdateGameMode:
-				outputString.Append("PlayerInfoPacket: Action UpdateGameMode, ");
-				for (int i = 0; i < UpdateGamemodeActions.Length; i++)
-				{
-					outputString.Append($"For GUID {UpdateGamemodeActions[i].Guid} new gamemode {UpdateGamemodeActions[i].GameMode}{((i + 1 != UpdateGamemodeActions.Length) ? "," : "") }");
-				}
-				break;
-			case InfoPacketAction.UpdateLatency:
-				outputString.Append("PlayerInfoPacket: Action UpdateLatency, ");
-				for (int i = 0; i < UpdateLatencyActions.Length; i++)
-				{
-					outputString.Append($"For GUID {UpdateLatencyActions[i].Guid} new latency {UpdateLatencyActions[i].Ping}{((i + 1 != UpdateLatencyActions.Length) ? "," : "") }");
-				}
-				break;
-			case InfoPacketAction.UpdateDisplayName:
-				outputString.Append("PlayerInfoPacket: Action UpdateGameMode, ");
-				for (int i = 0; i < UpdateDisplayNameActions.Length; i++)
-				{
-					outputString.Append($"For GUID {UpdateDisplayNameActions[i].Guid} hasDisplayName {UpdateDisplayNameActions[i].HasDisplayName} display name {UpdateDisplayNameActions[i].DisplayName}{((i + 1 != UpdateDisplayNameActions.Length) ? "," : "") }");
-				}
-				break;
-			case InfoPacketAction.RemovePlayer:
-				outputString.Append("PlayerInfoPacket: Action RemovePlayer, ");
-				for (int i = 0; i < RemovePlayerActions.Length; i++)
-				{
-					outputString.Append($"For GUID {RemovePlayerActions[i].Guid}{((i + 1 != RemovePlayerActions.Length) ? "," : "") }");
-				}
-				break;
-			default:
-				break;
-		}
-
-		return outputString.ToString();
 	}
 
 	public InfoPacketAction PacketAction { get; private set; }

@@ -41,7 +41,7 @@ public class SpawnMobPacket : Packet
 				using (BinaryReader reader = new BinaryReader(stream))
 				{
 					EntityID = PacketReader.ReadVarInt(reader);
-					UUID = PacketReader.ReadGUID(reader);
+					UUID = PacketReader.ReadGuid(reader);
 					Type = (Entity.EntityType)PacketReader.ReadVarInt(reader);
 
 					X = PacketReader.ReadDouble(reader);

@@ -76,13 +76,13 @@ public class EntityMetadataPacket : Packet
 								metaDataEntries.Enqueue(new EntityMetadataEntry(indexKey, (EntityMetadataEntry.MetadataType)type) { RotationValue = rotationResult });
 								break;
 							case EntityMetadataEntry.MetadataType.Position:
-								Position positionResult = PacketReader.ReadPosition(reader);
+								BlockPos positionResult = PacketReader.ReadPosition(reader);
 								metaDataEntries.Enqueue(new EntityMetadataEntry(indexKey, (EntityMetadataEntry.MetadataType)type) { PositionValue = positionResult });
 								break;
 							case EntityMetadataEntry.MetadataType.OptPosition:
 								bool optBoolPositionResult = PacketReader.ReadBoolean(reader);
 
-								Position optPositionResult = new Position();
+								BlockPos optPositionResult = new BlockPos();
 								if (optBoolPositionResult)
 								{
 									optPositionResult = PacketReader.ReadPosition(reader);
@@ -100,7 +100,7 @@ public class EntityMetadataPacket : Packet
 								Guid optUuidResult = new Guid();
 								if (optBoolUuidResult)
 								{
-									optUuidResult = PacketReader.ReadGUID(reader);
+									optUuidResult = PacketReader.ReadGuid(reader);
 								}
 
 								metaDataEntries.Enqueue(new EntityMetadataEntry(indexKey, (EntityMetadataEntry.MetadataType)type) { BoolValue = optBoolUuidResult, GuidValue = optUuidResult });
@@ -165,7 +165,7 @@ public class EntityMetadataPacket : Packet
 		public string StringValue;
 		public SlotData SlotDataValue;
 		public Vector3 RotationValue;
-		public Position PositionValue;
+		public BlockPos PositionValue;
 		public Guid GuidValue;
 		//public NbtCompound nbtValue;
 		public Particle ParticleValue;
@@ -181,7 +181,7 @@ public class EntityMetadataPacket : Packet
 			StringValue = null;
 			SlotDataValue = new SlotData();
 			RotationValue = new Vector3();
-			PositionValue = new Position();
+			PositionValue = new BlockPos();
 			GuidValue = new Guid();
 			//nbtValue = null;
 			ParticleValue = new Particle();

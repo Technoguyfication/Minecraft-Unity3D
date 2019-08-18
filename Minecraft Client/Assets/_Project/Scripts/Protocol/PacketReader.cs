@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
+/// <summary>
+/// Provides utilities for reading packet data
+/// </summary>
 public static class PacketReader
 {
 	/// <summary>
@@ -31,7 +34,7 @@ public static class PacketReader
 	/// </summary>
 	/// <param name="reader">The reader to use</param>
 	/// <param name="result">The read GUID</param>
-	public static Guid ReadGUID(in BinaryReader reader)
+	public static Guid ReadGuid(in BinaryReader reader)
 	{
 		return new Guid(reader.ReadBytes(16));
 	}
@@ -107,6 +110,17 @@ public static class PacketReader
 	}
 
 	/// <summary>
+	/// Reads an unsigned long from the given <see cref="BinaryReader"/>
+	/// </summary>
+	/// <param name="reader"></param>
+	/// <returns></returns>
+	public static ulong ReadUInt64(in BinaryReader reader)
+	{
+		byte[] ulongData = reader.ReadBytes(sizeof(ulong));
+		return BitConverter.ToUInt64(ulongData.ReverseIfLittleEndian(), 0);
+	}
+
+	/// <summary>
 	/// Reads a byte[] from the given BinaryReader
 	/// </summary>
 	/// <param name="reader">The reader to use</param>
@@ -118,13 +132,21 @@ public static class PacketReader
 	}
 
 	/// <summary>
-	/// Reads a Position from the given BinaryReader
+	/// Reads a Position from the given BinaryReader.
+	/// https://wiki.vg/Protocol#Position
 	/// </summary>
 	/// <param name="reader">The reader to use</param>
 	/// <param name="result">The read position (3 ints)</param>
-	public static Position ReadPosition(in BinaryReader reader)
+	public static BlockPos ReadPosition(in BinaryReader reader)
 	{
-		return new Position(reader);
+		var val = ReadUInt64(reader);
+
+		return new BlockPos()
+		{
+			X = (int)val << 38,
+			Y = (int)(val >> 26) & 0xFFF,
+			Z = (int)val << 38 >> 38
+		};
 	}
 
 	/// <summary>
