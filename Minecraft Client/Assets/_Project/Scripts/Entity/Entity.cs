@@ -14,6 +14,8 @@ public abstract class Entity : MonoBehaviour
 	public EntityType Type { get; set; }
 	public World World { get; set; }
 
+	public bool ForceGravityOn = false;
+
 	protected readonly float HeadMinX = -89.9f;
 	protected readonly float HeadMaxX = 89.9f;
 
@@ -89,7 +91,7 @@ public abstract class Entity : MonoBehaviour
 		Collider = Physical.GetComponent<BoxCollider>();
 		Rigidbody = GetComponent<Rigidbody>();
 
-		Rigidbody.useGravity = false;   // don't use gravity by default for entities
+		Rigidbody.useGravity = ForceGravityOn;   // don't use gravity by default for entities
 	}
 
 	public void SetRotation(float pitch, float yaw)

@@ -69,7 +69,7 @@ public class PlayerController : EntityPlayer
 	{
 		// only simulate gravity on the player if the chunk we are in is loaded
 		// stops player from falling through world when loading
-		Rigidbody.useGravity = World?.ChunkRenderer.IsChunkSectionGenerated(BlockPos.GetChunkSectionPos()) ?? false;
+		Rigidbody.useGravity = World?.ChunkRenderer.IsChunkSectionGenerated(BlockPos.GetChunkSectionPos()) ?? false || ForceGravityOn;
 
 		Vector3 inputVelocity = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;    // get raw input from user
 
@@ -84,9 +84,8 @@ public class PlayerController : EntityPlayer
 		// add in falling velocity
 		inputVelocity.y = Rigidbody.velocity.y;
 
-		// since the camera is the only part of the player that turns, we need to rotate the velocity vectors to the camera's looking position
-		// so the user moves in the direction they are looking
-		Vector3 rotatedVelocity = Quaternion.Euler(0, Head.transform.rotation.eulerAngles.y, 0) * inputVelocity;
+		// we need to adjust the input velocity by which direction the player is looking, so they walk in the direction they are looking
+		Vector3 rotatedVelocity = Quaternion.Euler(0, Yaw, 0) * inputVelocity;
 
 		// check if player ground status changed
 		if (OnGround != _wasOnGround)
