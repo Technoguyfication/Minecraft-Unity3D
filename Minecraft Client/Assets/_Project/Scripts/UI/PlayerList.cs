@@ -8,9 +8,7 @@ public class PlayerList : MonoBehaviour
 	public GameObject PlayerListPanel;
 	public KeyCode PlayerListKey = KeyCode.Tab;
 
-	public PlayerEntry playerListEntryPrefab;
-
-	private readonly Dictionary<Guid, PlayerEntry> entries = new Dictionary<Guid, PlayerEntry>();
+	public PlayerEntry PlayerEntryPrefab;
 
 	// Start is called before the first frame update
 	void Start()
@@ -31,8 +29,12 @@ public class PlayerList : MonoBehaviour
 		}
 	}
 
-	public void AddPlayerInfo(PlayerInfoPacket pkt)
+	/// <summary>
+	/// Updates the in game player list (tab menu) with a new collection of players
+	/// </summary>
+	/// <param name="players"></param>
+	public void UpdatePlayerList(Player[] players)
 	{
-
+		Debug.Log($"adding {players.Length} players");
 	}
 }

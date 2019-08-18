@@ -13,10 +13,15 @@ class TranslateComponent : ChatComponent
 	public string translate;
 
 	[JsonConverter(typeof(ChatComponentJsonConverter))]
-	public ChatComponent[] with;
+	public ChatComponent[] with = new ChatComponent[0];
 
 	public override string ToString()
 	{
-		return ChatTranslation.TranslateString(translate, with.Select(c => c.ToString()).ToArray()) + base.ToString();
+		string translatedString = ChatTranslation.TranslateString(translate, with?.Select((c) =>
+		{
+			return c.ToString();
+		})?.ToArray());
+
+		return translatedString + base.ToString();
 	}
 }

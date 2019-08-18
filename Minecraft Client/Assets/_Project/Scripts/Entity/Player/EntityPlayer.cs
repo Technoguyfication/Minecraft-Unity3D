@@ -7,7 +7,7 @@ using UnityEngine;
 /// </summary>
 public class EntityPlayer : LivingEntity
 {
-	public Texture Skin { get; set; }
+	public Player Player { get; set; }
 
 	public EntityPlayer()
 	{

@@ -454,7 +454,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PlayerListPanel: {fileID: 1968976371}
   PlayerListKey: 9
-  playerListEntryPrefab: {fileID: 0}
+  PlayerEntryPrefab: {fileID: 0}
 --- !u!222 &38015112
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1072,6 +1072,51 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.ScrollRect+ScrollRectEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
+--- !u!1 &673761916
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 673761918}
+  - component: {fileID: 673761917}
+  m_Layer: 0
+  m_Name: Reference Linker
+  m_TagString: ReferenceLinker
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &673761917
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 673761916}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2317d6a9c84834749aeccaf7a97b5fea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Chat: {fileID: 1933294540}
+  PlayerList: {fileID: 38015108}
+--- !u!4 &673761918
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 673761916}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.9502788, y: 0.91687536, z: 2.3973532}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &677520713
 GameObject:
   m_ObjectHideFlags: 0
@@ -2101,7 +2146,7 @@ GameObject:
   - component: {fileID: 1933294540}
   m_Layer: 5
   m_Name: Chat
-  m_TagString: Chat
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

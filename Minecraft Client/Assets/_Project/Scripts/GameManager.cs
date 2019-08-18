@@ -20,6 +20,7 @@ public class GameManager : MonoBehaviour
 	public DebugCanvas DebugCanvas;
 	public EntityManager EntityManager;
 	public Chat Chat;
+	public PlayerLibrary PlayerLibrary;
 
 	private PlayerController _player = null;
 	private NetworkClient _client;
@@ -31,14 +32,14 @@ public class GameManager : MonoBehaviour
 	private bool _initialized = false;
 	private World CurrentWorld
 	{
-		get => _currentWorldVar;
+		get => _currentWorld;
 		set
 		{
-			_currentWorldVar = value;
+			_currentWorld = value;
 			EntityManager.World = CurrentWorld;
 		}
 	}
-	private World _currentWorldVar;
+	private World _currentWorld;
 	private Guid _playerUuid;
 	private LoadingScreenController _loadingScreen;
 	private float _lastTick = 0f;
@@ -55,8 +56,6 @@ public class GameManager : MonoBehaviour
 #if ENABLE_PROFILER
 		Debug.Log("Unity profiler enabled");
 #endif
-
-		PlayerLibrary.Initialize();
 	}
 
 	// Update is called once per frame
@@ -241,8 +240,10 @@ public class GameManager : MonoBehaviour
 		// set up references in game scene
 		CurrentWorld.ChunkRenderer = Instantiate(ChunkRendererPrefab, Vector3.zero, Quaternion.identity).GetComponent<ChunkRenderer>();
 		CurrentWorld.ChunkRenderer.DebugCanvas = DebugCanvas;
-		Chat = GameObject.FindGameObjectWithTag("Chat").GetComponent<Chat>();
+		var referenceLinker = GameObject.FindGameObjectWithTag("ReferenceLinker").GetComponent<ReferenceLinker>();
+		Chat = referenceLinker.Chat;
 		Chat.ChatSend += Chat_ChatSend;
+		PlayerLibrary = new PlayerLibrary(referenceLinker.PlayerList);
 
 		// start network worker tasks
 		_netReadTask = new Task(() =>
@@ -263,7 +264,7 @@ public class GameManager : MonoBehaviour
 		StartCoroutine(ClientTickLoopCoroutine(_cancellationTokenSource.Token));
 	}
 
-	private void Chat_ChatSend(Chat.ChatSendEventArgs e, object sender)
+	private void Chat_ChatSend(object sender, Chat.ChatSendEventArgs e)
 	{
 		DispatchWritePacket(new CSChatMessagePacket()
 		{
@@ -321,21 +322,10 @@ public class GameManager : MonoBehaviour
 				EntityManager.HandleEntityHeadLook(new EntityHeadLookPacket(data));
 				break;
 			case ClientboundIDs.PlayerInfo:
-				PlayerInfoPacket playerInfo = new PlayerInfoPacket(data);
-				PlayerLibrary.HandleUpdatePacket(playerInfo);
+				PlayerLibrary.HandlePlayerInfoPacket(new PlayerInfoPacket(data));
 				break;
 			case ClientboundIDs.ChatMessage:
-				ChatMessage chatMsg = new ChatMessage(new ChatMessagePacket(data));
-				ChatHistoryManager.AddMessage(chatMsg.PlaintextMessage);
-				break;
-			/*
-		case ClientboundIDs.ENTITY_METADATA:
-			EntityMetadataPacket metadata = new EntityMetadataPacket(data);
-
-			Debug.Log(metadata.ToString());
-			break;*/
-			default:
-				//Debug.Log($"Case {data.ID} is not handled!");
+				Chat.HandleChatPacket(new ChatMessagePacket(data));
 				break;
 		}
 	}

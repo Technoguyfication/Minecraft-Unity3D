@@ -5,8 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - Loading Screen Controller
-  - Chunk Renderer
-  - Chat
+  - ReferenceLinker
   layers:
   - Default
   - TransparentFX

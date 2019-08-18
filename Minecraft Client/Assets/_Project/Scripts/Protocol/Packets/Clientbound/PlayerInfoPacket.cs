@@ -62,10 +62,9 @@ public class PlayerInfoPacket : Packet
 
 								action.GameMode = (GameMode)PacketReader.ReadVarInt(reader);
 								action.Ping = PacketReader.ReadVarInt(reader);
-								action.HasDisplayName = PacketReader.ReadBoolean(reader);
-
+								
 								// displayname only exists if HasDisplayName = true
-								if (action.HasDisplayName)
+								if (PacketReader.ReadBoolean(reader))   // read has display name
 								{
 									string displayNameJson = PacketReader.ReadString(reader);
 									action.DisplayName = ChatComponent.FromJson(displayNameJson);
@@ -78,10 +77,8 @@ public class PlayerInfoPacket : Packet
 								action.Ping = PacketReader.ReadVarInt(reader);
 								break;
 							case ActionType.UpdateDisplayName:
-								action.HasDisplayName = PacketReader.ReadBoolean(reader);
-
 								// displayname only exists if HasDisplayName = true
-								if (action.HasDisplayName)
+								if (PacketReader.ReadBoolean(reader))	// read has display name
 								{
 									string displayNameJson = PacketReader.ReadString(reader);
 									action.DisplayName = ChatComponent.FromJson(displayNameJson);
@@ -110,8 +107,7 @@ public class PlayerInfoPacket : Packet
 		public Property[] Properties { get; set; }
 		public GameMode GameMode { get; set; }
 		public int Ping { get; set; }
-		public bool HasDisplayName { get; set; }
-		public ChatComponent DisplayName { get; set; }
+		public ChatComponent DisplayName { get; set; } = null;
 	}
 
 	public class Property

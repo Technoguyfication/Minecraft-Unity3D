@@ -16,7 +16,7 @@ public class Chat : MonoBehaviour
 	/// </summary>
 	const float CHATBOX_TIMEOUT = 6.5f;
 
-	public delegate void ChatSendEventHandler(ChatSendEventArgs e, object sender);
+	public delegate void ChatSendEventHandler(object sender, ChatSendEventArgs e);
 	public event ChatSendEventHandler ChatSend;
 
 	public TextMeshProUGUI ChatBox;
@@ -55,7 +55,7 @@ public class Chat : MonoBehaviour
 		}
 		catch (Exception ex)
 		{
-			Debug.LogWarning($"Error parsing chat message: {ex}");
+			Debug.LogWarning($"Error parsing chat message: {ex}\n\nJSON:\n{pkt.Json}");
 			return;
 		}
 
@@ -154,7 +154,7 @@ public class Chat : MonoBehaviour
 		}
 
 		// send chat packet
-		ChatSend?.Invoke(new ChatSendEventArgs() { Message = ChatInput.text }, this);
+		ChatSend?.Invoke(this, new ChatSendEventArgs() { Message = ChatInput.text });
 
 		CloseChat();    // this also clears the chat box
 	}
