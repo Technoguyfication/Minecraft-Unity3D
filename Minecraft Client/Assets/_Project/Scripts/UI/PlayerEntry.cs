@@ -16,6 +16,6 @@ public class PlayerEntry : MonoBehaviour
 		else
 			DisplayName.text = player.Name;
 
-		DisplayName.text += $" {player.Ping.ToString()}";
+		DisplayName.text += $" {player.Ping.ToString()}ms";
 	}
 }

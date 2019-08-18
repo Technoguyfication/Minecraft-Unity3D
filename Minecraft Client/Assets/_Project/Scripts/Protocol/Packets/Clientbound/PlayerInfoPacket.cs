@@ -26,7 +26,7 @@ public class PlayerInfoPacket : Packet
 			{
 				using (BinaryReader reader = new BinaryReader(stream))
 				{
-					ActionType actionType = (ActionType)PacketReader.ReadVarInt(reader);
+					Type = (ActionType)PacketReader.ReadVarInt(reader);
 					int actionCount = PacketReader.ReadVarInt(reader);
 					Actions = new Action[actionCount];
 
@@ -37,7 +37,7 @@ public class PlayerInfoPacket : Packet
 							UUID = PacketReader.ReadGuid(reader)
 						};
 
-						switch (actionType)
+						switch (Type)
 						{
 							case ActionType.AddPlayer:
 								action.Name = PacketReader.ReadString(reader);
@@ -87,7 +87,7 @@ public class PlayerInfoPacket : Packet
 							case ActionType.RemovePlayer:
 								break;
 							default:
-								throw new Exception($"Unknown PlayerInfo action type: {actionType}");
+								throw new Exception($"Unknown PlayerInfo action type: {Type}");
 						}
 
 						Actions[i] = action;
