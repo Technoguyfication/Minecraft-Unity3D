@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,7 +11,19 @@ public class LoginStartPacket : Packet
 
 	public override byte[] Payload
 	{
-		get => PacketHelper.GetBytes(Username);
+		get
+		{
+			using (MemoryStream stream = new MemoryStream())
+			{
+				using (BinaryWriter writer = new BinaryWriter(stream))
+				{
+					PacketWriter.WriteString(writer, Username);
+
+					return stream.ToArray();
+				}
+			}
+			//PacketHelper.GetBytes(Username);
+		}
 		set => throw new NotImplementedException();
 	}
 

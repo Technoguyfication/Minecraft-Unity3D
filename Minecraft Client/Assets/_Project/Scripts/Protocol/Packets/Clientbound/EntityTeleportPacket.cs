@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,27 +16,34 @@ public class EntityTeleportPacket : Packet
 	public byte Pitch { get; set; }
 	public bool OnGround { get; set; }
 
-	public override byte[] Payload
-	{
-		set
-		{
-			List<byte> buffer = new List<byte>(value);
-			EntityID = VarInt.ReadNext(buffer);
-			X = PacketHelper.GetDouble(buffer);
-			Y = PacketHelper.GetDouble(buffer);
-			Z = PacketHelper.GetDouble(buffer);
-			Yaw = buffer.Read(1)[0];
-			Pitch = buffer.Read(1)[0];
-			OnGround = PacketHelper.GetBoolean(buffer);
-		}
-		get => throw new NotImplementedException();
-	}
-
 	public EntityTeleportPacket()
 	{
-		PacketID = (int)ClientboundIDs.ENTITY_TELEPORT;
+		PacketID = (int)ClientboundIDs.EntityTeleport;
 	}
 
 	public EntityTeleportPacket(PacketData data) : base(data) { } // packet id should be set correctly if this ctor is used
 
+	public override byte[] Payload
+	{
+		set
+		{
+			using (MemoryStream stream = new MemoryStream(value))
+			{
+				using (BinaryReader reader = new BinaryReader(stream))
+				{
+					EntityID = PacketReader.ReadVarInt(reader);
+
+					X = PacketReader.ReadDouble(reader);
+					Y = PacketReader.ReadDouble(reader);
+					Z = PacketReader.ReadDouble(reader);
+
+					Yaw = PacketReader.ReadByte(reader);
+					Pitch = PacketReader.ReadByte(reader);
+
+					OnGround = PacketReader.ReadBoolean(reader);
+				}
+			}
+		}
+		get => throw new NotImplementedException();
+	}
 }

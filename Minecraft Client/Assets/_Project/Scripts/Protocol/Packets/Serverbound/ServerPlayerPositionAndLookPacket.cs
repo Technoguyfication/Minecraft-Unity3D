@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,25 +14,35 @@ public class ServerPlayerPositionAndLookPacket : Packet
 	public float Pitch { get; set; }
 	public bool OnGround { get; set; }
 
+	public ServerPlayerPositionAndLookPacket(PacketData data) : base(data) { } // packet id should be set correctly if this ctor is used
+
+	public ServerPlayerPositionAndLookPacket()
+	{
+		PacketID = (int)ServerboundIDs.PlayerPositionAndLook;
+	}
+
 	public override byte[] Payload
 	{
 		get
 		{
-			List<byte> builder = new List<byte>();
-			builder.AddRange(BitConverter.GetBytes(X).ReverseIfLittleEndian());
-			builder.AddRange(BitConverter.GetBytes(FeetY).ReverseIfLittleEndian());
-			builder.AddRange(BitConverter.GetBytes(Z).ReverseIfLittleEndian());
-			builder.AddRange(BitConverter.GetBytes(Yaw).ReverseIfLittleEndian());
-			builder.AddRange(BitConverter.GetBytes(Pitch).ReverseIfLittleEndian());
-			builder.AddRange(BitConverter.GetBytes(OnGround));
-			return builder.ToArray();
+			using (MemoryStream stream = new MemoryStream())
+			{
+				using (BinaryWriter writer = new BinaryWriter(stream))
+				{
+					PacketWriter.WriteDouble(writer, X);
+					PacketWriter.WriteDouble(writer, FeetY);
+					PacketWriter.WriteDouble(writer, Z);
+
+					PacketWriter.WriteFloat(writer, Yaw);
+					PacketWriter.WriteFloat(writer, Pitch);
+
+					PacketWriter.WriteBoolean(writer, OnGround);
+
+					return stream.ToArray();
+				}
+			}
 		}
 		set => throw new NotImplementedException();
-	}
-
-	public ServerPlayerPositionAndLookPacket()
-	{
-		PacketID = (int)ServerboundIDs.PLAYER_POSITION_AND_LOOK;
 	}
 
 	public static ServerPlayerPositionAndLookPacket FromPlayer(PlayerController player)
@@ -46,7 +57,4 @@ public class ServerPlayerPositionAndLookPacket : Packet
 			OnGround = player.OnGround
 		};
 	}
-
-	public ServerPlayerPositionAndLookPacket(PacketData data) : base(data) { } // packet id should be set correctly if this ctor is used
-
 }

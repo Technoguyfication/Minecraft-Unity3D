@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,27 +16,34 @@ public class EntityLookAndRelativeMovePacket : Packet
 	public sbyte Pitch { get; set; }
 	public bool OnGround { get; set; }
 
-	public override byte[] Payload
-	{
-		set
-		{
-			List<byte> buffer = new List<byte>(value);
-			EntityID = VarInt.ReadNext(buffer);
-			DeltaX = PacketHelper.GetInt16(buffer);
-			DeltaY = PacketHelper.GetInt16(buffer);
-			DeltaZ = PacketHelper.GetInt16(buffer);
-			Yaw = (sbyte)buffer.Read(1)[0];
-			Pitch = (sbyte)buffer.Read(1)[0];
-			OnGround = PacketHelper.GetBoolean(buffer);
-		}
-		get => throw new NotImplementedException();
-	}
-
 	public EntityLookAndRelativeMovePacket()
 	{
-		PacketID = (int)ClientboundIDs.ENTITY_LOOK_AND_RELATIVE_MOVE;
+		PacketID = (int)ClientboundIDs.EntityLookAndRelativeMove;
 	}
 
 	public EntityLookAndRelativeMovePacket(PacketData data) : base(data) { } // packet id should be set correctly if this ctor is used
 
+	public override byte[] Payload
+	{
+		set
+		{
+			using (MemoryStream stream = new MemoryStream(value))
+			{
+				using (BinaryReader reader = new BinaryReader(stream))
+				{
+					EntityID = PacketReader.ReadVarInt(reader);
+
+					DeltaX = PacketReader.ReadInt16(reader);
+					DeltaY = PacketReader.ReadInt16(reader);
+					DeltaZ = PacketReader.ReadInt16(reader);
+
+					Yaw = (sbyte)PacketReader.ReadByte(reader);
+					Pitch = (sbyte)PacketReader.ReadByte(reader);
+
+					OnGround = PacketReader.ReadBoolean(reader);
+				}
+			}
+		}
+		get => throw new NotImplementedException();
+	}
 }

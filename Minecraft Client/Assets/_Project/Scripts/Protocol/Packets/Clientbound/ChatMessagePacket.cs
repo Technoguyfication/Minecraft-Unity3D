@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,7 +12,7 @@ public class ChatMessagePacket : Packet
 {
 	public ChatMessagePacket()
 	{
-		PacketID = (int)ClientboundIDs.CHAT_MESSAGE;
+		PacketID = (int)ClientboundIDs.ChatMessage;
 	}
 
 	public ChatMessagePacket(PacketData data) : base(data) { }
@@ -21,12 +22,17 @@ public class ChatMessagePacket : Packet
 		get => throw new NotImplementedException();
 		set
 		{
-			var buffer = new List<byte>(value);
-			Json = PacketHelper.GetString(buffer);
-			Position = (global::ChatMessage.Position)buffer.Read(1)[0];
+			using (MemoryStream stream = new MemoryStream(value))
+			{
+				using (BinaryReader reader = new BinaryReader(stream))
+				{
+					Json = PacketReader.ReadString(reader);
+					Position = (ChatMessage.Position)PacketReader.ReadByte(reader);
+				}
+			}
 		}
 	}
 
-	public string Json { get; set; }
-	public ChatMessage.Position Position { get; set; }
+	public string Json { get; protected set; }
+	public ChatMessage.Position Position { get; protected set; }
 }

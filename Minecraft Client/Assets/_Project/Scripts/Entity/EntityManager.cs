@@ -12,18 +12,6 @@ public class EntityManager : MonoBehaviour
 	private const float ENTITY_ANGLE_COEFFICIENT = 360 / 256f;
 	private const float ENTITY_ANGLE_OFFSET = 90f;
 
-	// Start is called before the first frame update
-	void Start()
-	{
-
-	}
-
-	// Update is called once per frame
-	void Update()
-	{
-
-	}
-
 	/// <summary>
 	/// Moves an entity relative to it's current position in Minecraft coordinate space
 	/// </summary>
@@ -216,5 +204,11 @@ public class EntityManager : MonoBehaviour
 	{
 		_entities.ForEach(e => Destroy(e));
 		_entities.Clear();
+	}
+
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Notimplemented")]
+	public void HandleEntityMetadataPacket(EntityMetadataPacket packet)
+	{
+		throw new NotImplementedException("Not yet implemented");
 	}
 }

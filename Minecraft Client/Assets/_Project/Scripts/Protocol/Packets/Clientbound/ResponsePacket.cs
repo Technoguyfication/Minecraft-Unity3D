@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,7 +12,7 @@ public class ResponsePacket : Packet
 {
 	public ResponsePacket()
 	{
-		PacketID = (int)ClientboundIDs.STATUS_RESPONSE;
+		PacketID = (int)ClientboundIDs.Status_Response;
 	}
 
 	public ResponsePacket(PacketData data) : base(data) { }
@@ -21,8 +22,13 @@ public class ResponsePacket : Packet
 		get => PacketHelper.GetBytes(JSONResponse);
 		set
 		{
-			List<byte> buffer = new List<byte>(value);
-			JSONResponse = PacketHelper.GetString(buffer);
+			using (MemoryStream stream = new MemoryStream(value))
+			{
+				using (BinaryReader reader = new BinaryReader(stream))
+				{
+					JSONResponse = PacketReader.ReadString(reader);
+				}
+			}
 		}
 	}
 

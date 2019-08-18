@@ -23,7 +23,7 @@ public class PhysicalChunk : MonoBehaviour
 		};
 
 	// Use this for initialization
-	void Start()
+	public void Start()
 	{
 		name = Chunk.Position.ToString();
 
@@ -127,11 +127,11 @@ public class PhysicalChunk : MonoBehaviour
 												neighborChunk = neighborChunks[3];
 												break;
 											default:
-												neighbors[i] = false;	// this block is outside 0 <= x <= 25
+												neighbors[i] = false;   // this block is outside 0 <= x <= 25
 												continue;
 										}
 
-										neighbors[i] = neighborChunk?.GetBlockAt(neighborPos).IsSolid ?? true;	// unloaded neighbor chunks are null. if the chunk is unloaded, say it's empty
+										neighbors[i] = neighborChunk?.GetBlockAt(neighborPos).IsSolid ?? true;  // unloaded neighbor chunks are null. if the chunk is unloaded, say it's empty
 									}
 								}
 
@@ -192,6 +192,7 @@ public class PhysicalChunk : MonoBehaviour
 		return finishedMeshes.ToArray();
 	}
 
+	/*
 	private bool HasAllNeighbors(bool[] blocks)
 	{
 		foreach (var neighbor in blocks)
@@ -199,7 +200,7 @@ public class PhysicalChunk : MonoBehaviour
 				return false;
 
 		return true;
-	}
+	}*/
 
 	/// <summary>
 	/// Get vertices for face inx: (minecraft: +X -X +Y -Y +Z -Z) (unity: +Z -Z +Y -Y +X -X)

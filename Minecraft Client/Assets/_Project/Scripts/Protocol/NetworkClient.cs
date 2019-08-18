@@ -1,5 +1,4 @@
-﻿using Ionic.Zlib;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -8,6 +7,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Ionic.Zlib;
 using UnityEngine;
 
 public class NetworkClient : IDisposable
@@ -241,14 +241,14 @@ public class NetworkClient : IDisposable
 		if (State == ProtocolState.LOGIN)
 		{
 			// handle compression packet
-			if (packetId == (int)ClientboundIDs.LOGIN_SET_COMPRESSION)
+			if (packetId == (int)ClientboundIDs.LogIn_SetCompression)
 			{
 				_compressionThreshold = VarInt.ReadNext(new List<byte>(payload));
 				return ReadNextPacket();
 			}
 
 			// handle protocol encryption packet
-			if (packetId == (int)ClientboundIDs.LOGIN_ENCRYPTION_REQUEST)
+			if (packetId == (int)ClientboundIDs.LogIn_EncryptionRequest)
 			{
 				var encRequestPkt = new EncryptionRequestPacket()
 				{

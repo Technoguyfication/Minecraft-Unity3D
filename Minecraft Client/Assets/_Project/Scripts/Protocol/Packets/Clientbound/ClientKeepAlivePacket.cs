@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,13 +11,22 @@ public class ClientKeepAlivePacket : Packet
 
 	public override byte[] Payload
 	{
-		set => KeepAliveID = PacketHelper.GetInt64(new List<byte>(value));
+		set
+		{
+			using (MemoryStream stream = new MemoryStream(value))
+			{
+				using (BinaryReader reader = new BinaryReader(stream))
+				{
+					KeepAliveID = PacketReader.ReadInt64(reader);
+				}
+			}
+		}
 		get => throw new NotImplementedException();
 	}
 
 	public ClientKeepAlivePacket()
 	{
-		PacketID = (int)ClientboundIDs.KEEP_ALIVE;
+		PacketID = (int)ClientboundIDs.KeepAlive;
 	}
 
 	public ClientKeepAlivePacket(PacketData data) : base(data) { } // packet id should be set correctly if this ctor is used

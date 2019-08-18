@@ -11,6 +11,7 @@ class ChatTranslation
 	static ChatTranslation()
 	{
 		_translationTable.Add("chat.type.text", "<{0}> {1}");
+		_translationTable.Add("gameMode.spectator", "Spectator Mode");
 	}
 
 	/// <summary>
@@ -22,8 +23,16 @@ class ChatTranslation
 	public static string TranslateString(string key, string[] insertions)
 	{
 		if (_translationTable.ContainsKey(key))
+		{
 			return string.Format(_translationTable[key], insertions);
+		}
 		else
-			return $"{key}: \"{(string.Join("\", \"", insertions))}\"";	// chat.type.text: "PlayerName", "message here"
+		{
+			// if there are insertions, add them after the raw key name
+			if (insertions != null && insertions.Length > 0)
+				return $"{key}: [\"{string.Join("\", \"", insertions)}\"]"; // chat.type.text: "PlayerName", "message here"
+			else
+				return $"{key}: []";
+		}
 	}
 }

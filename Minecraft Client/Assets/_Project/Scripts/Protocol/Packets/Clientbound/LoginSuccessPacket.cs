@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,22 +10,26 @@ public class LoginSuccessPacket : Packet
 	public Guid UUID { get; set; }
 	public string Username { get; set; }
 
-	public override byte[] Payload
-	{
-		set
-		{
-			List<byte> buffer = new List<byte>(value);
-			UUID = Guid.Parse(PacketHelper.GetString(buffer));
-			Username = PacketHelper.GetString(buffer);
-		}
-		get => throw new NotImplementedException();
-	}
-
 	public LoginSuccessPacket()
 	{
-		PacketID = (int)ClientboundIDs.LOGIN_SUCCESS;
+		PacketID = (int)ClientboundIDs.LogIn_Success;
 	}
 
 	public LoginSuccessPacket(PacketData data) : base(data) { } // packet id should be set correctly if this ctor is used
 
+	public override byte[] Payload
+	{
+		set
+		{
+			using (MemoryStream stream = new MemoryStream(value))
+			{
+				using (BinaryReader reader = new BinaryReader(stream))
+				{
+					UUID = Guid.Parse(PacketReader.ReadString(reader));
+					Username = PacketReader.ReadString(reader);
+				}
+			}
+		}
+		get => throw new NotImplementedException();
+	}
 }

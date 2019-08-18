@@ -20,6 +20,7 @@ public class GameManager : MonoBehaviour
 	public DebugCanvas DebugCanvas;
 	public EntityManager EntityManager;
 	public Chat Chat;
+	public PlayerLibrary PlayerLibrary;
 
 	private PlayerController _player = null;
 	private NetworkClient _client;
@@ -31,20 +32,20 @@ public class GameManager : MonoBehaviour
 	private bool _initialized = false;
 	private World CurrentWorld
 	{
-		get => _currentWorldVar;
+		get => _currentWorld;
 		set
 		{
-			_currentWorldVar = value;
+			_currentWorld = value;
 			EntityManager.World = CurrentWorld;
 		}
 	}
-	private World _currentWorldVar;
+	private World _currentWorld;
 	private Guid _playerUuid;
 	private LoadingScreenController _loadingScreen;
 	private float _lastTick = 0f;
 	private bool _disconnecting = false;
 
-	void Awake()
+	public void Awake()
 	{
 #if UNITY_EDITOR
 		Debug.Log("Running in editor");
@@ -58,7 +59,7 @@ public class GameManager : MonoBehaviour
 	}
 
 	// Update is called once per frame
-	void Update()
+	public void Update()
 	{
 		// this only happens if we are actively connected to a server
 		if (_initialized)
@@ -92,7 +93,7 @@ public class GameManager : MonoBehaviour
 		}
 	}
 
-	private void OnDestroy()
+	public void OnDestroy()
 	{
 		Disconnect("Game stopped");
 	}
@@ -127,7 +128,7 @@ public class GameManager : MonoBehaviour
 	{
 		// disable main menu controller
 		//GetComponent<MainMenuController>().enabled = false;
-		
+
 		// open loading screen
 		AsyncOperation loadLoadingScreenTask = SceneManager.LoadSceneAsync("LoadingScreen", LoadSceneMode.Additive);
 		while (!loadLoadingScreenTask.isDone)
@@ -139,7 +140,7 @@ public class GameManager : MonoBehaviour
 		SceneManager.MoveGameObjectToScene(gameObject, SceneManager.GetSceneByName("LoadingScreen"));
 		AsyncOperation unloadMainMenuTask = SceneManager.UnloadSceneAsync("MainMenu");
 
-		while (!unloadMainMenuTask?.isDone ?? false)	// if main menu isn't loaded in the first place, asyncoperation is null
+		while (!unloadMainMenuTask?.isDone ?? false)    // if main menu isn't loaded in the first place, asyncoperation is null
 			yield return null;
 
 		Debug.Log("Closed main menu");
@@ -196,13 +197,13 @@ public class GameManager : MonoBehaviour
 				var packet = _client.ReadNextPacket();
 				switch ((ClientboundIDs)packet.ID)
 				{
-					case ClientboundIDs.LOGIN_SUCCESS:
+					case ClientboundIDs.LogIn_Success:
 						loginSuccess = new LoginSuccessPacket(packet);
 						break;
-					case ClientboundIDs.JOIN_GAME:
+					case ClientboundIDs.JoinGame:
 						joinGame = new JoinGamePacket(packet);
 						break;
-					case ClientboundIDs.LOGIN_DISCONNECT:
+					case ClientboundIDs.LogIn_Disconnect:
 						Disconnect($"Disconnected from server: {new DisconnectPacket(packet).JSONResponse}");
 						yield break;
 				}
@@ -239,8 +240,10 @@ public class GameManager : MonoBehaviour
 		// set up references in game scene
 		CurrentWorld.ChunkRenderer = Instantiate(ChunkRendererPrefab, Vector3.zero, Quaternion.identity).GetComponent<ChunkRenderer>();
 		CurrentWorld.ChunkRenderer.DebugCanvas = DebugCanvas;
-		Chat = GameObject.FindGameObjectWithTag("Chat").GetComponent<Chat>();
+		var referenceLinker = GameObject.FindGameObjectWithTag("ReferenceLinker").GetComponent<ReferenceLinker>();
+		Chat = referenceLinker.Chat;
 		Chat.ChatSend += Chat_ChatSend;
+		PlayerLibrary = new PlayerLibrary(referenceLinker.PlayerList);
 
 		// start network worker tasks
 		_netReadTask = new Task(() =>
@@ -261,7 +264,7 @@ public class GameManager : MonoBehaviour
 		StartCoroutine(ClientTickLoopCoroutine(_cancellationTokenSource.Token));
 	}
 
-	private void Chat_ChatSend(Chat.ChatSendEventArgs e, object sender)
+	private void Chat_ChatSend(object sender, Chat.ChatSendEventArgs e)
 	{
 		DispatchWritePacket(new CSChatMessagePacket()
 		{
@@ -282,49 +285,47 @@ public class GameManager : MonoBehaviour
 	{
 		switch ((ClientboundIDs)data.ID)
 		{
-			case ClientboundIDs.DISCONNECT:
+			case ClientboundIDs.Disconnect:
 				Disconnect(new DisconnectPacket(data).JSONResponse);
 				break;
-			case ClientboundIDs.KEEP_ALIVE:
+			case ClientboundIDs.KeepAlive:
 				HandleKeepAlive(new ClientKeepAlivePacket(data));
 				break;
-			case ClientboundIDs.CHUNK_DATA:
+			case ClientboundIDs.ChunkData:
 				StartCoroutine(CurrentWorld.AddChunkDataCoroutine(new ChunkDataPacket(data)));
 				break;
-			case ClientboundIDs.PLAYER_POSITION_AND_LOOK:
+			case ClientboundIDs.PlayerPositionAndLook:
 				HandlePositionAndLook(new ClientPlayerPositionAndLookPacket(data));
 				break;
-			case ClientboundIDs.UNLOAD_CHUNK:
+			case ClientboundIDs.UnloadChunk:
 				CurrentWorld.UnloadChunk(new UnloadChunkPacket(data).Position);
 				break;
-			case ClientboundIDs.SPAWN_MOB:
+			case ClientboundIDs.SpawnMob:
 				EntityManager.HandleSpawnMobPacket(new SpawnMobPacket(data));
 				break;
-			case ClientboundIDs.DESTROY_ENTITIES:
+			case ClientboundIDs.DestroyEntities:
 				EntityManager.DestroyEntities(new DestroyEntitiesPacket(data).EntityIDs);
 				break;
-			case ClientboundIDs.ENTITY_RELATIVE_MOVE:
+			case ClientboundIDs.EntityRelativeMove:
 				EntityManager.HandleEntityRelativeMovePacket(new EntityRelativeMovePacket(data));
 				break;
-			case ClientboundIDs.ENTITY_LOOK:
+			case ClientboundIDs.EntityMove:
 				EntityManager.HandleEntityLook(new EntityLookPacket(data));
 				break;
-			case ClientboundIDs.ENTITY_LOOK_AND_RELATIVE_MOVE:
+			case ClientboundIDs.EntityLookAndRelativeMove:
 				EntityManager.HandleEntityLookAndRelativeMovePacket(new EntityLookAndRelativeMovePacket(data));
 				break;
-			case ClientboundIDs.ENTITY_TELEPORT:
+			case ClientboundIDs.EntityTeleport:
 				EntityManager.HandleEntityTeleport(new EntityTeleportPacket(data));
 				break;
-			case ClientboundIDs.ENTITY_HEAD_LOOK:
+			case ClientboundIDs.EntityHeadLook:
 				EntityManager.HandleEntityHeadLook(new EntityHeadLookPacket(data));
 				break;
-			case ClientboundIDs.PLAYER_INFO:
-				Debug.Log($"Player info: {Convert.ToBase64String(data.Payload)}");
+			case ClientboundIDs.PlayerInfo:
+				PlayerLibrary.HandlePlayerInfoPacket(new PlayerInfoPacket(data));
 				break;
-			case ClientboundIDs.CHAT_MESSAGE:
+			case ClientboundIDs.ChatMessage:
 				Chat.HandleChatPacket(new ChatMessagePacket(data));
-				break;
-			default:
 				break;
 		}
 	}

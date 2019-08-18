@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,7 +27,7 @@ public class SpawnMobPacket : Packet
 
 	public SpawnMobPacket()
 	{
-		PacketID = 0x03;
+		PacketID = (int)ClientboundIDs.SpawnMob;
 	}
 
 	public SpawnMobPacket(PacketData data) : base(data) { }
@@ -35,19 +36,27 @@ public class SpawnMobPacket : Packet
 	{
 		set
 		{
-			List<byte> buffer = new List<byte>(value);
-			EntityID = VarInt.ReadNext(buffer);
-			UUID = PacketHelper.GetGUID(buffer);
-			Type = (Entity.EntityType)VarInt.ReadNext(buffer);
-			X = PacketHelper.GetDouble(buffer);
-			Y = PacketHelper.GetDouble(buffer);
-			Z = PacketHelper.GetDouble(buffer);
-			Yaw = buffer.Read(1)[0];
-			Pitch = buffer.Read(1)[0];
-			HeadPitch = buffer.Read(1)[0];
-			VelocityX = PacketHelper.GetInt16(buffer);
-			VelocityY = PacketHelper.GetInt16(buffer);
-			VelocityZ = PacketHelper.GetInt16(buffer);
+			using (MemoryStream stream = new MemoryStream(value))
+			{
+				using (BinaryReader reader = new BinaryReader(stream))
+				{
+					EntityID = PacketReader.ReadVarInt(reader);
+					UUID = PacketReader.ReadGuid(reader);
+					Type = (Entity.EntityType)PacketReader.ReadVarInt(reader);
+
+					X = PacketReader.ReadDouble(reader);
+					Y = PacketReader.ReadDouble(reader);
+					Z = PacketReader.ReadDouble(reader);
+
+					Yaw = PacketReader.ReadByte(reader);
+					Pitch = PacketReader.ReadByte(reader);
+					HeadPitch = PacketReader.ReadByte(reader);
+
+					VelocityX = PacketReader.ReadInt16(reader);
+					VelocityY = PacketReader.ReadInt16(reader);
+					VelocityZ = PacketReader.ReadInt16(reader);
+				}
+			}
 		}
 		get => throw new NotImplementedException();
 	}

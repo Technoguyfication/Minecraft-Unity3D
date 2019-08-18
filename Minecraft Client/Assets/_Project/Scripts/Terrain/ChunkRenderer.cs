@@ -7,8 +7,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
-using IEnumerator = System.Collections.IEnumerator;
 using Debug = UnityEngine.Debug;
+using IEnumerator = System.Collections.IEnumerator;
 
 /// <summary>
 /// Manages chunk meshes and rendering
@@ -26,17 +26,17 @@ public class ChunkRenderer : MonoBehaviour
 	private readonly List<Task> _regenTasks = new List<Task>();
 	private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
-	private void Start()
+	public void Start()
 	{
 		StartCoroutine(AssignChunkMeshCoroutine(_cancellationTokenSource.Token));
 	}
 
-	private void OnDestroy()
+	public void OnDestroy()
 	{
 		_cancellationTokenSource.Cancel();
 	}
 
-	private void Update()
+	public void Update()
 	{
 		// remove completed regen tasks from list
 		_regenTasks.RemoveAll(t => t.IsCompleted);
@@ -204,6 +204,11 @@ public class ChunkRenderer : MonoBehaviour
 		{
 			return _chunkMeshes.Find(cm => cm.Chunk.Position.Equals(chunkPos));
 		}
+	}
+
+	public void AddGeneratedChunkMesh(ChunkMeshData data)
+	{
+		_finishedMeshData.Enqueue(data);
 	}
 
 	private IEnumerator RegenerateChunkCoroutine(PhysicalChunk physicalChunk, ushort sections)

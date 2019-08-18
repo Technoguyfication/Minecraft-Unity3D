@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,7 +12,7 @@ public class UnloadChunkPacket : Packet
 {
 	public UnloadChunkPacket()
 	{
-		PacketID = (int)ClientboundIDs.UNLOAD_CHUNK;
+		PacketID = (int)ClientboundIDs.UnloadChunk;
 	}
 
 	public UnloadChunkPacket(PacketData data) : base(data) { }
@@ -21,9 +22,14 @@ public class UnloadChunkPacket : Packet
 		get => throw new NotImplementedException();
 		set
 		{
-			List<byte> buffer = new List<byte>(value);
-			X = PacketHelper.GetInt32(buffer);
-			Z = PacketHelper.GetInt32(buffer);
+			using (MemoryStream stream = new MemoryStream(value))
+			{
+				using (BinaryReader reader = new BinaryReader(stream))
+				{
+					X = PacketReader.ReadInt32(reader);
+					Z = PacketReader.ReadInt32(reader);
+				}
+			}
 		}
 	}
 

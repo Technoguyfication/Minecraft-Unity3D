@@ -8,12 +8,13 @@ using UnityEngine;
 /// <summary>
 /// Represents a player on the server. Not physically, that's <see cref="EntityPlayer"/>
 /// </summary>
-class Player
+public class Player
 {
-	public bool HasDisplayName { get; set; }
-	public string DisplayName { get; set; }
-	public Texture Skin { get; set; }
+	public ChatComponent DisplayName { get; set; }
+	public Texture SkinTexture { get; set; }
 	public byte SkinBitmask { get; set; }
 	public GameMode GameMode { get; set; }
 	public int Ping { get; set; }
+	public string Name { get; set; }
+	public Guid UUID { get; set; }
 }

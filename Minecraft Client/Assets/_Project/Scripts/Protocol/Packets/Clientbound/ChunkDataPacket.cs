@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,7 +17,7 @@ public class ChunkDataPacket : Packet
 
 	public ChunkDataPacket()
 	{
-		PacketID = (int)ClientboundIDs.CHUNK_DATA;
+		PacketID = (int)ClientboundIDs.ChunkData;
 	}
 
 	public ChunkDataPacket(PacketData data) : base(data) { }
@@ -26,13 +27,20 @@ public class ChunkDataPacket : Packet
 		get => throw new NotImplementedException();
 		set
 		{
-			List<byte> buffer = new List<byte>(value);
-			ChunkX = PacketHelper.GetInt32(buffer);
-			ChunkZ = PacketHelper.GetInt32(buffer);
-			GroundUpContinuous = PacketHelper.GetBoolean(buffer);
-			PrimaryBitmask = VarInt.ReadNext(buffer);
-			int dataSize = VarInt.ReadNext(buffer);
-			Data = buffer.Read(dataSize).ToArray();
+			using (MemoryStream stream = new MemoryStream(value))
+			{
+				using (BinaryReader reader = new BinaryReader(stream))
+				{
+					ChunkX = PacketReader.ReadInt32(reader);
+					ChunkZ = PacketReader.ReadInt32(reader);
+
+					GroundUpContinuous = PacketReader.ReadBoolean(reader);
+					PrimaryBitmask = PacketReader.ReadVarInt(reader);
+
+					int byteCount = PacketReader.ReadVarInt(reader);
+					Data = PacketReader.ReadBytes(reader, byteCount);
+				}
+			}
 
 			// todo support block entities
 		}

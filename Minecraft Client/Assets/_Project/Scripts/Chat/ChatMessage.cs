@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using Newtonsoft.Json;
+using UnityEngine;
 
 /// <summary>
 /// Represents a chat message from the server. Uses <see cref="ChatComponent"/> for formatting and styling
@@ -12,11 +12,11 @@ public class ChatMessage
 	/// Gets the message with no styling information
 	/// </summary>
 	public string PlaintextMessage { get; }
-	
+
 	/// <summary>
 	/// For use in TextMeshPro dialogs
 	/// </summary>
-	public string  HtmlFormattedMessage { get; }
+	public string HtmlFormattedMessage { get; }
 
 	/// <summary>
 	/// The position of the message on the screen

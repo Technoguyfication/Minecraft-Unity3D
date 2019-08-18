@@ -1,13 +1,19 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public class HandshakePacket : Packet
 {
+	public int ProtocolVersion { get; set; } = NetworkClient.PROTOCOL_VERSION;
+	public string Address { get; set; }
+	public int Port { get; set; }
+	public NetworkClient.ProtocolState NextState { get; set; }
+
 	public HandshakePacket()
 	{
-		PacketID = 0x00;
+		PacketID = (int)ServerboundIDs.Status_Request;
 	}
 
 	public HandshakePacket(PacketData data) : base(data) { }
@@ -16,18 +22,19 @@ public class HandshakePacket : Packet
 	{
 		get
 		{
-			List<byte> builder = new List<byte>();
-			builder.AddRange(VarInt.GetBytes(ProtocolVersion));
-			builder.AddRange(PacketHelper.GetBytes(Address));
-			builder.AddRange(BitConverter.GetBytes((ushort)Port).ReverseIfLittleEndian());
-			builder.AddRange(VarInt.GetBytes((int)NextState));
-			return builder.ToArray();
+			using (MemoryStream stream = new MemoryStream())
+			{
+				using (BinaryWriter writer = new BinaryWriter(stream))
+				{
+					PacketWriter.WriteVarInt(writer, ProtocolVersion);
+					PacketWriter.WriteString(writer, Address);
+					PacketWriter.WriteInt16(writer, (ushort)Port);
+					PacketWriter.WriteVarInt(writer, (int)NextState);
+
+					return stream.ToArray();
+				}
+			}
 		}
 		set => throw new NotImplementedException();
 	}
-
-	public int ProtocolVersion { get; set; } = NetworkClient.PROTOCOL_VERSION;
-	public string Address { get; set; }
-	public int Port { get; set; }
-	public NetworkClient.ProtocolState NextState { get; set; }
 }

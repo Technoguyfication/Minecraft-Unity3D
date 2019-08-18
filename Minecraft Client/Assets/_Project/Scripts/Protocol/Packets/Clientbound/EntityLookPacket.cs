@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,18 +17,25 @@ public class EntityLookPacket : Packet
 	{
 		set
 		{
-			List<byte> buffer = new List<byte>(value);
-			EntityID = VarInt.ReadNext(buffer);
-			Yaw = (sbyte)buffer.Read(1)[0];
-			Pitch = (sbyte)buffer.Read(1)[0];
-			OnGround = PacketHelper.GetBoolean(buffer);
+			using (MemoryStream stream = new MemoryStream(value))
+			{
+				using (BinaryReader reader = new BinaryReader(stream))
+				{
+					EntityID = PacketReader.ReadVarInt(reader);
+
+					Yaw = (sbyte)PacketReader.ReadByte(reader);
+					Pitch = (sbyte)PacketReader.ReadByte(reader);
+
+					OnGround = PacketReader.ReadBoolean(reader);
+				}
+			}
 		}
 		get => throw new NotImplementedException();
 	}
 
 	public EntityLookPacket()
 	{
-		PacketID = (int)ClientboundIDs.ENTITY_LOOK;
+		PacketID = (int)ClientboundIDs.EntityMove;
 	}
 
 	public EntityLookPacket(PacketData data) : base(data) { } // packet id should be set correctly if this ctor is used

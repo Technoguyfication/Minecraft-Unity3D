@@ -9,10 +9,7 @@ public abstract class Packet
 	public int PacketID { get; set; }
 	public abstract byte[] Payload { get; set; }
 
-	public Packet()
-	{
-
-	}
+	public Packet() { }
 
 	/// <summary>
 	/// Create a packet using a <see cref="PacketData"/> object
@@ -35,51 +32,52 @@ public abstract class Packet
 /// </summary>
 public enum ClientboundIDs : int
 {
-	// status
-	STATUS_RESPONSE = 0x00,
-	STATUS_PONG = 0x01,
+	// Status
+	Status_Response = 0x00,
+	Status_Pong = 0x01,
 
-	// login
-	LOGIN_DISCONNECT = 0x00,
-	LOGIN_ENCRYPTION_REQUEST = 0x01,
-	LOGIN_SUCCESS = 0x02,
-	LOGIN_SET_COMPRESSION = 0x03,
+	// Login
+	LogIn_Disconnect = 0x00,
+	LogIn_EncryptionRequest = 0x01,
+	LogIn_Success = 0x02,
+	LogIn_SetCompression = 0x03,
 
-	// play
-	CHUNK_DATA = 0x22,
-	UNLOAD_CHUNK = 0x1f,
-	KEEP_ALIVE = 0x21,
-	JOIN_GAME = 0x25,
-	DISCONNECT = 0x1b,
-	PLAYER_POSITION_AND_LOOK = 0x32,
-	ENTITY = 0x27,
-	SPAWN_MOB = 0x03,
-	DESTROY_ENTITIES = 0x35,
-	ENTITY_RELATIVE_MOVE = 0x28,
-	ENTITY_LOOK_AND_RELATIVE_MOVE = 0x29,
-	ENTITY_LOOK = 0x2A,
-	ENTITY_TELEPORT = 0x50,
-	ENTITY_HEAD_LOOK = 0x39,
-	PLAYER_INFO = 0x30,
-	CHAT_MESSAGE = 0x0E
+	// Play
+	ChunkData = 0x22,
+	UnloadChunk = 0x1f,
+	KeepAlive = 0x21,
+	JoinGame = 0x25,
+	Disconnect = 0x1b,
+	PlayerPositionAndLook = 0x32,
+	Entity = 0x27,
+	SpawnMob = 0x03,
+	DestroyEntities = 0x35,
+	EntityRelativeMove = 0x28,
+	EntityLookAndRelativeMove = 0x29,
+	EntityMove = 0x2A,
+	EntityTeleport = 0x50,
+	EntityHeadLook = 0x39,
+	PlayerInfo = 0x30,
+	EntityMetadata = 0x3F,
+	ChatMessage = 0x0E
 }
 
 public enum ServerboundIDs : int
 {
-	// status
-	STATUS_REQUEST = 0x00,
-	STATUS_PING = 0x01,
+	// Status
+	Status_Request = 0x00,
+	Status_Ping = 0x01,
 
-	// login
-	LOGIN_START = 0x00,
-	LOGIN_ENCRYPTION_RESPONSE = 0x01,
+	// Login
+	LogIn_Start = 0x00,
+	LogIn_EncryptionResponse = 0x01,
 
-	// play
-	TELEPORT_CONFIRM = 0x00,
-	KEEP_ALIVE = 0x0E,
-	PLAYER = 0x0F,
-	PLAYER_POSITION_AND_LOOK = 0x11,
-	CHAT_MESSAGE = 0x02
+	// Play
+	TeleportConfirm = 0x00,
+	KeepAlive = 0x0E,
+	Player = 0x0F,
+	PlayerPositionAndLook = 0x11,
+	ChatMessage = 0x02
 
 }
 
