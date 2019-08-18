@@ -13,21 +13,7 @@ public static class PacketReader
 	/// <param name="result">The int representation of the VarInt</param>
 	public static int ReadVarInt(in BinaryReader reader)
 	{
-		int value, numRead = 0, result = 0;
-		byte read;
-		while (true)
-		{
-			read = reader.ReadByte();
-			value = (read & 0x7F);
-			result |= (value << (7 * numRead));
-
-			numRead++;
-			if (numRead > 5)
-				throw new UnityException("VarInt too big!");
-			if ((read & 0x80) != 128) break;
-		}
-
-		return result;
+		return VarInt.ReadNext(reader.ReadBytes);
 	}
 
 	/// <summary>
@@ -161,10 +147,10 @@ public static class PacketReader
 	/// <param name="reader">The reader to use</param>
 	/// <param name="nbtData">The read NBT data (complex)</param>
 	/*
-    public static void ReadNbtData(in BinaryReader reader, out NbtCompound nbtData)
-    {
-        throw new NotImplementedException("NBT Data is not yet supported");
-    }*/
+	public static void ReadNbtData(in BinaryReader reader, out NbtCompound nbtData)
+	{
+		throw new NotImplementedException("NBT Data is not yet supported");
+	}*/
 
 	/// <summary>
 	/// Reads SlotData from the given BinaryReader
@@ -172,19 +158,19 @@ public static class PacketReader
 	/// <param name="reader">The reader to use</param>
 	/// <param name="slotData">The read slot data (inventory slot)</param>
 	/*
-    public static void ReadSlotData(in BinaryReader reader, out SlotData slotData)
-    {
-        ReadBoolean(reader, out bool present);
-        if (!present)
-            slotData = new SlotData(false, 0, 0, null);
-        else
-        {
-            ReadVarInt(reader, out int itemID);
-            ReadByte(reader, out byte count);
-            ReadNbtData(reader, out NbtCompound nbt);
-            slotData = new SlotData(true, itemID, count, nbt);
-        }
-    }*/
+	public static void ReadSlotData(in BinaryReader reader, out SlotData slotData)
+	{
+		ReadBoolean(reader, out bool present);
+		if (!present)
+			slotData = new SlotData(false, 0, 0, null);
+		else
+		{
+			ReadVarInt(reader, out int itemID);
+			ReadByte(reader, out byte count);
+			ReadNbtData(reader, out NbtCompound nbt);
+			slotData = new SlotData(true, itemID, count, nbt);
+		}
+	}*/
 
 	/// <summary>
 	/// Reads a Particle from the given BinaryReader
