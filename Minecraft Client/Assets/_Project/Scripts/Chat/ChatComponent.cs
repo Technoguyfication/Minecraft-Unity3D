@@ -13,7 +13,7 @@ using UnityEngine;
 /// Represents a stylized string from the server. Can be used in chat messages, dialog titles, action bars, etc.
 /// </summary>
 [Serializable]
-class ChatComponent
+public class ChatComponent
 {
 	[JsonProperty("bold")]
 	public bool Bold { get; set; }

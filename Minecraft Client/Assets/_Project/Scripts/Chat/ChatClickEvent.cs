@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 #pragma warning disable CS0649 // field never assigned to
 
 [Serializable]
-class ChatClickEvent
+public class ChatClickEvent
 {
 	public string open_url;
 	public string run_command;
