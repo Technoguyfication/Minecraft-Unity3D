@@ -20,18 +20,18 @@ public class EncryptionResponsePacket : Packet
 	{
 		get
 		{
-            using (MemoryStream stream = new MemoryStream())
-            {
-                using (BinaryWriter writer = new BinaryWriter(stream))
-                {
-                    PacketWriter.WriteVarInt(writer, SharedSecret.Length);
-                    PacketWriter.WriteBytes(writer, SharedSecret);
-                    PacketWriter.WriteVarInt(writer, VerifyToken.Length);
-                    PacketWriter.WriteBytes(writer, VerifyToken);
+			using (MemoryStream stream = new MemoryStream())
+			{
+				using (BinaryWriter writer = new BinaryWriter(stream))
+				{
+					PacketWriter.WriteVarInt(writer, SharedSecret.Length);
+					PacketWriter.WriteBytes(writer, SharedSecret);
+					PacketWriter.WriteVarInt(writer, VerifyToken.Length);
+					PacketWriter.WriteBytes(writer, VerifyToken);
 
-                    return stream.ToArray();
-                }
-            }
+					return stream.ToArray();
+				}
+			}
 		}
 		set => throw new NotImplementedException();
 	}

@@ -5,15 +5,15 @@ using UnityEngine.UI;
 
 public class PlayerListEntry : MonoBehaviour
 {
-    private Text displayText;
+	private Text displayText;
 
-    void Awake()
-    {
-        displayText = GetComponentInChildren<Text>();
-    }
+	void Awake()
+	{
+		displayText = GetComponentInChildren<Text>();
+	}
 
-    public void SetValues(string displayName, int ping)
-    {
-        displayText.text = $"{displayName} - {ping}ms";
-    }
+	public void SetValues(string displayName, int ping)
+	{
+		displayText.text = $"{displayName} - {ping}ms";
+	}
 }

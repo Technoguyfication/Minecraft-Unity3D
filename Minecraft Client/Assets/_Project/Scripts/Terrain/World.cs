@@ -179,7 +179,7 @@ public class World
 		}
 	}
 
-    public enum DimensionType
+	public enum DimensionType
 	{
 		OVERWORLD = 0,
 		NETHER = -1,

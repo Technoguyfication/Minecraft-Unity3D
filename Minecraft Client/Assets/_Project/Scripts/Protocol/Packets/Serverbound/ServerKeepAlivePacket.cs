@@ -12,18 +12,18 @@ public class ServerKeepAlivePacket : Packet
 	public override byte[] Payload
 	{
 		set => throw new NotImplementedException();
-        get
-        {
-            using (MemoryStream stream = new MemoryStream())
-            {
-                using (BinaryWriter writer = new BinaryWriter(stream))
-                {
-                    PacketWriter.WriteInt64(writer, KeepAliveID);
+		get
+		{
+			using (MemoryStream stream = new MemoryStream())
+			{
+				using (BinaryWriter writer = new BinaryWriter(stream))
+				{
+					PacketWriter.WriteInt64(writer, KeepAliveID);
 
-                    return stream.ToArray();
-                }
-            }
-        }
+					return stream.ToArray();
+				}
+			}
+		}
 	}
 
 	public ServerKeepAlivePacket()

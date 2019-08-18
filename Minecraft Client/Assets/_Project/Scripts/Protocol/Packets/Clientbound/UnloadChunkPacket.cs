@@ -22,14 +22,14 @@ public class UnloadChunkPacket : Packet
 		get => throw new NotImplementedException();
 		set
 		{
-            using (MemoryStream stream = new MemoryStream(value))
-            {
-                using (BinaryReader reader = new BinaryReader(stream))
-                {
-                    X = PacketReader.ReadInt32(reader);
-                    Z = PacketReader.ReadInt32(reader);
-                }
-            }
+			using (MemoryStream stream = new MemoryStream(value))
+			{
+				using (BinaryReader reader = new BinaryReader(stream))
+				{
+					X = PacketReader.ReadInt32(reader);
+					Z = PacketReader.ReadInt32(reader);
+				}
+			}
 		}
 	}
 

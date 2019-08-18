@@ -206,8 +206,8 @@ public class EntityManager : MonoBehaviour
 		_entities.Clear();
 	}
 
-    public void HandleEntityMetadataPacket(EntityMetadataPacket packet)
-    {
-        throw new NotImplementedException("Not yet implemented");
-    }
+	public void HandleEntityMetadataPacket(EntityMetadataPacket packet)
+	{
+		throw new NotImplementedException("Not yet implemented");
+	}
 }

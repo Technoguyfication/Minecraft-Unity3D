@@ -89,7 +89,7 @@ public abstract class Entity : MonoBehaviour
 		Collider = Physical.GetComponent<BoxCollider>();
 		Rigidbody = GetComponent<Rigidbody>();
 
-		Rigidbody.useGravity = false;	// don't use gravity by default for entities
+		Rigidbody.useGravity = false;   // don't use gravity by default for entities
 	}
 
 	public void SetRotation(float pitch, float yaw)

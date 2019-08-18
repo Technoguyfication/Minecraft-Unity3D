@@ -15,33 +15,33 @@ public class ClientPlayerPositionAndLookPacket : Packet
 	public byte Flags { get; set; }
 	public int TeleportID { get; set; }
 
-    public ClientPlayerPositionAndLookPacket()
-    {
-        PacketID = (int)ClientboundIDs.PlayerPositionAndLook;
-    }
+	public ClientPlayerPositionAndLookPacket()
+	{
+		PacketID = (int)ClientboundIDs.PlayerPositionAndLook;
+	}
 
-    public ClientPlayerPositionAndLookPacket(PacketData data) : base(data) { } // packet id should be set correctly if this ctor is used
+	public ClientPlayerPositionAndLookPacket(PacketData data) : base(data) { } // packet id should be set correctly if this ctor is used
 
-    public override byte[] Payload
+	public override byte[] Payload
 	{
 		set
 		{
-            using (MemoryStream stream = new MemoryStream(value))
-            {
-                using (BinaryReader reader = new BinaryReader(stream))
-                {
-                    X = PacketReader.ReadDouble(reader);
-                    Y = PacketReader.ReadDouble(reader);
-                    Z = PacketReader.ReadDouble(reader);
+			using (MemoryStream stream = new MemoryStream(value))
+			{
+				using (BinaryReader reader = new BinaryReader(stream))
+				{
+					X = PacketReader.ReadDouble(reader);
+					Y = PacketReader.ReadDouble(reader);
+					Z = PacketReader.ReadDouble(reader);
 
-                    Yaw = PacketReader.ReadSingle(reader);
-                    Pitch = PacketReader.ReadSingle(reader);
+					Yaw = PacketReader.ReadSingle(reader);
+					Pitch = PacketReader.ReadSingle(reader);
 
-                    Flags = PacketReader.ReadByte(reader);
+					Flags = PacketReader.ReadByte(reader);
 
-                    TeleportID = PacketReader.ReadVarInt(reader);
-                }
-            }
+					TeleportID = PacketReader.ReadVarInt(reader);
+				}
+			}
 		}
 		get => throw new NotImplementedException();
 	}

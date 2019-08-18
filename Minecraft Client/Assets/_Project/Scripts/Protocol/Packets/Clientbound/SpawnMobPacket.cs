@@ -36,27 +36,27 @@ public class SpawnMobPacket : Packet
 	{
 		set
 		{
-            using (MemoryStream stream = new MemoryStream(value))
-            {
-                using (BinaryReader reader = new BinaryReader(stream))
-                {
-                    EntityID = PacketReader.ReadVarInt(reader);
-                    UUID = PacketReader.ReadGUID(reader);
-                    Type = (Entity.EntityType)PacketReader.ReadVarInt(reader);
+			using (MemoryStream stream = new MemoryStream(value))
+			{
+				using (BinaryReader reader = new BinaryReader(stream))
+				{
+					EntityID = PacketReader.ReadVarInt(reader);
+					UUID = PacketReader.ReadGUID(reader);
+					Type = (Entity.EntityType)PacketReader.ReadVarInt(reader);
 
-                    X = PacketReader.ReadDouble(reader);
-                    Y = PacketReader.ReadDouble(reader);
-                    Z = PacketReader.ReadDouble(reader);
+					X = PacketReader.ReadDouble(reader);
+					Y = PacketReader.ReadDouble(reader);
+					Z = PacketReader.ReadDouble(reader);
 
-                    Yaw = PacketReader.ReadByte(reader);
-                    Pitch = PacketReader.ReadByte(reader);
-                    HeadPitch = PacketReader.ReadByte(reader);
+					Yaw = PacketReader.ReadByte(reader);
+					Pitch = PacketReader.ReadByte(reader);
+					HeadPitch = PacketReader.ReadByte(reader);
 
-                    VelocityX = PacketReader.ReadInt16(reader);
-                    VelocityY = PacketReader.ReadInt16(reader);
-                    VelocityZ = PacketReader.ReadInt16(reader);
-                }
-            }
+					VelocityX = PacketReader.ReadInt16(reader);
+					VelocityY = PacketReader.ReadInt16(reader);
+					VelocityZ = PacketReader.ReadInt16(reader);
+				}
+			}
 		}
 		get => throw new NotImplementedException();
 	}

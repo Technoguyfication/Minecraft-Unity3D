@@ -16,16 +16,16 @@ public class Player
 	public byte SkinBitmask { get; set; }
 	public GameMode PlayerGameMode { get; set; }
 	public int Ping { get; set; }
-    public string Name { get; set; }
+	public string Name { get; set; }
 
-    public Player(bool hasDisplayName, string displayName, Texture skin, byte skinBitmask, GameMode gameMode, int ping, string name)
-    {
-        HasDisplayName = hasDisplayName;
-        DisplayName = displayName;
-        SkinTexture = skin;
-        SkinBitmask = skinBitmask;
-        PlayerGameMode = gameMode;
-        Ping = ping;
-        Name = name;
-    }
+	public Player(bool hasDisplayName, string displayName, Texture skin, byte skinBitmask, GameMode gameMode, int ping, string name)
+	{
+		HasDisplayName = hasDisplayName;
+		DisplayName = displayName;
+		SkinTexture = skin;
+		SkinBitmask = skinBitmask;
+		PlayerGameMode = gameMode;
+		Ping = ping;
+		Name = name;
+	}
 }

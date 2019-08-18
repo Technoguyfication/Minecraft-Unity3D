@@ -9,7 +9,7 @@ public abstract class Packet
 	public int PacketID { get; set; }
 	public abstract byte[] Payload { get; set; }
 
-    public Packet() { }
+	public Packet() { }
 
 	/// <summary>
 	/// Create a packet using a <see cref="PacketData"/> object
@@ -58,7 +58,7 @@ public enum ClientboundIDs : int
 	EntityTeleport = 0x50,
 	EntityHeadLook = 0x39,
 	PlayerInfo = 0x30,
-    EntityMetadata = 0x3F,
+	EntityMetadata = 0x3F,
 	ChatMessage = 0x0E
 }
 

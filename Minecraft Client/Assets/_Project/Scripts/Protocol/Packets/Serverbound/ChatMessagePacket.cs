@@ -9,27 +9,27 @@ public class CSChatMessagePacket : Packet
 {
 	public string Message { get; set; }
 
-    public CSChatMessagePacket()
-    {
-        PacketID = (int)ServerboundIDs.ChatMessage;
-    }
-
-    public CSChatMessagePacket(PacketData data) : base(data) { } // packet id should be set correctly if this ctor is used
-
-    public override byte[] Payload
+	public CSChatMessagePacket()
 	{
-        get
-        {
-            using (MemoryStream stream = new MemoryStream())
-            {
-                using (BinaryWriter writer = new BinaryWriter(stream))
-                {
-                    PacketWriter.WriteString(writer, Message);
+		PacketID = (int)ServerboundIDs.ChatMessage;
+	}
 
-                    return stream.ToArray();
-                }
-            }
-        }
+	public CSChatMessagePacket(PacketData data) : base(data) { } // packet id should be set correctly if this ctor is used
+
+	public override byte[] Payload
+	{
+		get
+		{
+			using (MemoryStream stream = new MemoryStream())
+			{
+				using (BinaryWriter writer = new BinaryWriter(stream))
+				{
+					PacketWriter.WriteString(writer, Message);
+
+					return stream.ToArray();
+				}
+			}
+		}
 		set => throw new NotImplementedException();
 	}
 }

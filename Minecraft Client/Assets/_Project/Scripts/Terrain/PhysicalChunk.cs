@@ -22,8 +22,8 @@ public class PhysicalChunk : MonoBehaviour
 			new BlockPos() { Z = -1 },
 		};
 
-    // Use this for initialization
-    public void Start()
+	// Use this for initialization
+	public void Start()
 	{
 		name = Chunk.Position.ToString();
 
@@ -127,11 +127,11 @@ public class PhysicalChunk : MonoBehaviour
 												neighborChunk = neighborChunks[3];
 												break;
 											default:
-												neighbors[i] = false;	// this block is outside 0 <= x <= 25
+												neighbors[i] = false;   // this block is outside 0 <= x <= 25
 												continue;
 										}
 
-                                        neighbors[i] = neighborChunk?.GetBlockAt(neighborPos).IsSolid ?? true;	// unloaded neighbor chunks are null. if the chunk is unloaded, say it's empty
+										neighbors[i] = neighborChunk?.GetBlockAt(neighborPos).IsSolid ?? true;  // unloaded neighbor chunks are null. if the chunk is unloaded, say it's empty
 									}
 								}
 
@@ -187,12 +187,12 @@ public class PhysicalChunk : MonoBehaviour
 				ChunkSection = s,
 				ElapsedTime = sw.ElapsedMilliseconds
 			});
-        }
+		}
 
 		return finishedMeshes.ToArray();
 	}
 
-    /*
+	/*
 	private bool HasAllNeighbors(bool[] blocks)
 	{
 		foreach (var neighbor in blocks)

@@ -27,20 +27,20 @@ public class ChunkDataPacket : Packet
 		get => throw new NotImplementedException();
 		set
 		{
-            using (MemoryStream stream = new MemoryStream(value))
-            {
-                using (BinaryReader reader = new BinaryReader(stream))
-                {
-                    ChunkX = PacketReader.ReadInt32(reader);
-                    ChunkZ = PacketReader.ReadInt32(reader);
+			using (MemoryStream stream = new MemoryStream(value))
+			{
+				using (BinaryReader reader = new BinaryReader(stream))
+				{
+					ChunkX = PacketReader.ReadInt32(reader);
+					ChunkZ = PacketReader.ReadInt32(reader);
 
-                    GroundUpContinuous = PacketReader.ReadBoolean(reader);
-                    PrimaryBitmask = PacketReader.ReadVarInt(reader);
+					GroundUpContinuous = PacketReader.ReadBoolean(reader);
+					PrimaryBitmask = PacketReader.ReadVarInt(reader);
 
-                    int byteCount = PacketReader.ReadVarInt(reader);
-                    Data = PacketReader.ReadBytes(reader, byteCount);
-                }
-            }
+					int byteCount = PacketReader.ReadVarInt(reader);
+					Data = PacketReader.ReadBytes(reader, byteCount);
+				}
+			}
 
 			// todo support block entities
 		}

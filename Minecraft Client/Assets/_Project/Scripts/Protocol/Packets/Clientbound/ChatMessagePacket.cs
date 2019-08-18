@@ -22,14 +22,14 @@ public class ChatMessagePacket : Packet
 		get => throw new NotImplementedException();
 		set
 		{
-            using (MemoryStream stream = new MemoryStream(value))
-            {
-                using (BinaryReader reader = new BinaryReader(stream))
-                {
-                    Json = PacketReader.ReadString(reader);
-                    Position = (ChatMessage.Position)PacketReader.ReadByte(reader);
-                }
-            }
+			using (MemoryStream stream = new MemoryStream(value))
+			{
+				using (BinaryReader reader = new BinaryReader(stream))
+				{
+					Json = PacketReader.ReadString(reader);
+					Position = (ChatMessage.Position)PacketReader.ReadByte(reader);
+				}
+			}
 		}
 	}
 

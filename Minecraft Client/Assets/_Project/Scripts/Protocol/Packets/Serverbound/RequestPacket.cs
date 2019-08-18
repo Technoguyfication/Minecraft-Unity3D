@@ -13,6 +13,6 @@ public class RequestPacket : Packet
 
 	public RequestPacket()
 	{
-        PacketID = (int)ServerboundIDs.Status_Request;
+		PacketID = (int)ServerboundIDs.Status_Request;
 	}
 }

@@ -17,19 +17,19 @@ public class EntityLookPacket : Packet
 	{
 		set
 		{
-            using (MemoryStream stream = new MemoryStream(value))
-            {
-                using (BinaryReader reader = new BinaryReader(stream))
-                {
-                    EntityID = PacketReader.ReadVarInt(reader);
+			using (MemoryStream stream = new MemoryStream(value))
+			{
+				using (BinaryReader reader = new BinaryReader(stream))
+				{
+					EntityID = PacketReader.ReadVarInt(reader);
 
-                    Yaw = (sbyte)PacketReader.ReadByte(reader);
-                    Pitch = (sbyte)PacketReader.ReadByte(reader);
+					Yaw = (sbyte)PacketReader.ReadByte(reader);
+					Pitch = (sbyte)PacketReader.ReadByte(reader);
 
-                    OnGround = PacketReader.ReadBoolean(reader);
-                }
-            }
-        }
+					OnGround = PacketReader.ReadBoolean(reader);
+				}
+			}
+		}
 		get => throw new NotImplementedException();
 	}
 

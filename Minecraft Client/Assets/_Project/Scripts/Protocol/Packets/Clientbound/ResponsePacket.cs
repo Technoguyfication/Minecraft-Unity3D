@@ -22,14 +22,14 @@ public class ResponsePacket : Packet
 		get => PacketHelper.GetBytes(JSONResponse);
 		set
 		{
-            using (MemoryStream stream = new MemoryStream(value))
-            {
-                using (BinaryReader reader = new BinaryReader(stream))
-                {
-                    JSONResponse = PacketReader.ReadString(reader);
-                }
-            }
-        }
+			using (MemoryStream stream = new MemoryStream(value))
+			{
+				using (BinaryReader reader = new BinaryReader(stream))
+				{
+					JSONResponse = PacketReader.ReadString(reader);
+				}
+			}
+		}
 	}
 
 	public string JSONResponse { get; set; }

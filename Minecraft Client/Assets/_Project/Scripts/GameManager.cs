@@ -56,7 +56,7 @@ public class GameManager : MonoBehaviour
 		Debug.Log("Unity profiler enabled");
 #endif
 
-        PlayerLibrary.Initialize();
+		PlayerLibrary.Initialize();
 	}
 
 	// Update is called once per frame
@@ -129,7 +129,7 @@ public class GameManager : MonoBehaviour
 	{
 		// disable main menu controller
 		//GetComponent<MainMenuController>().enabled = false;
-		
+
 		// open loading screen
 		AsyncOperation loadLoadingScreenTask = SceneManager.LoadSceneAsync("LoadingScreen", LoadSceneMode.Additive);
 		while (!loadLoadingScreenTask.isDone)
@@ -141,7 +141,7 @@ public class GameManager : MonoBehaviour
 		SceneManager.MoveGameObjectToScene(gameObject, SceneManager.GetSceneByName("LoadingScreen"));
 		AsyncOperation unloadMainMenuTask = SceneManager.UnloadSceneAsync("MainMenu");
 
-		while (!unloadMainMenuTask?.isDone ?? false)	// if main menu isn't loaded in the first place, asyncoperation is null
+		while (!unloadMainMenuTask?.isDone ?? false)    // if main menu isn't loaded in the first place, asyncoperation is null
 			yield return null;
 
 		Debug.Log("Closed main menu");
@@ -321,21 +321,21 @@ public class GameManager : MonoBehaviour
 				EntityManager.HandleEntityHeadLook(new EntityHeadLookPacket(data));
 				break;
 			case ClientboundIDs.PlayerInfo:
-                PlayerInfoPacket playerInfo = new PlayerInfoPacket(data);
-                PlayerLibrary.HandleUpdatePacket(playerInfo);
+				PlayerInfoPacket playerInfo = new PlayerInfoPacket(data);
+				PlayerLibrary.HandleUpdatePacket(playerInfo);
 				break;
 			case ClientboundIDs.ChatMessage:
-                ChatMessage chatMsg = new ChatMessage(new ChatMessagePacket(data));
-                ChatHistoryManager.AddMessage(chatMsg.PlaintextMessage);
+				ChatMessage chatMsg = new ChatMessage(new ChatMessagePacket(data));
+				ChatHistoryManager.AddMessage(chatMsg.PlaintextMessage);
 				break;
-                /*
-            case ClientboundIDs.ENTITY_METADATA:
-                EntityMetadataPacket metadata = new EntityMetadataPacket(data);
+			/*
+		case ClientboundIDs.ENTITY_METADATA:
+			EntityMetadataPacket metadata = new EntityMetadataPacket(data);
 
-                Debug.Log(metadata.ToString());
-                break;*/
+			Debug.Log(metadata.ToString());
+			break;*/
 			default:
-                //Debug.Log($"Case {data.ID} is not handled!");
+				//Debug.Log($"Case {data.ID} is not handled!");
 				break;
 		}
 	}

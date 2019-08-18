@@ -11,19 +11,19 @@ public class LoginStartPacket : Packet
 
 	public override byte[] Payload
 	{
-        get
-        {
-            using (MemoryStream stream = new MemoryStream())
-            {
-                using (BinaryWriter writer = new BinaryWriter(stream))
-                {
-                    PacketWriter.WriteString(writer, Username);
+		get
+		{
+			using (MemoryStream stream = new MemoryStream())
+			{
+				using (BinaryWriter writer = new BinaryWriter(stream))
+				{
+					PacketWriter.WriteString(writer, Username);
 
-                    return stream.ToArray();
-                }
-            }
-            //PacketHelper.GetBytes(Username);
-        }
+					return stream.ToArray();
+				}
+			}
+			//PacketHelper.GetBytes(Username);
+		}
 		set => throw new NotImplementedException();
 	}
 

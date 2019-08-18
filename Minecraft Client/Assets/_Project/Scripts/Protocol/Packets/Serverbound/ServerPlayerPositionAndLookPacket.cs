@@ -14,33 +14,33 @@ public class ServerPlayerPositionAndLookPacket : Packet
 	public float Pitch { get; set; }
 	public bool OnGround { get; set; }
 
-    public ServerPlayerPositionAndLookPacket(PacketData data) : base(data) { } // packet id should be set correctly if this ctor is used
+	public ServerPlayerPositionAndLookPacket(PacketData data) : base(data) { } // packet id should be set correctly if this ctor is used
 
-    public ServerPlayerPositionAndLookPacket()
-    {
-        PacketID = (int)ServerboundIDs.PlayerPositionAndLook;
-    }
+	public ServerPlayerPositionAndLookPacket()
+	{
+		PacketID = (int)ServerboundIDs.PlayerPositionAndLook;
+	}
 
-    public override byte[] Payload
+	public override byte[] Payload
 	{
 		get
 		{
-            using (MemoryStream stream = new MemoryStream())
-            {
-                using (BinaryWriter writer = new BinaryWriter(stream))
-                {
-                    PacketWriter.WriteDouble(writer, X);
-                    PacketWriter.WriteDouble(writer, FeetY);
-                    PacketWriter.WriteDouble(writer, Z);
+			using (MemoryStream stream = new MemoryStream())
+			{
+				using (BinaryWriter writer = new BinaryWriter(stream))
+				{
+					PacketWriter.WriteDouble(writer, X);
+					PacketWriter.WriteDouble(writer, FeetY);
+					PacketWriter.WriteDouble(writer, Z);
 
-                    PacketWriter.WriteFloat(writer, Yaw);
-                    PacketWriter.WriteFloat(writer, Pitch);
+					PacketWriter.WriteFloat(writer, Yaw);
+					PacketWriter.WriteFloat(writer, Pitch);
 
-                    PacketWriter.WriteBoolean(writer, OnGround);
+					PacketWriter.WriteBoolean(writer, OnGround);
 
-                    return stream.ToArray();
-                }
-            }
+					return stream.ToArray();
+				}
+			}
 		}
 		set => throw new NotImplementedException();
 	}

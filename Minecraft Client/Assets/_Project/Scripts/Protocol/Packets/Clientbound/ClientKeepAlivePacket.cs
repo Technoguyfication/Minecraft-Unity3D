@@ -11,16 +11,16 @@ public class ClientKeepAlivePacket : Packet
 
 	public override byte[] Payload
 	{
-        set
-        {
-            using (MemoryStream stream = new MemoryStream(value))
-            {
-                using (BinaryReader reader = new BinaryReader(stream))
-                {
-                    KeepAliveID = PacketReader.ReadInt64(reader);
-                }
-            }
-        }
+		set
+		{
+			using (MemoryStream stream = new MemoryStream(value))
+			{
+				using (BinaryReader reader = new BinaryReader(stream))
+				{
+					KeepAliveID = PacketReader.ReadInt64(reader);
+				}
+			}
+		}
 		get => throw new NotImplementedException();
 	}
 
