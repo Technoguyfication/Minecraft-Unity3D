@@ -7,3 +7,6 @@
 *.meta linguist-generated
 *.prefab linguist-generated
 *.unity linguist-generated
+
+# Vendored code
+/Minecraft Client/Assets/TestMesh Pro/* linguist-vendored=true
