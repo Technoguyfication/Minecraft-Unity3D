@@ -8,6 +8,10 @@ using UnityEngine;
 public class LivingEntity : Entity
 {
 	public GameObject Head;
+
+	protected readonly float HeadMinX = -89.9f;
+	protected readonly float HeadMaxX = 89.9f;
+
 	public float HeadPitch
 	{
 		get => Pitch;
@@ -41,6 +45,9 @@ public class LivingEntity : Entity
 	public GameObject Body;
 	private float headYaw;
 
+	/// <summary>
+	/// Sets the angles of the head and body of the entity
+	/// </summary>
 	private void SetHeadAndBodyAngles()
 	{
 		// subtract yaw from head yaw because head is parented to body

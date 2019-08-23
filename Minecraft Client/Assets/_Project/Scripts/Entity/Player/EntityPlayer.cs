@@ -11,7 +11,7 @@ public class EntityPlayer : LivingEntity
 
 	public EntityPlayer()
 	{
-		Type = EntityType.PLAYER;
+		Type = EntityType.Player;
 	}
 
 	protected void Update()

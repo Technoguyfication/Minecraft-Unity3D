@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Defines a minecraft with physics and stuff
+/// Defines a Minecraft Entity
+/// https://minecraft.gamepedia.com/Entity
 /// </summary>
 public abstract class Entity : MonoBehaviour
 {
@@ -14,10 +15,10 @@ public abstract class Entity : MonoBehaviour
 	public EntityType Type { get; set; }
 	public World World { get; set; }
 
-	public bool ForceGravityOn = false;
-
-	protected readonly float HeadMinX = -89.9f;
-	protected readonly float HeadMaxX = 89.9f;
+	/// <summary>
+	/// Force gravity to be enabled for this entity even if the world has not loaded yet
+	/// </summary>
+	public bool ForceGravityOn { get; set; } = false;
 
 	protected BoxCollider Collider;
 	protected Rigidbody Rigidbody;
@@ -49,18 +50,21 @@ public abstract class Entity : MonoBehaviour
 	/// X coordinate in Minecraft space
 	/// </summary>
 	public double X => transform.position.z;
+
 	/// <summary>
 	/// Y coordinate in Minecraft space
 	/// </summary>
 	public double Y => transform.position.y;
+
 	/// <summary>
 	/// Z coordinate in Minecraft space
 	/// </summary>
 	public double Z => transform.position.x;
 	public float Pitch { get; set; } = 0f;
 	public float Yaw { get; set; } = 0f;
+
 	/// <summary>
-	/// The rotation of the entity. (Usually the head rotation)
+	/// The rotation of the entity. For living entities, this is the rotation of the body.
 	/// </summary>
 	public Quaternion EntityRotation
 	{
@@ -76,7 +80,7 @@ public abstract class Entity : MonoBehaviour
 	public short VelocityZ { get; set; }
 
 	/// <summary>
-	/// The block this player is in
+	/// The block this entity is in
 	/// </summary>
 	public BlockPos BlockPos => new BlockPos()
 	{
@@ -119,108 +123,110 @@ public abstract class Entity : MonoBehaviour
 		return $"{Type.ToString()}:{EntityID}";
 	}
 
-
+	/// <summary>
+	/// All types of entities in Minecraft
+	/// </summary>
 	public enum EntityType
 	{
 		// the following are spawned using spawn mob packet
-		BAT = 3,
-		BLAZE = 4,
-		CAVE_SPIDER = 6,
-		CHICKEN = 7,
-		COD = 8,
-		COW = 9,
-		CREEPER = 10,
-		DONKEY = 11,
-		DOLPHIN = 12,
-		DROWNED = 14,
-		ELDER_GUARDIAN = 15,
-		ENDER_DRAGON = 17,
-		ENDERMAN = 18,
-		ENDERMITE = 19,
-		EVOCATION_VILLAGER = 21,
-		GHAST = 26,
-		GIANT = 27,
-		GUARDIAN = 28,
-		HORSE = 29,
-		HUSK = 30,
-		ILLUSION_ILLAGER = 31,
-		LLAMA = 36,
-		LAVA_SLIME = 38,
-		MULE = 46,
-		MUSHROOM_COW = 47,
-		OZELOT = 48,
-		PARROT = 50,
-		PIG = 51,
-		PUFFERFISH = 52,
-		PIG_ZOMBIE = 53,
-		POLAR_BEAR = 54,
-		RABBIT = 56,
-		SALMON = 57,
-		SHEEP = 58,
-		SHULKER = 59,
-		SILVERFISH = 61,
-		SKELETON = 62,
-		SKELETON_HORSE = 63,
-		SLIME = 64,
-		SNOWMAN = 66,
-		SPIDER = 69,
-		SQUID = 70,
-		STRAY = 71,
-		TROPICAL_FISH = 72,
-		TURTLE = 73,
-		VEX = 78,
-		VILLAGER = 79,
-		IRON_GOLEM = 80,
-		VINDICATION_ILLAGER = 81,
-		WITCH = 82,
-		WITHER = 83,
-		WITHER_SKELETON = 84,
-		WOLF = 86,
-		ZOMBIE = 87,
-		ZOMBIE_HORSE = 88,
-		ZOMBIE_VILLAGER = 89,
-		PHANTOM = 90,
+		Bat = 3,
+		Blaze = 4,
+		CaveSpider = 6,
+		Chicken = 7,
+		Cod = 8,
+		Cow = 9,
+		Creeper = 10,
+		Donkey = 11,
+		Dolphin = 12,
+		Drowned = 14,
+		ElderGuardian = 15,
+		EnderDragon = 17,
+		Enderman = 18,
+		Endermite = 19,
+		EvocationVillager = 21,
+		Ghast = 26,
+		Giant = 27,
+		Guardian = 28,
+		Horse = 29,
+		Husk = 30,
+		IllusionVillager = 31,
+		Llama = 36,
+		MagmaSlime = 38,
+		Mule = 46,
+		Mooshroom = 47,
+		Ocelot = 48,
+		Parrot = 50,
+		Pig = 51,
+		Pufferfish = 52,
+		Pigman = 53,
+		PolarBear = 54,
+		Rabbit = 56,
+		Salmon = 57,
+		Sheep = 58,
+		Shulker = 59,
+		Silverfish = 61,
+		Skeleton = 62,
+		SkeletonHorse = 63,
+		Slime = 64,
+		Snowman = 66,
+		Spider = 69,
+		Squid = 70,
+		Stray = 71,
+		TropicalFish = 72,
+		Turtle = 73,
+		Vex = 78,
+		Villager = 79,
+		IronGolem = 80,
+		VindicationVillager = 81,
+		Witch = 82,
+		Wither = 83,
+		WitherSkeleton = 84,
+		Wolf = 86,
+		Zombie = 87,
+		ZombieHorse = 88,
+		ZombieVillager = 89,
+		Phantom = 90,
 
 		// The following are spawned using spawn object
-		AREA_EFFECT_CLOUD = 0,
-		ARMOR_STAND = 1,
-		ARROW = 3,
-		BOAT = 5,
-		DRAGON_FIREBALL = 13,   // dragon
-		END_CRYSTAL = 16,
-		EVOCATION_FANGS = 20,
-		EYE_OF_ENDER_SIGNAL = 23,
-		FALLING_SAND = 24,
-		FIREWORK_ROCKET = 25,
-		ITEM = 32,
-		ITEM_FRAME = 33,
-		FIREBALL = 34,  // ghast
-		LEASH_KNOT = 35,
-		LLAMA_SPIT = 37,
-		MINECART_RIDEABLE = 39,
-		MINECART_CHEST = 40,
-		MINECART_COMMAND_BLOCK = 41,
-		MINECART_FURNACE = 42,
-		MINECART_HOPPER = 43,
-		MINECART_SPAWNER = 44,
-		MINECART_TNT = 45,
-		PRIMED_TNT = 55,
-		SHULKER_BULLET = 60,
-		SMALL_FIREBALL = 65,    // blaze
-		SNOWBALL = 67,
-		SPECTRAL_ARROW = 68,
-		THROWN_EGG = 74,
-		THROWN_ENDER_PEARL = 75,
-		THROWN_EXP_BOTTLE = 76,
-		THROWN_POTION = 77,
-		WITHER_SKULL = 85,
-		FISHING_BOBBER = 93,
-		TRIDENT = 94,
+		AreaEffectCloud = 0,
+		ArmorStand = 1,
+		Arrow = 3,
+		Boat = 5,
+		DragonFireball = 13,   // dragon
+		EndCrystal = 16,
+		EvocationFangs = 20,
+		EyeOfEnderSignal = 23,
+		FallingSand = 24,
+		FireworkRocket = 25,
+		Item = 32,
+		ItemFrame = 33,
+		Fireball = 34,  // ghast
+		LeashKnot = 35,
+		LlamaSpit = 37,
+		MinecartRideable = 39,
+		MinecartChest = 40,
+		MinecartCommandBlock = 41,
+		MinecartFurnace = 42,
+		MinecartHopper = 43,
+		MinecartSpawner = 44,
+		MinecartTnt = 45,
+		PrimedTnt = 55,
+		ShulkerBullet = 60,
+		SmallFireball = 65,    // blaze
+		Snowball = 67,
+		SpectralArrow = 68,
+		ThrownEgg = 74,
+		ThrownEnderPearl = 75,
+		ThrownExpBottle = 76,
+		ThrownPotion = 77,
+		WitherSkull = 85,
+		FishingBobber = 93,
+		Trident = 94,
 
 		// the following have special packet to be spawned
-		EXP_ORB = 22,
-		PAINTING = 49,
-		LIGHTNING_BOLT = 91,
-		PLAYER = 92
+		ExpOrb = 22,
+		Painting = 49,
+		LightingBolt = 91,
+		Player = 92
 	}
 }

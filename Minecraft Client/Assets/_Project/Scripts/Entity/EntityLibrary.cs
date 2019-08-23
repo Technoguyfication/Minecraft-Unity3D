@@ -16,11 +16,11 @@ public class EntityLibrary : MonoBehaviour
 	{
 		switch (type)
 		{
-			case EntityType.CREEPER:
+			case EntityType.Creeper:
 				return Creeper;
-			case EntityType.COW:
+			case EntityType.Cow:
 				return Cow;
-			case EntityType.PIG:
+			case EntityType.Pig:
 				return Pig;
 			default:
 				return DefaultEntity;
