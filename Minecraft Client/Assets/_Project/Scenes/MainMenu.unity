@@ -228,9 +228,9 @@ MonoBehaviour:
     type: 3}
   ChunkRendererPrefab: {fileID: 1373419148536406, guid: 3ed795cc8aaa4484da1c4aa8a115fc40,
     type: 3}
-  Username: mcplayer
   DebugCanvas: {fileID: 1103229369}
   EntityManager: {fileID: 85674382}
+  Chat: {fileID: 0}
 --- !u!4 &13402249
 Transform:
   m_ObjectHideFlags: 0
@@ -650,6 +650,7 @@ MonoBehaviour:
   Creeper: {fileID: 2635472375816120246, guid: ec4e6fd0fcf61ff4fbaa8fb9dbef4c08, type: 3}
   Cow: {fileID: 7411706794983835076, guid: 39ad4773c32735d48bbd8bc2cc7cc2d8, type: 3}
   Pig: {fileID: 3144754443554451387, guid: f39a986edda0959459ca0e7424d41190, type: 3}
+  Player: {fileID: 1818212769120596, guid: 9491017758607d74c814f7b89d3a3829, type: 3}
 --- !u!1 &127268863
 GameObject:
   m_ObjectHideFlags: 0
@@ -2553,7 +2554,7 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_text: <font="Minecraft Regular SDF"><mark=#00000050>Test text goes here</mark>
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 0}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}

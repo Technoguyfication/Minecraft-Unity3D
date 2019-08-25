@@ -51,7 +51,7 @@ public class LivingEntity : Entity
 	private void SetHeadAndBodyAngles()
 	{
 		// subtract yaw from head yaw because head is parented to body
-		Head.transform.localEulerAngles = new Vector3(HeadPitch, HeadYaw - Yaw, 0);
+		Head.transform.localEulerAngles = new Vector3(HeadPitch, 0, HeadYaw - Yaw);
 		Body.transform.localEulerAngles = new Vector3(0, Yaw, 0);
 	}
 }

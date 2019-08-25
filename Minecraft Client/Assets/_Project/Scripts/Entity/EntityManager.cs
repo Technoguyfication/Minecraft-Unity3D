@@ -5,10 +5,11 @@ using UnityEngine;
 
 public class EntityManager : MonoBehaviour
 {
+	public PlayerLibrary PlayerLibrary;
 	public EntityLibrary EntityLibrary;
 	public World World;
 
-	private readonly List<Entity> _entities = new List<Entity>();
+	private readonly Dictionary<Guid, Entity> _entities = new Dictionary<Guid, Entity>();
 	private const float ENTITY_ANGLE_COEFFICIENT = 360 / 256f;
 	private const float ENTITY_ANGLE_OFFSET = 90f;
 
@@ -72,18 +73,40 @@ public class EntityManager : MonoBehaviour
 			return;
 		}
 
-		var mob = Instantiate(EntityLibrary.GetEntity(pkt.Type), transform).GetComponent<Mob>();
+		var mob = Instantiate(EntityLibrary.GetEntityPrefab(pkt.Type), transform).GetComponent<Mob>();
 		mob.Type = pkt.Type;
 		mob.World = World;
 		mob.UUID = pkt.UUID;
 		mob.EntityID = pkt.EntityID;
-		Vector3 pos = new Vector3((float)pkt.X, (float)pkt.Y, (float)pkt.Z); ;
+		Vector3 pos = new Vector3((float)pkt.X, (float)pkt.Y, (float)pkt.Z);
 		mob.MinecraftPosition = pos;
 		mob.SetRotation(pkt.Pitch * ENTITY_ANGLE_COEFFICIENT, pkt.Yaw * ENTITY_ANGLE_COEFFICIENT + ENTITY_ANGLE_OFFSET);
 		//mob.HeadPitch = pkt.HeadPitch * ENTITY_ANGLE_COEFFICIENT;
 		mob.name = $"{mob.Type.ToString()} ID:{mob.EntityID} UUID:{mob.UUID.ToString()}";
 
-		_entities.Add(mob);
+		_entities.Add(mob.UUID, mob);
+	}
+
+	/// <summary>
+	/// Spawns a player on the client
+	/// </summary>
+	/// <param name="pkt"></param>
+	public void HandleSpawnPlayerPacket(SpawnPlayerPacket pkt)
+	{
+		// ignore spawn player if player info has not been sent by server
+		if (!PlayerLibrary.TryGetPlayer(pkt.PlayerUUID, out var player))
+			return;
+
+		var playerEntity = Instantiate(EntityLibrary.GetEntityPrefab(Entity.EntityType.Player), transform).GetComponent<EntityPlayer>();
+		playerEntity.Player = player;
+		playerEntity.World = World;
+		playerEntity.EntityID = pkt.EntityID;
+		Vector3 pos = new Vector3((float)pkt.X, (float)pkt.Y, (float)pkt.Z);
+		playerEntity.MinecraftPosition = pos;
+		playerEntity.SetRotation(pkt.Pitch * ENTITY_ANGLE_COEFFICIENT, pkt.Yaw * ENTITY_ANGLE_COEFFICIENT + ENTITY_ANGLE_OFFSET);
+		playerEntity.name = $"{player.Name}: {player.UUID}";
+
+		_entities.Add(player.UUID, playerEntity);
 	}
 
 	public void HandleEntityRelativeMovePacket(EntityRelativeMovePacket pkt)
@@ -183,8 +206,8 @@ public class EntityManager : MonoBehaviour
 		if (entity == null)
 			return;
 
-		_entities.Remove(entity);
 		Destroy(entity.gameObject);
+		_entities.Remove(entity.UUID);
 	}
 
 	/// <summary>
@@ -194,7 +217,10 @@ public class EntityManager : MonoBehaviour
 	/// <returns></returns>
 	public Entity GetEntityByID(int entityId)
 	{
-		return _entities.Find(e => e.EntityID == entityId);
+		foreach (var entity in _entities)
+			if (entity.Value.EntityID == entityId) return entity.Value;
+
+		return null;
 	}
 
 	/// <summary>
@@ -202,7 +228,11 @@ public class EntityManager : MonoBehaviour
 	/// </summary>
 	public void DestroyAllEntities()
 	{
-		_entities.ForEach(e => Destroy(e));
+		foreach (var entity in _entities)
+		{
+			Destroy(entity.Value.gameObject);
+		}
+
 		_entities.Clear();
 	}
 

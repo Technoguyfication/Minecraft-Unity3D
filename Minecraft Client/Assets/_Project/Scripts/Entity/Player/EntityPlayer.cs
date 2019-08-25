@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,6 +9,18 @@ using UnityEngine;
 public class EntityPlayer : LivingEntity
 {
 	public Player Player { get; set; }
+
+	public override Guid UUID
+	{
+		get
+		{
+			return Player.UUID;
+		}
+		set
+		{
+			Player.UUID = value;
+		}
+	}
 
 	public EntityPlayer()
 	{

@@ -59,7 +59,8 @@ public enum ClientboundIDs : int
 	EntityHeadLook = 0x39,
 	PlayerInfo = 0x30,
 	EntityMetadata = 0x3F,
-	ChatMessage = 0x0E
+	ChatMessage = 0x0E,
+	SpawnPlayer = 0x05
 }
 
 public enum ServerboundIDs : int

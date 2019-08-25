@@ -16,7 +16,7 @@ public class PlayerLibrary
 		PlayerList = playerList;
 	}
 
-	private Dictionary<Guid, Player> Players { get; set; } = new Dictionary<Guid, Player>();
+	private Dictionary<Guid, Player> _players = new Dictionary<Guid, Player>();
 
 	/// <summary>
 	/// Updates the player library with data from a <see cref="PlayerInfoPacket"/>
@@ -29,15 +29,15 @@ public class PlayerLibrary
 			// if removing a player, there's no need to look it up or create it
 			if (packet.Type == PlayerInfoPacket.ActionType.RemovePlayer)
 			{
-				Players.Remove(action.UUID);
+				_players.Remove(action.UUID);
 				continue;
 			}
 
 			// try to lookup player, otherwise add it to the player list
-			if (!Players.TryGetValue(action.UUID, out Player player))
+			if (!_players.TryGetValue(action.UUID, out Player player))
 			{
 				player = new Player();
-				Players.Add(action.UUID, player);
+				_players.Add(action.UUID, player);
 			}
 
 			switch (packet.Type)
@@ -64,6 +64,27 @@ public class PlayerLibrary
 		}
 
 		// update player list after handling all actions
-		PlayerList?.UpdatePlayerList(Players.Values.ToArray());
+		PlayerList?.UpdatePlayerList(_players.Values.ToArray());
+	}
+
+	/// <summary>
+	/// Returns whether the player tracked in the library
+	/// </summary>
+	/// <param name="playerUuid"></param>
+	/// <returns></returns>
+	public bool HasPlayer(Guid playerUuid)
+	{
+		return _players.ContainsKey(playerUuid);
+	}
+
+	/// <summary>
+	/// Tries to return a Player contained in the library
+	/// </summary>
+	/// <param name="playerUuid"></param>
+	/// <param name="player"></param>
+	/// <returns></returns>
+	public bool TryGetPlayer(Guid playerUuid, out Player player)
+	{
+		return _players.TryGetValue(playerUuid, out player);
 	}
 }

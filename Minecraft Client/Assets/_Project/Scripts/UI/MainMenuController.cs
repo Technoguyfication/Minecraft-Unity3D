@@ -159,7 +159,7 @@ public class MainMenuController : MonoBehaviour
 				SetAuthImage(AuthImageStatus.VALID);
 				AuthStatusText.text = $"Logged in as {MojangAPI.Username}";
 				SetLoginLogoutButtons(true);
-				GameManager.Username = MojangAPI.Username;
+				GameManager.LocalPlayer.Name = MojangAPI.Username;
 				break;
 			case MojangAPI.AccountStatus.LOGGED_OUT:
 			case MojangAPI.AccountStatus.INVALID_CREDENTIALS:

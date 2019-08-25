@@ -10,9 +10,10 @@ public class EntityLibrary : MonoBehaviour
 	public GameObject Creeper;
 	public GameObject Cow;
 	public GameObject Pig;
+	public GameObject Player;
 
 	// todo: use reflection to generate this as a dictionary dynamically at runtime
-	public GameObject GetEntity(EntityType type)
+	public GameObject GetEntityPrefab(EntityType type)
 	{
 		switch (type)
 		{
@@ -22,6 +23,8 @@ public class EntityLibrary : MonoBehaviour
 				return Cow;
 			case EntityType.Pig:
 				return Pig;
+			case EntityType.Player:
+				return Player;
 			default:
 				return DefaultEntity;
 		}

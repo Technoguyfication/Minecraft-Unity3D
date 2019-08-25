@@ -12,17 +12,18 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public class GameManager : MonoBehaviour
 {
+	public Player LocalPlayer { get; } = new Player();
+
 	[Header("Prefabs")]
 	public GameObject PlayerPrefab;
 	public GameObject ChunkRendererPrefab;
 
-	public string Username = "mcplayer";
 	public DebugCanvas DebugCanvas;
 	public EntityManager EntityManager;
 	public Chat Chat;
 	public PlayerLibrary PlayerLibrary;
 
-	private PlayerController _player = null;
+	private PlayerController _localPlayerController = null;
 	private NetworkClient _client;
 	private readonly BlockingCollection<Packet> _packetSendQueue = new BlockingCollection<Packet>();
 	private readonly List<PacketData> _packetReceiveQueue = new List<PacketData>();
@@ -40,7 +41,6 @@ public class GameManager : MonoBehaviour
 		}
 	}
 	private World _currentWorld;
-	private Guid _playerUuid;
 	private LoadingScreenController _loadingScreen;
 	private float _lastTick = 0f;
 	private bool _disconnecting = false;
@@ -183,7 +183,7 @@ public class GameManager : MonoBehaviour
 				},
 				new LoginStartPacket()
 				{
-					Username = Username
+					Username = LocalPlayer.Name
 				}
 			});
 
@@ -224,7 +224,7 @@ public class GameManager : MonoBehaviour
 		_loadingScreen.UpdateSubtitleText("Downloading world...");
 
 		// set settings from server
-		_playerUuid = loginSuccess.UUID;
+		LocalPlayer.UUID = loginSuccess.UUID;
 		CurrentWorld = new World()
 		{
 			Dimension = joinGame.Dimension,
@@ -244,6 +244,7 @@ public class GameManager : MonoBehaviour
 		Chat = referenceLinker.Chat;
 		Chat.ChatSend += Chat_ChatSend;
 		PlayerLibrary = new PlayerLibrary(referenceLinker.PlayerList);
+		EntityManager.PlayerLibrary = PlayerLibrary;
 
 		// start network worker tasks
 		_netReadTask = new Task(() =>
@@ -303,6 +304,9 @@ public class GameManager : MonoBehaviour
 			case ClientboundIDs.SpawnMob:
 				EntityManager.HandleSpawnMobPacket(new SpawnMobPacket(data));
 				break;
+			case ClientboundIDs.SpawnPlayer:
+				EntityManager.HandleSpawnPlayerPacket(new SpawnPlayerPacket(data));
+				break;
 			case ClientboundIDs.DestroyEntities:
 				EntityManager.DestroyEntities(new DestroyEntitiesPacket(data).EntityIDs);
 				break;
@@ -344,26 +348,26 @@ public class GameManager : MonoBehaviour
 		// https://wiki.vg/Protocol#Player_Position_And_Look_.28clientbound.29
 		// ^ see flag table
 		Vector3 pos = new Vector3(
-			(float)packet.X + (((packet.Flags & 0x01) != 0) ? _player.MinecraftPosition.x : 0f),
-			(float)packet.Y + (((packet.Flags & 0x02) != 0) ? _player.MinecraftPosition.y : 0f),
-			(float)packet.Z + (((packet.Flags & 0x04) != 0) ? _player.MinecraftPosition.z : 0f));
+			(float)packet.X + (((packet.Flags & 0x01) != 0) ? _localPlayerController.MinecraftPosition.x : 0f),
+			(float)packet.Y + (((packet.Flags & 0x02) != 0) ? _localPlayerController.MinecraftPosition.y : 0f),
+			(float)packet.Z + (((packet.Flags & 0x04) != 0) ? _localPlayerController.MinecraftPosition.z : 0f));
 
 		// check if we need to spawn the player for the first time
-		if (_player == null)
+		if (_localPlayerController == null)
 		{
-			_player = Instantiate(PlayerPrefab).GetComponent<PlayerController>();
-			_player.World = CurrentWorld;
-			_player.UUID = _playerUuid;
-			_player.OnGroundChanged += PlayerOnGroundChanged;
+			_localPlayerController = Instantiate(PlayerPrefab).GetComponent<PlayerController>();
+			_localPlayerController.Player = LocalPlayer;
+			_localPlayerController.World = CurrentWorld;
+			_localPlayerController.OnGroundChanged += PlayerOnGroundChanged;
 			_loadingScreen.HideLoadingScreen();
-			DebugCanvas.Player = _player;
+			DebugCanvas.Player = _localPlayerController;
 		}
 
 		// update player position
-		_player.MinecraftPosition = pos;
-		_player.SetRotation(packet.Pitch + (((packet.Flags & 0x10) != 0) ? _player.Pitch : 0), packet.Yaw + (((packet.Flags & 0x08) != 0) ? _player.Yaw : 0) + 90);
+		_localPlayerController.MinecraftPosition = pos;
+		_localPlayerController.SetRotation(packet.Pitch + (((packet.Flags & 0x10) != 0) ? _localPlayerController.Pitch : 0), packet.Yaw + (((packet.Flags & 0x08) != 0) ? _localPlayerController.Yaw : 0) + 90);
 
-		Debug.Log($"Moved player to {pos}, {_player.transform.rotation.eulerAngles}");
+		Debug.Log($"Moved player to {pos}, {_localPlayerController.transform.rotation.eulerAngles}");
 
 		DispatchWritePacket(new TeleportConfirmPacket()
 		{
@@ -392,9 +396,9 @@ public class GameManager : MonoBehaviour
 
 			// update player position
 			// TODO: only update look / position if player has moved
-			if (_player != null)
+			if (_localPlayerController != null)
 			{
-				DispatchWritePacket(ServerPlayerPositionAndLookPacket.FromPlayer(_player));
+				DispatchWritePacket(ServerPlayerPositionAndLookPacket.FromPlayer(_localPlayerController));
 			}
 
 			// update tick time

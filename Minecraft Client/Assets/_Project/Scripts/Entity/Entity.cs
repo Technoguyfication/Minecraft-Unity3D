@@ -11,7 +11,7 @@ public abstract class Entity : MonoBehaviour
 {
 	public GameObject Physical;
 	public int EntityID { get; set; }
-	public Guid UUID { get; set; }
+	public virtual Guid UUID { get; set; }
 	public EntityType Type { get; set; }
 	public World World { get; set; }
 
