@@ -9,4 +9,4 @@
 *.unity linguist-generated
 
 # Vendored code
-/Minecraft[:space:]Client/Assets/TestMesh[:space:]Pro/* linguist-vendored
+"/Minecraft Client/Assets/TextMesh Pro/**" linguist-vendored
