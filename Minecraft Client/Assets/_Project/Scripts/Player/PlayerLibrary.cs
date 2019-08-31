@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,7 +17,7 @@ public class PlayerLibrary
 		PlayerList = playerList;
 	}
 
-	private Dictionary<Guid, Player> _players = new Dictionary<Guid, Player>();
+	private readonly Dictionary<Guid, Player> _players = new Dictionary<Guid, Player>();
 
 	/// <summary>
 	/// Updates the player library with data from a <see cref="PlayerInfoPacket"/>
@@ -48,6 +49,10 @@ public class PlayerLibrary
 					player.Ping = action.Ping;
 					player.DisplayName = action.DisplayName;
 					player.UUID = action.UUID;
+
+#if UNITY_EDITOR
+					Debug.Log($"{player.Name} props: {string.Join(", ", action.Properties?.Select(x => x?.ToString()))}");
+#endif
 					break;
 				case PlayerInfoPacket.ActionType.UpdateDisplayName:
 					player.DisplayName = action.DisplayName;

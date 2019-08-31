@@ -58,6 +58,8 @@ public class PlayerInfoPacket : Packet
 									{
 										prop.Signature = PacketReader.ReadString(reader);
 									}
+
+									action.Properties[i] = prop;
 								}
 
 								action.GameMode = (GameMode)PacketReader.ReadVarInt(reader);
@@ -116,6 +118,11 @@ public class PlayerInfoPacket : Packet
 		public string Value { get; set; }
 		public bool Signed { get; set; }
 		public string Signature { get; set; }
+
+		public override string ToString()
+		{
+			return $"{Name}: {Value}";
+		}
 	}
 
 	public enum ActionType
