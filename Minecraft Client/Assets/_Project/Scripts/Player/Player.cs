@@ -53,6 +53,6 @@ public class PlayerSkinUpdatedEventArgs : EventArgs
 /// </summary>
 public class PlayerSkinData
 {
-	public Texture2D Skin { get; set; }
+	public Texture2D Body { get; set; }
 	public Texture2D Cape { get; set; }
 }

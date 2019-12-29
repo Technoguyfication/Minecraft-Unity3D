@@ -4,6 +4,10 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 /// <summary>
 /// Used for communicating with mojang's servers.
@@ -181,6 +185,57 @@ public static class MojangAPI
 		}
 
 		return status;
+	}
+
+	/// <summary>
+	/// Gets the skin data for a player from a profile skin and cape response object
+	/// https://wiki.vg/Mojang_API#UUID_-.3E_Profile_.2B_Skin.2FCape
+	/// </summary>
+	/// <param name="textureData"></param>
+	/// <returns></returns>
+	public static async PlayerSkinData GetPlayerSkin(JObject textureData)
+	{
+		string bodyUrl = textureData["BODY"]["url"].ToString();
+		string capeUrl = string.Empty;
+
+		// try and load cape url if it is included in JSON
+		if (textureData.TryGetValue("CAPE", out JToken capeToken))
+		{
+			try
+			{
+				capeUrl = capeToken["url"].ToString();
+			}
+			catch (JsonException)
+			{
+				// malformed cape JSON can be ignored
+				Debug.LogWarning($"Malformed cape JSON from server: {capeToken.ToString()}");
+			}
+		}
+
+		var skinData = new PlayerSkinData();
+
+		// get skin data
+		using (var httpClient = new HttpClient())
+		{
+			// get body data
+			var bodyResponse = await httpClient.GetAsync(bodyUrl);
+			bodyResponse.EnsureSuccessStatusCode();
+			byte[] bodyRawData = await bodyResponse.Content.ReadAsByteArrayAsync();
+			skinData.Body = new Texture2D(0, 0);    // size doesn't matter since loading image will replace size
+			skinData.Body.LoadImage(bodyRawData);
+
+			// load cape if it exists
+			if (!string.IsNullOrEmpty(capeUrl))
+			{
+				var capeResponse = await httpClient.GetAsync(capeUrl);
+				capeResponse.EnsureSuccessStatusCode();
+				byte[] capeRawData = await capeResponse.Content.ReadAsByteArrayAsync();
+				skinData.Cape = new Texture2D(0, 0);
+				skinData.Cape.LoadImage(capeRawData);
+			}
+		}
+
+		return skinData;
 	}
 
 	/// <summary>
