@@ -7,6 +7,3 @@
 *.meta linguist-generated
 *.prefab linguist-generated
 *.unity linguist-generated
-
-# Vendored code
-/Minecraft[[:space:]]Client/Assets/TextMesh[[:space:]]Pro/** linguist-vendored
