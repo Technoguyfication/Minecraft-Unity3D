@@ -193,7 +193,7 @@ public static class MojangAPI
 	/// </summary>
 	/// <param name="textureData"></param>
 	/// <returns></returns>
-	public static async PlayerSkinData GetPlayerSkin(JObject textureData)
+	public static async Task<PlayerSkinData> GetPlayerSkin(JObject textureData)
 	{
 		string bodyUrl = textureData["BODY"]["url"].ToString();
 		string capeUrl = string.Empty;
